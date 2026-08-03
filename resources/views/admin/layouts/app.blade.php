@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
-    <title>@yield('judul', 'Panel Admin') — {{ config('app.name') }}</title>
+    <title>@yield('judul', 'Panel Admin') — {{ $desa->nama_desa }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="h-full bg-slate-100 text-slate-800" x-data="{ sidebarTerbuka: false }">
@@ -14,8 +14,18 @@
            :class="sidebarTerbuka && 'translate-x-0'">
 
         <div class="flex h-16 items-center gap-3 border-b border-slate-800 px-5">
-            <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-600 font-bold text-white">D</div>
-            <span class="truncate font-semibold text-white">Panel Admin</span>
+            @if (filled($desa->logo))
+                <img src="{{ $desa->urlLogo() }}" alt="Logo {{ $desa->nama_desa }}"
+                     class="h-9 w-9 shrink-0 rounded-lg object-cover">
+            @else
+                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-emerald-600 font-bold text-white">
+                    {{ mb_strtoupper(mb_substr($desa->nama_desa, 0, 1)) }}
+                </div>
+            @endif
+            <div class="min-w-0">
+                <p class="truncate text-sm font-semibold text-white">{{ $desa->nama_desa }}</p>
+                <p class="text-xs text-slate-400">Panel Admin</p>
+            </div>
         </div>
 
         <nav class="space-y-1 px-3 py-4 text-sm">
@@ -29,7 +39,14 @@
                 Dashboard
             </a>
 
-            {{-- Menu berikut ditambahkan saat fitur terkait dikerjakan (04–13). --}}
+            {{-- Menu data & konten ditambahkan saat fitur terkait dikerjakan (04–13). --}}
+            <p class="px-3 pt-5 pb-2 text-xs font-semibold tracking-wider text-slate-500 uppercase">Desa</p>
+
+            <a href="{{ route('admin.pengaturan') }}"
+               class="{{ request()->routeIs('admin.pengaturan*') ? $tautanAktif : $tautanBiasa }}">
+                Pengaturan Desa
+            </a>
+
             <p class="px-3 pt-5 pb-2 text-xs font-semibold tracking-wider text-slate-500 uppercase">Akun</p>
 
             <a href="{{ route('admin.kata-sandi') }}"

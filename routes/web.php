@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\PasswordController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\PengaturanDesaController;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +35,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // admin mengganti kata sandi (fitur 01).
     Route::middleware(['auth:admin', AuthenticateSession::class, 'sesi.segar', 'tanpa.cache'])->group(function () {
         Route::get('/', DashboardController::class)->name('dashboard');
+
+        // Pengaturan desa — satu halaman, lima bagian dengan simpan terpisah.
+        Route::get('pengaturan', [PengaturanDesaController::class, 'tampilkan'])->name('pengaturan');
+        Route::put('pengaturan/{bagian}', [PengaturanDesaController::class, 'perbarui'])
+            ->name('pengaturan.perbarui');
 
         Route::get('kata-sandi', [PasswordController::class, 'tampilkan'])->name('kata-sandi');
         Route::put('kata-sandi', [PasswordController::class, 'perbarui'])->name('kata-sandi.perbarui');

@@ -161,6 +161,20 @@ Perintah ini sengaja tidak menghapus apa pun secara otomatis. Menghapus berdasar
 
 ---
 
+## Identitas Desa
+
+Nama desa, logo, visi-misi, kontak, dan peta **tidak pernah ditulis di dalam kode**. Semuanya berasal dari satu baris pada tabel `pengaturan_desa`, diatur admin lewat **Panel Admin → Pengaturan Desa**, dan tersedia di seluruh tampilan sebagai variabel `$desa`.
+
+Halaman pengaturan terbagi lima bagian dengan tombol simpan masing-masing, sehingga menyunting kontak tidak berisiko menimpa profil.
+
+### Kode peta Google Maps
+
+Admin cukup menempelkan kode embed dari Google Maps (Bagikan → Sematkan peta → Salin HTML). Yang **disimpan hanya alamat `src`-nya**, setelah dipastikan berasal dari domain Google Maps dan memakai `https`. Peta kemudian dirender ulang oleh aplikasi di dalam iframe yang atributnya ditentukan sistem.
+
+Ini disengaja: menyimpan lalu menampilkan ulang HTML mentah dari admin akan menjadikan kolom itu celah XSS di setiap halaman publik. Ada 7 kasus uji yang memastikan skrip, iframe dari domain lain, `javascript:` URI, dan URL non-https ditolak.
+
+---
+
 ## Deployment ke Shared Hosting cPanel
 
 Batasan yang mengikat desain aplikasi ada di [PRD §8](PRD.md). Ringkasnya:
@@ -179,7 +193,7 @@ Batasan yang mengikat desain aplikasi ada di [PRD §8](PRD.md). Ringkasnya:
 |---|---|---|
 | 1 | 01 Autentikasi Admin | Selesai |
 | 1 | 02 Integrasi Penyimpanan R2 | Selesai — berjalan di disk lokal, tinggal isi kredensial R2 |
-| 1 | 03 Pengaturan & Identitas Desa | Belum |
+| 1 | 03 Pengaturan & Identitas Desa | Selesai |
 | 2 | 04–07 Data penduduk, rekap KK, statistik, ekspor | Belum |
 | 3 | 08–13 Konten desa | Belum |
 | 4 | 14–15 Etalase publik | Belum |

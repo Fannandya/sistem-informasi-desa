@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
-    <title>Masuk Panel Admin — {{ config('app.name') }}</title>
+    <title>Masuk Panel Admin — {{ $desa->nama_desa }}</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="h-full bg-slate-100 text-slate-800">
@@ -13,11 +13,16 @@
         <div class="w-full max-w-sm">
 
             <div class="mb-8 text-center">
-                <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 text-2xl font-bold text-white">
-                    D
-                </div>
+                @if (filled($desa->logo))
+                    <img src="{{ $desa->urlLogo() }}" alt="Logo {{ $desa->nama_desa }}"
+                         class="mx-auto mb-4 h-14 w-14 rounded-2xl object-cover">
+                @else
+                    <div class="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 text-2xl font-bold text-white">
+                        {{ mb_strtoupper(mb_substr($desa->nama_desa, 0, 1)) }}
+                    </div>
+                @endif
                 <h1 class="text-xl font-semibold text-slate-900">Panel Admin Desa</h1>
-                <p class="mt-1 text-sm text-slate-500">{{ config('app.name') }}</p>
+                <p class="mt-1 text-sm text-slate-500">{{ $desa->nama_desa }}</p>
             </div>
 
             @if (session('status'))
