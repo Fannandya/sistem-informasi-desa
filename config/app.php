@@ -65,7 +65,14 @@ return [
     |
     */
 
-    'timezone' => 'UTC',
+    /*
+     * Skeleton Laravel mengunci nilai ini ke 'UTC' dan tidak membaca .env.
+     * Untuk aplikasi desa di Indonesia itu keliru: antara pukul 00.00–07.00
+     * WIB, "hari ini" menurut server masih tanggal kemarin. Akibatnya admin
+     * yang memilih tanggal hari ini dari date picker akan ditolak validasi
+     * `before_or_equal:today` dengan pesan "tidak boleh melewati hari ini".
+     */
+    'timezone' => env('APP_TIMEZONE', 'UTC'),
 
     /*
     |--------------------------------------------------------------------------

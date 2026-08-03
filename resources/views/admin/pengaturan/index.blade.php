@@ -49,11 +49,7 @@
         </nav>
     </div>
 
-    @if ($errors->any())
-        <div class="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            Ada isian yang perlu diperbaiki. Periksa kembali kolom yang ditandai.
-        </div>
-    @endif
+    {{-- Ringkasan kesalahan sudah ditampilkan x-admin.notifikasi di layout. --}}
 
     {{-- ============================ IDENTITAS ============================ --}}
     <section x-show="bagian === 'identitas'" x-cloak

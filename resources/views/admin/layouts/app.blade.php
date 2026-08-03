@@ -39,7 +39,29 @@
                 Dashboard
             </a>
 
-            {{-- Menu data & konten ditambahkan saat fitur terkait dikerjakan (04–13). --}}
+            <p class="px-3 pt-5 pb-2 text-xs font-semibold tracking-wider text-slate-500 uppercase">Kependudukan</p>
+
+            <a href="{{ route('admin.penduduk.index') }}"
+               class="{{ request()->routeIs('admin.penduduk.index', 'admin.penduduk.create', 'admin.penduduk.edit') ? $tautanAktif : $tautanBiasa }}">
+                Data Warga
+            </a>
+
+            <a href="{{ route('admin.penduduk.arsip') }}"
+               class="{{ request()->routeIs('admin.penduduk.arsip') ? $tautanAktif : $tautanBiasa }}">
+                Arsip Warga
+            </a>
+
+            <a href="{{ route('admin.wilayah.index') }}"
+               class="{{ request()->routeIs('admin.wilayah.*') ? $tautanAktif : $tautanBiasa }}">
+                Wilayah
+            </a>
+
+            <a href="{{ route('admin.pekerjaan.index') }}"
+               class="{{ request()->routeIs('admin.pekerjaan.*') ? $tautanAktif : $tautanBiasa }}">
+                Pekerjaan
+            </a>
+
+            {{-- Menu konten publik ditambahkan saat fitur terkait dikerjakan (08–13). --}}
             <p class="px-3 pt-5 pb-2 text-xs font-semibold tracking-wider text-slate-500 uppercase">Desa</p>
 
             <a href="{{ route('admin.pengaturan') }}"
@@ -95,15 +117,12 @@
         </header>
 
         <main class="p-4 sm:p-6">
-            @if (session('status'))
-                <div class="mb-5 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
-                    {{ session('status') }}
-                </div>
-            @endif
+            <x-admin.notifikasi />
 
             @yield('konten')
         </main>
     </div>
 
+    @stack('skrip')
 </body>
 </html>

@@ -2,8 +2,12 @@
 
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\PasswordController;
+use App\Http\Controllers\Admin\ArsipPendudukController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\PendudukController;
 use App\Http\Controllers\Admin\PengaturanDesaController;
+use App\Http\Controllers\Admin\RefPekerjaanController;
+use App\Http\Controllers\Admin\WilayahController;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +39,37 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // admin mengganti kata sandi (fitur 01).
     Route::middleware(['auth:admin', AuthenticateSession::class, 'sesi.segar', 'tanpa.cache'])->group(function () {
         Route::get('/', DashboardController::class)->name('dashboard');
+
+        // --- Data penduduk ---
+        Route::get('penduduk', [PendudukController::class, 'index'])->name('penduduk.index');
+        Route::get('penduduk/tambah', [PendudukController::class, 'create'])->name('penduduk.create');
+        Route::post('penduduk', [PendudukController::class, 'store'])->name('penduduk.store');
+
+        // Arsip didaftarkan sebelum rute {penduduk} agar "arsip" tidak
+        // ditangkap sebagai ID warga.
+        Route::get('penduduk/arsip', [ArsipPendudukController::class, 'index'])->name('penduduk.arsip');
+        Route::post('penduduk/arsip/{id}/pulihkan', [ArsipPendudukController::class, 'pulihkan'])
+            ->name('penduduk.pulihkan');
+
+        // withTrashed() disengaja: tanpa itu membuka halaman ubah milik warga
+        // terarsip menghasilkan 404 polos. Dengan ini controller bisa
+        // menjelaskan bahwa datanya harus dipulihkan lebih dulu.
+        Route::get('penduduk/{penduduk}/ubah', [PendudukController::class, 'edit'])
+            ->withTrashed()->name('penduduk.edit');
+        Route::put('penduduk/{penduduk}', [PendudukController::class, 'update'])
+            ->withTrashed()->name('penduduk.update');
+        Route::delete('penduduk/{penduduk}', [PendudukController::class, 'arsipkan'])->name('penduduk.arsipkan');
+
+        // --- Data referensi ---
+        Route::get('wilayah', [WilayahController::class, 'index'])->name('wilayah.index');
+        Route::post('wilayah', [WilayahController::class, 'store'])->name('wilayah.store');
+        Route::put('wilayah/{wilayah}', [WilayahController::class, 'update'])->name('wilayah.update');
+        Route::delete('wilayah/{wilayah}', [WilayahController::class, 'destroy'])->name('wilayah.destroy');
+
+        Route::get('pekerjaan', [RefPekerjaanController::class, 'index'])->name('pekerjaan.index');
+        Route::post('pekerjaan', [RefPekerjaanController::class, 'store'])->name('pekerjaan.store');
+        Route::put('pekerjaan/{pekerjaan}', [RefPekerjaanController::class, 'update'])->name('pekerjaan.update');
+        Route::delete('pekerjaan/{pekerjaan}', [RefPekerjaanController::class, 'destroy'])->name('pekerjaan.destroy');
 
         // Pengaturan desa — satu halaman, lima bagian dengan simpan terpisah.
         Route::get('pengaturan', [PengaturanDesaController::class, 'tampilkan'])->name('pengaturan');
