@@ -22,3 +22,9 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Composer terpasang lokal di folder proyek, bukan bagian dari kode
+/composer.phar
+
+# Pengaturan lokal Claude Code, spesifik per mesin
+/.claude/settings.local.json

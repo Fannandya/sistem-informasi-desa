@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Belum ada foto">
+  <rect width="400" height="300" fill="#f1f5f9"/>
+  <g fill="none" stroke="#94a3b8" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"
+     transform="translate(200 138) scale(2.6) translate(-24 -24)">
+    <path d="M8 20l16-12 16 12v20a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2z"/><path d="M19 42V27h10v15"/>
+  </g>
+  <text x="200" y="248" text-anchor="middle" font-family="system-ui,sans-serif"
+        font-size="16" fill="#94a3b8">Belum ada foto</text>
+</svg>

@@ -47,16 +47,29 @@ return [
             'report' => false,
         ],
 
-        's3' => [
+        /*
+         * Cloudflare R2 (S3-compatible) — PRD 7.
+         *
+         * Selama kredensial belum diisi, aplikasi memakai disk `public`
+         * (lihat config/unggahan.php). Berpindah ke R2 cukup mengisi variabel
+         * R2_* di .env lalu mengubah UPLOAD_DISK=r2 — tidak ada kode yang
+         * perlu disentuh, karena seluruh unggahan lewat LayananUnggahGambar.
+         *
+         * Catatan R2:
+         * - region wajib 'auto'
+         * - use_path_style_endpoint wajib true
+         */
+        'r2' => [
             'driver' => 's3',
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'region' => env('AWS_DEFAULT_REGION'),
-            'bucket' => env('AWS_BUCKET'),
-            'url' => env('AWS_URL'),
-            'endpoint' => env('AWS_ENDPOINT'),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
-            'throw' => false,
+            'key' => env('R2_ACCESS_KEY_ID'),
+            'secret' => env('R2_SECRET_ACCESS_KEY'),
+            'region' => 'auto',
+            'bucket' => env('R2_BUCKET'),
+            'url' => env('R2_URL'),
+            'endpoint' => env('R2_ENDPOINT'),
+            'use_path_style_endpoint' => true,
+            'visibility' => 'public',
+            'throw' => true,
             'report' => false,
         ],
 

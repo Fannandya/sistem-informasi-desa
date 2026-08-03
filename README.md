@@ -99,19 +99,65 @@ Tes berjalan di atas SQLite in-memory, jadi tidak menyentuh database MySQL Anda.
 
 ---
 
-## Cloudflare R2
+## Penyimpanan Gambar
 
-Belum aktif — dikerjakan pada [fitur 02](features/02-integrasi-penyimpanan-r2.md). Variabel yang perlu diisi di `.env`:
+Seluruh unggahan gambar melewati satu layanan, `App\Services\LayananUnggahGambar`. Tidak ada fitur yang boleh memanggil `Storage::` langsung untuk gambar — aturan format, ukuran, kompresi, penamaan, dan folder ditetapkan sekali di [`config/unggahan.php`](config/unggahan.php).
 
-```
-R2_ACCESS_KEY_ID=
-R2_SECRET_ACCESS_KEY=
-R2_BUCKET=
+Yang dilakukan layanan ini pada setiap gambar masuk:
+
+| Langkah | Perilaku |
+|---|---|
+| Validasi | jpg / jpeg / png / webp, maksimal 4 MB |
+| Penamaan | diacak 32 karakter — nama berkas asli dari perangkat admin tidak pernah bocor ke URL |
+| Ukuran | dikecilkan ke lebar maks 1600 px; gambar yang sudah kecil tidak diperbesar |
+| Format | dikonversi ke WebP kualitas 82 |
+| Thumbnail | dibuat otomatis di `{folder}/thumb/`, lebar 400 px, untuk daftar dan kartu |
+| Penggantian | gambar baru disimpan **lebih dulu**, gambar lama dihapus setelah berhasil |
+
+Data tanpa foto tidak error — layanan mengembalikan gambar pengganti dari `public/images/placeholder/`.
+
+### Beralih ke Cloudflare R2
+
+Aplikasi saat ini memakai disk lokal (`storage/app/public`). Berpindah ke R2 **tidak memerlukan perubahan kode sama sekali** — cukup `.env`:
+
+```dotenv
+UPLOAD_DISK=r2
+
+R2_ACCESS_KEY_ID=<access key dari R2 API Token>
+R2_SECRET_ACCESS_KEY=<secret key dari R2 API Token>
+R2_BUCKET=<nama bucket>
 R2_ENDPOINT=https://<account-id>.r2.cloudflarestorage.com
 R2_URL=https://<domain-publik-bucket>
 ```
 
-Seluruh unggahan gambar wajib masuk ke R2, bukan ke penyimpanan lokal server.
+Langkah menyiapkan bucket di dashboard Cloudflare:
+
+1. **R2 → Create bucket**, beri nama, pilih lokasi terdekat (mis. APAC).
+2. Buka bucket → **Settings → Public access** → aktifkan akses publik, atau sambungkan domain kustom. Alamat yang muncul itulah `R2_URL`.
+3. **R2 → Manage API Tokens → Create API Token**, beri izin **Object Read & Write** terbatas pada bucket tersebut. Salin Access Key dan Secret Key — keduanya hanya ditampilkan sekali.
+4. `R2_ENDPOINT` memakai Account ID Anda, bukan nama bucket.
+
+Setelah `.env` diisi, pastikan koneksinya benar sebelum mengunggah apa pun:
+
+```bash
+php artisan config:clear
+php artisan unggahan:uji
+```
+
+Perintah itu menulis satu berkas uji, membacanya kembali, menampilkan URL publiknya, lalu menghapusnya. Bila ada variabel yang belum diisi, perintah berhenti dan menyebut variabel mana yang kurang.
+
+> Konfigurasi R2 sudah diatur benar di `config/filesystems.php`: `region` wajib `auto` dan `use_path_style_endpoint` wajib `true`. Keduanya adalah sumber galat tersering saat memakai R2 lewat driver S3.
+
+### Berkas yatim
+
+Gambar ikut terhapus otomatis saat datanya dihapus. Untuk memeriksa berkas yang tertinggal — misalnya akibat gangguan jaringan saat penghapusan:
+
+```bash
+php artisan unggahan:berkas-yatim            # hanya melaporkan
+php artisan unggahan:berkas-yatim --hapus    # menghapus setelah konfirmasi
+```
+
+Perintah ini sengaja tidak menghapus apa pun secara otomatis. Menghapus berdasarkan selisih database–penyimpanan berisiko: satu bug pembacaan bisa memusnahkan seluruh foto desa.
 
 ---
 
@@ -132,7 +178,7 @@ Batasan yang mengikat desain aplikasi ada di [PRD §8](PRD.md). Ringkasnya:
 | Fase | Fitur | Status |
 |---|---|---|
 | 1 | 01 Autentikasi Admin | Selesai |
-| 1 | 02 Integrasi Penyimpanan R2 | Belum |
+| 1 | 02 Integrasi Penyimpanan R2 | Selesai — berjalan di disk lokal, tinggal isi kredensial R2 |
 | 1 | 03 Pengaturan & Identitas Desa | Belum |
 | 2 | 04–07 Data penduduk, rekap KK, statistik, ekspor | Belum |
 | 3 | 08–13 Konten desa | Belum |

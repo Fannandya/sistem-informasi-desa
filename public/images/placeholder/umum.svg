@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Belum ada gambar">
+  <rect width="400" height="300" fill="#f1f5f9"/>
+  <g fill="none" stroke="#94a3b8" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"
+     transform="translate(200 138) scale(2.6) translate(-24 -24)">
+    <rect x="6" y="8" width="36" height="30" rx="4"/><circle cx="17" cy="19" r="4"/><path d="M8 34l10-10 7 7 5-5 8 8"/>
+  </g>
+  <text x="200" y="248" text-anchor="middle" font-family="system-ui,sans-serif"
+        font-size="16" fill="#94a3b8">Belum ada gambar</text>
+</svg>
