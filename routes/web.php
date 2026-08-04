@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\PasswordController;
 use App\Http\Controllers\Admin\ArsipPendudukController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\EksporPendudukController;
 use App\Http\Controllers\Admin\ImporPendudukController;
 use App\Http\Controllers\Admin\PendudukController;
 use App\Http\Controllers\Admin\PengaturanDesaController;
@@ -47,6 +48,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('penduduk', [PendudukController::class, 'index'])->name('penduduk.index');
         Route::get('penduduk/tambah', [PendudukController::class, 'create'])->name('penduduk.create');
         Route::post('penduduk', [PendudukController::class, 'store'])->name('penduduk.store');
+
+        Route::get('penduduk/ekspor', EksporPendudukController::class)->name('penduduk.ekspor');
 
         Route::get('penduduk/impor', [ImporPendudukController::class, 'tampilkan'])->name('penduduk.impor');
         Route::get('penduduk/impor/contoh', [ImporPendudukController::class, 'contoh'])->name('penduduk.impor.contoh');

@@ -15,6 +15,8 @@
         </div>
 
         <div class="flex items-center gap-2">
+            <x-admin.tombol-ekspor :pencarian="$pencarian" :ada-saringan="$pencarian->adaFilter()" />
+
             <a href="{{ route('admin.penduduk.impor') }}"
                class="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
                 Impor

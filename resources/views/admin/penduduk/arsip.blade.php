@@ -10,10 +10,14 @@
         jumlah penduduk. Datanya tetap tersimpan dan dapat dipulihkan kapan saja.
     </div>
 
-    <p class="text-sm text-slate-600">
-        <span class="font-semibold text-slate-900">{{ number_format($daftar->total(), 0, ',', '.') }}</span>
-        data terarsip{{ $pencarian->adaFilter() ? ' cocok dengan saringan' : '' }}
-    </p>
+    <div class="flex flex-wrap items-center justify-between gap-3">
+        <p class="text-sm text-slate-600">
+            <span class="font-semibold text-slate-900">{{ number_format($daftar->total(), 0, ',', '.') }}</span>
+            data terarsip{{ $pencarian->adaFilter() ? ' cocok dengan saringan' : '' }}
+        </p>
+
+        <x-admin.tombol-ekspor :pencarian="$pencarian" arsip :ada-saringan="$pencarian->adaFilter()" />
+    </div>
 
     {{-- Saringan --}}
     <form method="GET" action="{{ route('admin.penduduk.arsip') }}"

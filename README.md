@@ -210,6 +210,17 @@ Warga yang keluar dari daftar aktif diarsipkan beserta sebabnya, dan dapat dipul
 - Baris yang gagal dilaporkan beserta nomor barisnya di berkas asli dan alasannya, sehingga bisa diperbaiki lalu diunggah ulang.
 - Seluruh proses berjalan dalam satu transaksi: impor yang gagal di tengah jalan tidak meninggalkan separuh data.
 
+### Ekspor
+
+Tombol **Ekspor** di halaman Data Warga dan Arsip Warga, dengan pilihan `.xlsx` atau `.csv`.
+
+- Berkas berisi **persis data yang tampil di layar** — saringan yang aktif ikut terbawa.
+- Nama berkas mencerminkan saringannya (`desa-sukamaju-data-warga-krajan-jenis-kelamin-l-2026-08-04.csv`), supaya beberapa hasil ekspor tidak tertukar di folder unduhan.
+- Kolom ditetapkan eksplisit, bukan diambil dari kolom tabel. Menambah kolom pada tabel `penduduk` kelak **tidak** membuat kolom itu ikut terekspor dengan sendirinya.
+- Umur keluar sebagai angka; **tanggal lahir tidak pernah ikut**.
+- CSV memakai BOM UTF-8 agar nama beraksen tidak rusak saat dibuka di Excel Windows.
+- Di atas 10.000 baris, format `.xlsx` ditolak dengan saran memakai `.csv` — pada shared hosting `.xlsx` menghabiskan memori dan waktu eksekusi.
+
 **Deteksi ganda.** Tanpa NIK atau nomor KK tidak ada kunci unik yang benar-benar pasti. Sistem memakai kombinasi **nama + tanggal lahir + wilayah** — petunjuk terkuat yang tersedia, tetapi bukan kepastian. Baris yang dilewati ditampilkan agar admin bisa memeriksanya, dan deteksi ini bisa dimatikan bila desa memang punya dua warga dengan ketiga data itu sama.
 
 ---
@@ -254,6 +265,6 @@ Batasan yang mengikat desain aplikasi ada di [PRD §8](PRD.md). Ringkasnya:
 | 2 | 04 Data Penduduk | Selesai |
 | 2 | 05 Rekap KK per Wilayah | Selesai |
 | 2 | 06 Statistik Warga (dashboard) | Selesai |
-| 2 | 07 Ekspor Data Penduduk | Belum |
+| 2 | 07 Ekspor Data Penduduk | Selesai |
 | 3 | 08–13 Konten desa | Belum |
 | 4 | 14–15 Etalase publik | Belum |
