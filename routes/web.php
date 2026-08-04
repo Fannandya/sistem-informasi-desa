@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\PendudukController;
 use App\Http\Controllers\Admin\PengaturanDesaController;
 use App\Http\Controllers\Admin\RefPekerjaanController;
 use App\Http\Controllers\Admin\RekapKkController;
+use App\Http\Controllers\Admin\StatistikController;
 use App\Http\Controllers\Admin\WilayahController;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Facades\Route;
@@ -65,6 +66,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('penduduk/{penduduk}', [PendudukController::class, 'update'])
             ->withTrashed()->name('penduduk.update');
         Route::delete('penduduk/{penduduk}', [PendudukController::class, 'arsipkan'])->name('penduduk.arsipkan');
+
+        // --- Data grafik dashboard (JSON internal, bukan API publik) ---
+        Route::prefix('statistik')->name('statistik.')->group(function () {
+            Route::get('sebaran-umur', [StatistikController::class, 'sebaranUmur'])->name('umur');
+            Route::get('rasio-gender', [StatistikController::class, 'rasioGender'])->name('gender');
+            Route::get('mata-pencaharian', [StatistikController::class, 'mataPencaharian'])->name('pekerjaan');
+            Route::get('pendidikan', [StatistikController::class, 'pendidikan'])->name('pendidikan');
+            Route::get('sebaran-wilayah', [StatistikController::class, 'sebaranWilayah'])->name('wilayah');
+            Route::get('tren-mutasi', [StatistikController::class, 'trenMutasi'])->name('tren');
+        });
 
         // --- Rekap KK ---
         Route::get('rekap-kk', [RekapKkController::class, 'index'])->name('rekap-kk.index');

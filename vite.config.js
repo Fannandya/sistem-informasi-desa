@@ -5,7 +5,14 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/css/app.css', 'resources/js/app.js'],
+            input: [
+                'resources/css/app.css',
+                'resources/js/app.js',
+                // Entry terpisah supaya Chart.js hanya diunduh pada halaman
+                // yang benar-benar menampilkan grafik, bukan di setiap
+                // halaman admin dan publik.
+                'resources/js/grafik.js',
+            ],
             refresh: true,
         }),
         tailwindcss(),

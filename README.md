@@ -253,6 +253,7 @@ Batasan yang mengikat desain aplikasi ada di [PRD §8](PRD.md). Ringkasnya:
 | 1 | 03 Pengaturan & Identitas Desa | Selesai |
 | 2 | 04 Data Penduduk | Selesai |
 | 2 | 05 Rekap KK per Wilayah | Selesai |
-| 2 | 06–07 Statistik warga, ekspor | Belum |
+| 2 | 06 Statistik Warga (dashboard) | Selesai |
+| 2 | 07 Ekspor Data Penduduk | Belum |
 | 3 | 08–13 Konten desa | Belum |
 | 4 | 14–15 Etalase publik | Belum |

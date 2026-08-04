@@ -33,8 +33,7 @@
                 <p class="mt-1 text-xs text-slate-400">data tahun {{ $kk->tahunAcuan() }}</p>
 
                 @if (! $kk->lengkap())
-                    {{-- PRD 2.9: penanda ini hanya muncul di panel admin,
-                         tidak ditampilkan ke publik. --}}
+                    {{-- PRD 2.9: penanda ini hanya di panel admin, tidak publik. --}}
                     <a href="{{ route('admin.rekap-kk.index', ['tahun' => $kk->tahunAcuan()]) }}"
                        class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-1
                               text-xs font-medium text-amber-800 transition hover:bg-amber-200">
@@ -77,13 +76,149 @@
         </p>
     @endif
 
-    {{-- ------------------------- Grafik (fitur 06) ------------------------- --}}
-    <div class="rounded-2xl border border-dashed border-slate-300 bg-white/50 px-6 py-12 text-center">
-        <p class="font-medium text-slate-700">Grafik demografi menyusul</p>
-        <p class="mx-auto mt-1 max-w-md text-sm text-slate-500">
-            Sebaran umur, rasio gender, mata pencaharian, sebaran wilayah, dan tren
-            kelahiran–kematian akan muncul di sini pada fitur 06.
-        </p>
+    {{-- ---------------------------- Grafik ---------------------------- --}}
+    <div class="grid gap-5 lg:grid-cols-3">
+        <x-admin.kartu-grafik judul="Sebaran Umur" kanvas="grafikUmur" class="lg:col-span-2"
+                              keterangan="Dihitung dari tanggal lahir terhadap hari ini, jadi ikut bergeser sendiri seiring waktu." />
+
+        <x-admin.kartu-grafik judul="Rasio Gender" kanvas="grafikGender" />
+    </div>
+
+    <div class="grid gap-5 lg:grid-cols-2">
+        <x-admin.kartu-grafik judul="Mata Pencaharian" kanvas="grafikPekerjaan" tinggi="h-96"
+                              keterangan="Sepuluh terbanyak; sisanya digabung sebagai Lainnya." />
+
+        <x-admin.kartu-grafik judul="Tingkat Pendidikan" kanvas="grafikPendidikan" tinggi="h-96" />
+    </div>
+
+    <x-admin.kartu-grafik judul="Tren Kelahiran & Kematian" kanvas="grafikTren" tinggi="h-80"
+                          keterangan="Perpindahan penduduk ikut ditampilkan agar pertumbuhan desa terbaca utuh.">
+        <x-slot:aksi>
+            <select id="pilihTahunTren"
+                    class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs shadow-sm
+                           focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none">
+                <option value="5">5 tahun terakhir</option>
+                <option value="10">10 tahun terakhir</option>
+                <option value="15">15 tahun terakhir</option>
+            </select>
+        </x-slot:aksi>
+    </x-admin.kartu-grafik>
+
+    {{-- ----------------------- Sebaran wilayah ----------------------- --}}
+    <div class="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
+            <div>
+                <h2 class="text-sm font-semibold text-slate-900">Sebaran Per Wilayah</h2>
+                <p class="mt-0.5 text-xs text-slate-500">
+                    Wilayah yang belum punya warga tetap tampil dengan angka nol.
+                </p>
+            </div>
+            <div class="flex items-center gap-2">
+                <select id="pilihTingkatWilayah"
+                        class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs shadow-sm
+                               focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none">
+                    <option value="dusun">Per Dusun</option>
+                    <option value="rw">Per RW</option>
+                    <option value="rt">Per RT</option>
+                </select>
+                <button type="button" id="urutkanWilayah" data-urutan="desc"
+                        class="rounded-lg border border-slate-300 px-3 py-1.5 text-xs font-medium text-slate-700
+                               transition hover:bg-slate-50">
+                    Terbanyak &darr;
+                </button>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-slate-50 text-left text-xs tracking-wider text-slate-500 uppercase">
+                    <tr>
+                        <th class="px-5 py-3 font-semibold">Wilayah</th>
+                        <th class="px-5 py-3 text-right font-semibold">Warga</th>
+                        <th class="px-5 py-3 text-right font-semibold">KK</th>
+                        <th class="px-5 py-3 text-right font-semibold">Jiwa/KK</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelWilayah" class="divide-y divide-slate-100">
+                    <tr><td colspan="4" class="px-5 py-8 text-center text-sm text-slate-400">Memuat…</td></tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
+
+@push('skrip')
+@vite('resources/js/grafik.js')
+
+{{-- type="module" disengaja: @vite menghasilkan modul yang tertunda, dan
+     modul dieksekusi berurutan sesuai posisinya. Skrip biasa akan jalan lebih
+     dulu, saat window.Grafik belum sempat terdefinisi. --}}
+<script type="module">
+    const angka = (n) => new Intl.NumberFormat('id-ID').format(n);
+    const G = window.Grafik;
+
+    G.muat('grafikUmur', @js(route('admin.statistik.umur')), G.sebaranUmur);
+    G.muat('grafikGender', @js(route('admin.statistik.gender')), G.rasioGender);
+    G.muat('grafikPekerjaan', @js(route('admin.statistik.pekerjaan')), G.mataPencaharian);
+    G.muat('grafikPendidikan', @js(route('admin.statistik.pendidikan')), G.pendidikan);
+
+    // --- Tren, dengan pemilih rentang tahun ---
+    const muatTren = (tahun) =>
+        G.muat('grafikTren', `{{ route('admin.statistik.tren') }}?tahun=${tahun}`, G.trenMutasi);
+
+    muatTren(5);
+    document.getElementById('pilihTahunTren')?.addEventListener('change', (e) => muatTren(e.target.value));
+
+    // --- Tabel sebaran wilayah ---
+    const tbody = document.getElementById('tabelWilayah');
+    const pilihTingkat = document.getElementById('pilihTingkatWilayah');
+    const tombolUrut = document.getElementById('urutkanWilayah');
+
+    async function muatWilayah() {
+        const tingkat = pilihTingkat.value;
+        const urutan = tombolUrut.dataset.urutan;
+
+        tbody.innerHTML = '<tr><td colspan="4" class="px-5 py-8 text-center text-sm text-slate-400">Memuat…</td></tr>';
+
+        try {
+            const respons = await fetch(
+                `{{ route('admin.statistik.wilayah') }}?tingkat=${tingkat}&urutan=${urutan}`,
+                { headers: { Accept: 'application/json' } },
+            );
+            if (!respons.ok) throw new Error(`HTTP ${respons.status}`);
+
+            const { data } = await respons.json();
+
+            if (!data.length) {
+                tbody.innerHTML =
+                    '<tr><td colspan="4" class="px-5 py-8 text-center text-sm text-slate-500">Belum ada wilayah terdaftar.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map((b) => `
+                <tr class="hover:bg-slate-50">
+                    <td class="px-5 py-3 font-medium text-slate-900">${b.label}</td>
+                    <td class="px-5 py-3 text-right tabular-nums text-slate-700">${angka(b.jumlah_warga)}</td>
+                    <td class="px-5 py-3 text-right tabular-nums ${b.jumlah_kk ? 'text-slate-700' : 'text-slate-300'}">${b.jumlah_kk ? angka(b.jumlah_kk) : '—'}</td>
+                    <td class="px-5 py-3 text-right tabular-nums ${b.jiwa_per_kk ? 'text-slate-700' : 'text-slate-300'}">${b.jiwa_per_kk ? b.jiwa_per_kk.toFixed(2).replace('.', ',') : '—'}</td>
+                </tr>
+            `).join('');
+        } catch (e) {
+            console.error('Gagal memuat sebaran wilayah:', e);
+            tbody.innerHTML =
+                '<tr><td colspan="4" class="px-5 py-8 text-center text-sm text-amber-700">Gagal memuat data wilayah.</td></tr>';
+        }
+    }
+
+    pilihTingkat.addEventListener('change', muatWilayah);
+    tombolUrut.addEventListener('click', () => {
+        const naik = tombolUrut.dataset.urutan === 'asc';
+        tombolUrut.dataset.urutan = naik ? 'desc' : 'asc';
+        tombolUrut.innerHTML = naik ? 'Terbanyak &darr;' : 'Tersedikit &uarr;';
+        muatWilayah();
+    });
+
+    muatWilayah();
+</script>
+@endpush
 @endsection
