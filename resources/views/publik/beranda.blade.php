@@ -14,33 +14,61 @@
 @section('konten')
 
 {{-- ============================== HERO ============================== --}}
-<section class="relative overflow-hidden bg-on-surface">
-    @if (filled($desa->foto_sampul))
-        <img src="{{ $desa->urlSampul() }}" alt=""
-             class="absolute inset-0 h-full w-full object-cover opacity-45">
+<section class="relative overflow-hidden bg-on-surface"
+         x-data="carousel()" x-init="init()">
+    {{-- Carousel images --}}
+    <div class="absolute inset-0 overflow-hidden">
+        @php $layanan = app(\App\Services\LayananUnggahGambar::class); @endphp
+        @forelse ($carousel as $item)
+            <img :src="@js($layanan->url($item->path))"
+                 alt="{{ $item->judul }}"
+                 x-show="currentIndex === {{ $loop->index }}"
+                 class="h-full w-full object-cover opacity-45 transition-opacity duration-1000">
+        @empty
+            @if (filled($desa->foto_sampul))
+                <img src="{{ $desa->urlSampul() }}" alt=""
+                     class="h-full w-full object-cover opacity-45">
+            @endif
+        @endforelse
+    </div>
+
+    {{-- Navigation indicators --}}
+    @if ($carousel->isNotEmpty())
+        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-2">
+            @foreach ($carousel as $item)
+                <button type="button"
+                        @click="goToSlide({{ $loop->index }})"
+                        :class="currentIndex === {{ $loop->index }}
+                            ? 'w-8 bg-white'
+                            : 'w-2 bg-white/50'"
+                        class="h-2 rounded-full transition-all duration-300"
+                        :aria-label="'Slide ' + {{ $loop->index + 1 }}">
+                </button>
+            @endforeach
+        </div>
     @endif
 
     <div class="relative mx-auto max-w-6xl px-4 py-24 sm:px-6 sm:py-32">
         <div class="max-w-2xl">
             @if ($desa->wilayahLengkap())
-                <p class="text-sm font-medium tracking-wider text-emerald-300 uppercase">
+                <p class="text-sm font-medium tracking-wider text-primary uppercase">
                     {{ $desa->wilayahLengkap() }}
                 </p>
             @endif
 
-            <h1 class="mt-3 text-4xl leading-tight font-semibold text-white sm:text-5xl">
+            <h1 class="mt-3 text-4xl leading-tight font-semibold text-white sm:text-5xl font-headline">
                 {{ Teks::ambil('beranda.hero.sapaan') }}<br>{{ $desa->nama_desa }}
             </h1>
 
             @if (filled($desa->meta_description) || filled($desa->visi))
-                <p class="mt-5 text-lg leading-relaxed text-slate-200">
+                <p class="mt-5 text-lg leading-relaxed text-on-surface/80">
                     {{ Str::limit($desa->meta_description ?: $desa->visi, Teks::angka('kuota.beranda.limit_sapaan')) }}
                 </p>
             @endif
 
             <div class="mt-8 flex flex-wrap gap-3">
                 <a href="{{ route('publik.profil') }}"
-                   class="rounded-[12px] bg-primary px-5 py-3 text-sm font-semibold text-white transition hover:bg-primary-fixed/200">
+                   class="rounded-[12px] bg-primary px-5 py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-fixed">
                     {{ Teks::ambil('beranda.hero.cta_profil') }}
                 </a>
                 <a href="#potensi"
@@ -51,6 +79,41 @@
         </div>
     </div>
 </section>
+
+@push('skrip')
+<script>
+function carousel() {
+    return {
+        currentIndex: 0,
+        autoplayInterval: null,
+        totalSlides: {{ $carousel->count() ?? 0 }},
+
+        init() {
+            if (this.totalSlides > 1) {
+                this.startAutoplay();
+                // Clear and restart autoplay on user interaction
+                this.$el.addEventListener('click', () => {
+                    clearInterval(this.autoplayInterval);
+                    this.startAutoplay();
+                });
+            }
+        },
+
+        startAutoplay() {
+            this.autoplayInterval = setInterval(() => {
+                this.currentIndex = (this.currentIndex + 1) % this.totalSlides;
+            }, 4000); // 4 seconds
+        },
+
+        goToSlide(index) {
+            this.currentIndex = index;
+            clearInterval(this.autoplayInterval);
+            this.startAutoplay();
+        }
+    };
+}
+</script>
+@endpush
 
 {{-- ============================ STATISTIK ============================ --}}
 <section id="statistik" class="border-b border-outline-variant bg-surface-container-low py-14">

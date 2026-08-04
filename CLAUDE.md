@@ -206,6 +206,18 @@ itu ikut berkurang.
 | POST | `admin/rekap-kk/{tahun}` | `admin.rekap-kk.simpan` | `RekapKkController::simpan` |
 | POST | `admin/rekap-kk/{tahun}/salin` | `admin.rekap-kk.salin` | `RekapKkController::salinTahunSebelumnya` |
 
+**Carousel Gambar Hero**
+
+| Method | URI | Nama | Aksi |
+|---|---|---|---|
+| GET | `admin/carousel` | `admin.carousel.index` | `CarouselImageController::index` |
+| GET | `admin/carousel/tambah` | `admin.carousel.create` | `CarouselImageController::create` |
+| POST | `admin/carousel` | `admin.carousel.store` | `CarouselImageController::store` |
+| GET | `admin/carousel/{carouselImage}/ubah` | `admin.carousel.edit` | `CarouselImageController::edit` |
+| PUT | `admin/carousel/{carouselImage}` | `admin.carousel.update` | `CarouselImageController::update` |
+| DELETE | `admin/carousel/{carouselImage}` | `admin.carousel.destroy` | `CarouselImageController::destroy` |
+| POST | `admin/carousel/{carouselImage}/geser` | `admin.carousel.geser` | `CarouselImageController::geser` |
+
 **Teks Tampilan**
 
 | Method | URI | Nama | Aksi |
@@ -335,6 +347,7 @@ Migrasi di `database/migrations/`, semua bertanggal `2026_08_04_*` kecuali bawaa
 | `..._000006_create_potensi_fasilitas_prestasi_tables` | `potensi_desa`, `fasilitas_umum`, `prestasi_desa` |
 | `..._000007_create_berita_dan_acara_tables` | `kategori_berita`, `berita_desa`, `acara_desa`, `foto_acara` |
 | `..._000008_create_teks_tampilan_table` | `teks_tampilan` |
+| `..._000226_create_carousel_images_table` | `carousel_images` |
 
 Tabel `password_reset_tokens` **sengaja tidak dibuat** (tidak ada reset sandi publik).
 
@@ -383,6 +396,10 @@ Unique `(wilayah_id, tahun)`.
 Berita & acara **sengaja dipisah** (PRD §3.1): berita = artikel teks berkategori
 dengan satu sampul; acara = kumpulan foto dengan narasi singkat. Nilai `status`
 dibuat identik agar logika penyaringan bisa dipakai ulang.
+
+**`carousel_images`** — `path`, `judul` (nullable), `deskripsi` (nullable), 
+`urutan`, `tampil`, `admin_id`. Gambar sampul hero section di beranda dengan
+auto-scroll 4 detik. Disaring tampil=true dan diurutkan urutan asc di halaman publik.
 
 **`teks_tampilan`** — CMS key-value untuk teks & kuota tampilan publik.
 `kunci` (unique), `nilai` (nullable — kosong berarti pakai default dari
@@ -685,6 +702,9 @@ Spesifikasi per fitur ada di `features/01-*.md` … `features/15-*.md`
 | `f66b887` | CMS Teks Tampilan: beranda, footer, menu, dan kuota dari admin panel |
 
 Seluruh 15 fitur PRD sudah selesai.
+
+**Fitur tambahan:**
+| `TBD` | Fitur 16 — Carousel Gambar Hero dengan Alpine.js auto-scroll (4 detik) |
 
 ---
 

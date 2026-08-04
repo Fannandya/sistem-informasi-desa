@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Publik;
 use App\Http\Controllers\Controller;
 use App\Models\AcaraDesa;
 use App\Models\BeritaDesa;
+use App\Models\CarouselImage;
 use App\Models\FasilitasUmum;
 use App\Models\Pengurus;
 use App\Models\PotensiDesa;
@@ -26,6 +27,8 @@ class BerandaController extends Controller
     public function __invoke(StatistikPublik $statistik): View
     {
         return view('publik.beranda', [
+            'carousel' => CarouselImage::tampil()->urut()->get(),
+
             'potensi' => PotensiDesa::query()->tampil()->urut()->take(Teks::angka('kuota.beranda.potensi'))->get(),
 
             'beritaUtama' => BeritaDesa::query()->terbit()->where('utama', true)->with('kategori')->first()

@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\RekapKkController;
 use App\Http\Controllers\Admin\StatistikController;
 use App\Http\Controllers\Admin\TeksTampilanController;
 use App\Http\Controllers\Admin\WilayahController;
+use App\Http\Controllers\Admin\CarouselImageController;
 use App\Http\Controllers\Publik\BerandaController;
 use App\Http\Controllers\Publik\BeritaController as BeritaPublikController;
 use App\Http\Controllers\Publik\SitemapController;
@@ -208,6 +209,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('pekerjaan', [RefPekerjaanController::class, 'store'])->name('pekerjaan.store');
         Route::put('pekerjaan/{pekerjaan}', [RefPekerjaanController::class, 'update'])->name('pekerjaan.update');
         Route::delete('pekerjaan/{pekerjaan}', [RefPekerjaanController::class, 'destroy'])->name('pekerjaan.destroy');
+
+        // --- Carousel gambar hero ---
+        Route::get('carousel', [CarouselImageController::class, 'index'])->name('carousel.index');
+        Route::get('carousel/tambah', [CarouselImageController::class, 'create'])->name('carousel.create');
+        Route::post('carousel', [CarouselImageController::class, 'store'])->name('carousel.store');
+        Route::get('carousel/{carouselImage}/ubah', [CarouselImageController::class, 'edit'])->name('carousel.edit');
+        Route::put('carousel/{carouselImage}', [CarouselImageController::class, 'update'])->name('carousel.update');
+        Route::delete('carousel/{carouselImage}', [CarouselImageController::class, 'destroy'])->name('carousel.destroy');
+        Route::post('carousel/{carouselImage}/geser', [CarouselImageController::class, 'geser'])->name('carousel.geser');
 
         // --- Teks tampilan (CMS beranda) ---
         Route::get('teks-tampilan', [TeksTampilanController::class, 'tampilkan'])->name('teks-tampilan.index');

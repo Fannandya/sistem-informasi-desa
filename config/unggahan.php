@@ -64,6 +64,7 @@ return [
         'prestasi' => 'prestasi',
         'berita' => 'berita',
         'acara' => 'acara',
+        'carousel' => 'carousel',
     ],
 
     /*

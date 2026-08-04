@@ -108,6 +108,11 @@
                 Galeri Acara
             </a>
 
+            <a href="{{ route('admin.carousel.index') }}"
+               class="{{ request()->routeIs('admin.carousel.*') ? $tautanAktif : $tautanBiasa }}">
+                Carousel Beranda
+            </a>
+
             <a href="{{ route('admin.teks-tampilan.index') }}"
                class="{{ request()->routeIs('admin.teks-tampilan.*') ? $tautanAktif : $tautanBiasa }}">
                 Teks Tampilan
