@@ -96,7 +96,11 @@
                                         <a href="{{ route('admin.acara.edit', $acara) }}"
                                            class="rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200">Ubah</a>
                                         <form method="POST" action="{{ route('admin.acara.destroy', $acara) }}"
-                                              onsubmit="return confirm('Hapus dokumentasi ini beserta {{ $acara->foto_count }} fotonya?')">
+                                              data-konfirmasi data-bahaya
+                                              data-judul="Hapus dokumentasi acara?"
+                                              data-pesan="{{ $acara->judul }} akan dihapus permanen beserta {{ $acara->foto_count }} fotonya."
+                                              data-catatan="Foto yang sudah terhapus tidak dapat dikembalikan."
+                                              data-tombol="Hapus Permanen">
                                             @csrf @method('DELETE')
                                             <button type="submit"
                                                     class="rounded-md px-2.5 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50">Hapus</button>

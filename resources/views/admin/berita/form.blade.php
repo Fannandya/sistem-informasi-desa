@@ -15,6 +15,7 @@
     <form method="POST"
           action="{{ $ubah ? route('admin.berita.update', $berita) : route('admin.berita.store') }}"
           enctype="multipart/form-data"
+          data-lacak-perubahan
           x-data="formBerita(@js($ubah ? 'berita-' . $berita->id : 'berita-baru'))"
           @submit="bersihkanDraf()"
           class="space-y-5 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">

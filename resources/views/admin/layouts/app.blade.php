@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow">
     <title>@yield('judul', 'Panel Admin') — {{ $desa->nama_desa }}</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @vite(['resources/css/app.css', 'resources/js/app.js', 'resources/js/dialog.js'])
 </head>
 <body class="h-full bg-slate-100 text-slate-800" x-data="{ sidebarTerbuka: false }">
 
@@ -162,6 +162,8 @@
             @yield('konten')
         </main>
     </div>
+
+    <x-admin.pusat-dialog />
 
     @stack('skrip')
 </body>

@@ -96,7 +96,11 @@
                                             Ubah
                                         </a>
                                         <form method="POST" action="{{ route('admin.potensi.destroy', $potensi) }}"
-                                              onsubmit="return confirm('Hapus {{ $potensi->nama }} secara permanen? Fotonya ikut terhapus.')">
+                                              data-konfirmasi data-bahaya
+                                              data-judul="Hapus potensi desa?"
+                                              data-pesan="{{ $potensi->nama }} akan dihapus permanen beserta fotonya, dan halaman detailnya di situs desa ikut hilang."
+                                              data-catatan="Untuk sekadar menyembunyikannya dari halaman publik, gunakan tombol status Tampil."
+                                              data-tombol="Hapus Permanen">
                                             @csrf @method('DELETE')
                                             <button type="submit"
                                                     class="rounded-md px-2.5 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50">

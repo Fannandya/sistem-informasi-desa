@@ -16,6 +16,7 @@
     <form method="POST"
           action="{{ $ubah ? route('admin.potensi.update', $potensi) : route('admin.potensi.store') }}"
           enctype="multipart/form-data"
+          data-lacak-perubahan
           x-data="{ singkat: @js(old('deskripsi_singkat', $potensi->deskripsi_singkat ?? '')) }"
           class="space-y-5 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
         @csrf

@@ -237,6 +237,13 @@
         @endif
 
         <form id="formImpor" method="POST" action="{{ route('admin.penduduk.impor.proses') }}"
+              data-konfirmasi
+              data-judul="Simpan data ke database?"
+              data-pesan="{{ count($analisis->siap) }} warga baru akan ditambahkan, ditambah data ganda yang Anda centang."
+              @if ($analisis->adaGanda())
+                  data-catatan="Data ganda yang tidak dicentang tidak akan diimpor. Periksa sekali lagi sebelum melanjutkan."
+              @endif
+              data-tombol="Ya, Simpan Sekarang"
               class="flex flex-wrap items-center gap-3">
             @csrf
             <input type="hidden" name="token" value="{{ $token }}">
@@ -250,7 +257,12 @@
             @endif
         </form>
 
-        <form method="POST" action="{{ route('admin.penduduk.impor.batal') }}" class="mt-3">
+        <form method="POST" action="{{ route('admin.penduduk.impor.batal') }}"
+              data-konfirmasi data-bahaya
+              data-judul="Batalkan impor?"
+              data-pesan="Berkas yang sudah diunggah akan dibuang dan tidak ada data yang tersimpan."
+              data-tombol="Ya, Batalkan"
+              class="mt-3">
             @csrf
             <button type="submit"
                     class="rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700

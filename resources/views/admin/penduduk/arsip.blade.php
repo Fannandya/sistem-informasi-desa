@@ -118,15 +118,45 @@
                                 <td class="px-4 py-3 whitespace-nowrap text-slate-600">
                                     {{ $warga->tanggal_keluar?->translatedFormat('d M Y') ?? '—' }}
                                 </td>
-                                <td class="px-4 py-3 text-right">
-                                    <form method="POST" action="{{ route('admin.penduduk.pulihkan', $warga->id) }}"
-                                          onsubmit="return confirm('Pulihkan {{ $warga->nama_lengkap }} ke daftar warga aktif?')">
-                                        @csrf
-                                        <button type="submit"
-                                                class="rounded-md px-2.5 py-1.5 text-xs font-medium text-emerald-700 transition hover:bg-emerald-50">
-                                            Pulihkan
-                                        </button>
-                                    </form>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center justify-end gap-2">
+                                        <form method="POST" action="{{ route('admin.penduduk.pulihkan', $warga->id) }}"
+                                              data-konfirmasi
+                                              data-judul="Pulihkan warga ini?"
+                                              data-pesan="{{ $warga->nama_lengkap }} akan kembali ke daftar warga aktif."
+                                              data-catatan="Alasan dan tanggal keluar dikosongkan, sehingga ia tidak lagi terhitung pada statistik tahun tersebut."
+                                              data-tombol="Pulihkan">
+                                            @csrf
+                                            <button type="submit"
+                                                    class="rounded-md px-2.5 py-1.5 text-xs font-medium text-emerald-700 transition hover:bg-emerald-50">
+                                                Pulihkan
+                                            </button>
+                                        </form>
+
+                                        {{-- Hapus permanen sengaja hanya ada di sini: warga harus melewati
+                                             pengarsipan lebih dulu, sehingga tidak ada data yang lenyap tanpa
+                                             pernah tercatat alasan keluarnya. --}}
+                                        <form method="POST" action="{{ route('admin.penduduk.hapus-permanen', $warga->id) }}"
+                                              data-konfirmasi data-bahaya
+                                              data-judul="Hapus permanen dari database?"
+                                              data-pesan="{{ $warga->nama_lengkap }} akan dihapus selamanya. Tindakan ini tidak dapat dibatalkan dan datanya tidak dapat dipulihkan."
+                                              @if ($warga->alasan_keluar?->value === 'meninggal')
+                                                  data-catatan="Warga ini tercatat meninggal pada {{ $warga->tanggal_keluar?->translatedFormat('d F Y') }}. Menghapusnya membuat angka kematian tahun {{ $warga->tanggal_keluar?->year }} berkurang satu, sehingga laporan yang sudah dibuat tidak lagi cocok."
+                                              @elseif ($warga->alasan_keluar?->value === 'pindah_keluar')
+                                                  data-catatan="Warga ini tercatat pindah keluar pada {{ $warga->tanggal_keluar?->translatedFormat('d F Y') }}. Menghapusnya membuat angka perpindahan tahun {{ $warga->tanggal_keluar?->year }} berkurang satu."
+                                              @else
+                                                  data-catatan="Data bertanda duplikat tidak pernah masuk statistik, jadi menghapusnya tidak mengubah angka apa pun."
+                                              @endif
+                                              data-ketik="{{ $warga->nama_lengkap }}"
+                                              data-ketik-field="konfirmasi_nama"
+                                              data-tombol="Hapus Permanen">
+                                            @csrf @method('DELETE')
+                                            <button type="submit"
+                                                    class="rounded-md px-2.5 py-1.5 text-xs font-medium text-red-700 transition hover:bg-red-50">
+                                                Hapus
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @endforeach

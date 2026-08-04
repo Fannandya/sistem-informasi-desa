@@ -87,7 +87,7 @@
     {{-- ============================= PROFIL ============================== --}}
     <section x-show="bagian === 'profil'" x-cloak
              class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-        <form method="POST" action="{{ route('admin.pengaturan.perbarui', 'profil') }}" class="space-y-5">
+        <form method="POST" action="{{ route('admin.pengaturan.perbarui', 'profil') }}" data-lacak-perubahan class="space-y-5">
             @csrf @method('PUT')
 
             <x-admin.textarea name="visi" label="Visi" rows="3" :value="$pengaturan->visi" />
@@ -107,7 +107,7 @@
     {{-- =========================== GEOGRAFIS ============================= --}}
     <section x-show="bagian === 'geografis'" x-cloak
              class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-        <form method="POST" action="{{ route('admin.pengaturan.perbarui', 'geografis') }}" class="space-y-5">
+        <form method="POST" action="{{ route('admin.pengaturan.perbarui', 'geografis') }}" data-lacak-perubahan class="space-y-5">
             @csrf @method('PUT')
 
             <x-admin.textarea name="letak_geografis" label="Letak Geografis & Batas Wilayah" rows="6"
@@ -135,7 +135,7 @@
     {{-- ============================= KONTAK ============================== --}}
     <section x-show="bagian === 'kontak'" x-cloak
              class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-        <form method="POST" action="{{ route('admin.pengaturan.perbarui', 'kontak') }}" class="space-y-5">
+        <form method="POST" action="{{ route('admin.pengaturan.perbarui', 'kontak') }}" data-lacak-perubahan class="space-y-5">
             @csrf @method('PUT')
 
             <x-admin.field name="alamat_kantor" label="Alamat Kantor Desa" :value="$pengaturan->alamat_kantor" />
@@ -170,7 +170,7 @@
     {{-- =============================== SEO =============================== --}}
     <section x-show="bagian === 'seo'" x-cloak
              class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-        <form method="POST" action="{{ route('admin.pengaturan.perbarui', 'seo') }}" class="space-y-5"
+        <form method="POST" action="{{ route('admin.pengaturan.perbarui', 'seo') }}" data-lacak-perubahan class="space-y-5"
               x-data="{ teks: @js(old('meta_description', $pengaturan->meta_description ?? '')) }">
             @csrf @method('PUT')
 

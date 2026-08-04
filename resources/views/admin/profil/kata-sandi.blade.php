@@ -11,7 +11,13 @@
             harus masuk ulang.
         </p>
 
-        <form method="POST" action="{{ route('admin.kata-sandi.perbarui') }}" class="space-y-5">
+        <form method="POST" action="{{ route('admin.kata-sandi.perbarui') }}"
+              data-konfirmasi
+              data-judul="Ganti kata sandi?"
+              data-pesan="Kata sandi baru berlaku untuk login berikutnya."
+              data-catatan="Sesi Anda di perangkat lain akan berakhir dan harus masuk ulang."
+              data-tombol="Ganti Kata Sandi"
+              class="space-y-5">
             @csrf
             @method('PUT')
 

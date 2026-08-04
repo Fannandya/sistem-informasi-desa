@@ -132,7 +132,11 @@
                                             Ubah
                                         </a>
                                         <form method="POST" action="{{ route('admin.pengurus.destroy', $pengurus) }}"
-                                              onsubmit="return confirm('Hapus {{ $pengurus->nama }} secara permanen? Fotonya ikut terhapus.')">
+                                              data-konfirmasi data-bahaya
+                                              data-judul="Hapus pengurus?"
+                                              data-pesan="{{ $pengurus->nama }} akan dihapus permanen beserta fotonya."
+                                              data-catatan="Data pengurus tidak dapat dipulihkan. Untuk sekadar menyembunyikannya dari halaman publik, gunakan tombol status Tampil."
+                                              data-tombol="Hapus Permanen">
                                             @csrf @method('DELETE')
                                             <button type="submit"
                                                     class="rounded-md px-2.5 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50">

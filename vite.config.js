@@ -13,6 +13,7 @@ export default defineConfig({
                 // halaman admin dan publik.
                 'resources/js/grafik.js',
                 'resources/js/editor.js',
+                'resources/js/dialog.js',
             ],
             refresh: true,
         }),

@@ -14,7 +14,7 @@
 
     <form method="POST"
           action="{{ $ubah ? route('admin.fasilitas.update', $fasilitas) : route('admin.fasilitas.store') }}"
-          enctype="multipart/form-data"
+          enctype="multipart/form-data" data-lacak-perubahan
           class="space-y-5 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
         @csrf
         @if ($ubah) @method('PUT') @endif

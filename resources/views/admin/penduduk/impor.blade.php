@@ -27,7 +27,13 @@
         </div>
 
         <form method="POST" action="{{ route('admin.penduduk.impor.pratinjau') }}"
-              enctype="multipart/form-data" class="space-y-5">
+              enctype="multipart/form-data"
+              data-konfirmasi
+              data-judul="Periksa berkas ini?"
+              data-pesan="Berkas akan dibaca dan ditampilkan hasilnya untuk Anda periksa."
+              data-catatan="Belum ada data yang tersimpan pada langkah ini."
+              data-tombol="Periksa Sekarang"
+              class="space-y-5">
             @csrf
 
             <div>

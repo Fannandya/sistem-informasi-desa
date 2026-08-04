@@ -82,7 +82,8 @@
     </div>
 
     {{-- ------------------------- Formulir isian ------------------------- --}}
-    <form method="POST" action="{{ route('admin.rekap-kk.simpan', $tahun) }}" class="space-y-5">
+    <form method="POST" action="{{ route('admin.rekap-kk.simpan', $tahun) }}"
+          data-lacak-perubahan class="space-y-5">
         @csrf
 
         @if ($kelompok->isEmpty())
@@ -170,7 +171,11 @@
     {{-- Salin tahun sebelumnya — form terpisah agar tidak ikut terkirim saat menyimpan --}}
     @if ($adaTahunSebelumnya && ! $kelompok->isEmpty())
         <form method="POST" action="{{ route('admin.rekap-kk.salin', $tahun) }}"
-              onsubmit="return confirm('Muat angka tahun {{ $tahun - 1 }} ke formulir? Isian yang sekarang akan tertimpa, tetapi belum tersimpan sampai Anda menekan Simpan.')"
+              data-konfirmasi
+              data-judul="Salin angka tahun {{ $tahun - 1 }}?"
+              data-pesan="Isian yang sekarang tampil akan tertimpa angka tahun {{ $tahun - 1 }}."
+              data-catatan="Belum ada yang tersimpan sampai Anda menekan tombol Simpan Rekap."
+              data-tombol="Muat ke Formulir"
               class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
             @csrf
             <div class="flex flex-wrap items-center gap-3">

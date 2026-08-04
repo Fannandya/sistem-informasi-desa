@@ -98,7 +98,10 @@
                                         <a href="{{ route('admin.prestasi.edit', $prestasi) }}"
                                            class="rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200">Ubah</a>
                                         <form method="POST" action="{{ route('admin.prestasi.destroy', $prestasi) }}"
-                                              onsubmit="return confirm('Hapus prestasi ini? Fotonya ikut terhapus.')">
+                                              data-konfirmasi data-bahaya
+                                              data-judul="Hapus prestasi?"
+                                              data-pesan="{{ $prestasi->judul }} ({{ $prestasi->tahun }}) akan dihapus permanen beserta fotonya."
+                                              data-tombol="Hapus Permanen">
                                             @csrf @method('DELETE')
                                             <button type="submit"
                                                     class="rounded-md px-2.5 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50">Hapus</button>

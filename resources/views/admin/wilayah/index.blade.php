@@ -80,7 +80,10 @@
                                                 </span>
                                             @else
                                                 <form method="POST" action="{{ route('admin.wilayah.destroy', $wilayah) }}"
-                                                      onsubmit="return confirm('Hapus wilayah {{ $wilayah->label() }}?')">
+                                                      data-konfirmasi data-bahaya
+                                                      data-judul="Hapus wilayah?"
+                                                      data-pesan="{{ $wilayah->label() }} akan dihapus dari daftar wilayah."
+                                                      data-tombol="Hapus">
                                                     @csrf @method('DELETE')
                                                     <button type="submit"
                                                             class="rounded-md px-2.5 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50">

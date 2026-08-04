@@ -58,7 +58,10 @@
                             <span class="text-xs text-slate-400">{{ $k->berita_count }}</span>
                             @if ($k->berita_count === 0)
                                 <form method="POST" action="{{ route('admin.kategori-berita.destroy', $k) }}"
-                                      onsubmit="return confirm('Hapus kategori ini?')">
+                                      data-konfirmasi data-bahaya
+                                      data-judul="Hapus kategori berita?"
+                                      data-pesan="Kategori {{ $k->nama }} akan dihapus."
+                                      data-tombol="Hapus">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="rounded-full px-1.5 text-slate-400 hover:text-red-600">&times;</button>
                                 </form>
@@ -160,7 +163,11 @@
                                         <a href="{{ route('admin.berita.edit', $berita) }}"
                                            class="rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-200">Ubah</a>
                                         <form method="POST" action="{{ route('admin.berita.destroy', $berita) }}"
-                                              onsubmit="return confirm('Hapus berita ini secara permanen?')">
+                                              data-konfirmasi data-bahaya
+                                              data-judul="Hapus berita?"
+                                              data-pesan="{{ $berita->judul }} akan dihapus permanen beserta gambar sampulnya."
+                                              data-catatan="Tautan berita ini yang sudah tersebar akan mati."
+                                              data-tombol="Hapus Permanen">
                                             @csrf @method('DELETE')
                                             <button type="submit"
                                                     class="rounded-md px-2.5 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50">Hapus</button>

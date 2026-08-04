@@ -15,6 +15,7 @@
 
     <form method="POST"
           action="{{ $ubah ? route('admin.penduduk.update', $penduduk) : route('admin.penduduk.store') }}"
+          data-lacak-perubahan
           x-data="formWarga(@js(old('tanggal_lahir', $penduduk->tanggal_lahir?->toDateString())), @js(old('jenis_masuk', $penduduk->jenis_masuk?->value)))"
           class="space-y-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
         @csrf

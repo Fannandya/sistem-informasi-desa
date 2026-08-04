@@ -36,7 +36,14 @@
         @endif
 
         @foreach (['xlsx' => 'Excel (.xlsx)', 'csv' => 'CSV (.csv)'] as $format => $label)
-            <form method="GET" action="{{ route('admin.penduduk.ekspor') }}">
+            <form method="GET" action="{{ route('admin.penduduk.ekspor') }}"
+                  data-konfirmasi
+                  data-judul="Unduh berkas {{ strtoupper($format) }}?"
+                  data-pesan="{{ $adaSaringan
+                      ? 'Berkas berisi hasil saringan yang sedang tampil, bukan seluruh data.'
+                      : 'Berkas berisi seluruh data ' . ($arsip ? 'arsip' : 'warga aktif') . '.' }}"
+                  data-catatan="Berkas memuat nama warga. Simpan di tempat yang aman dan jangan dibagikan sembarangan."
+                  data-tombol="Unduh">
                 @foreach ($pencarian->parameter() as $kunci => $nilai)
                     <input type="hidden" name="{{ $kunci }}" value="{{ $nilai }}">
                 @endforeach

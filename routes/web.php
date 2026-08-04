@@ -102,6 +102,8 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('penduduk/arsip', [ArsipPendudukController::class, 'index'])->name('penduduk.arsip');
         Route::post('penduduk/arsip/{id}/pulihkan', [ArsipPendudukController::class, 'pulihkan'])
             ->name('penduduk.pulihkan');
+        Route::delete('penduduk/arsip/{id}', [ArsipPendudukController::class, 'hapusPermanen'])
+            ->name('penduduk.hapus-permanen');
 
         // withTrashed() disengaja: tanpa itu membuka halaman ubah milik warga
         // terarsip menghasilkan 404 polos. Dengan ini controller bisa

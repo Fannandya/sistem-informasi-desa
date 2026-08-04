@@ -129,7 +129,10 @@
                                             </span>
                                         @else
                                             <form method="POST" action="{{ route('admin.organisasi.destroy', $organisasi) }}"
-                                                  onsubmit="return confirm('Hapus organisasi {{ $organisasi->nama }}?')">
+                                                  data-konfirmasi data-bahaya
+                                                      data-judul="Hapus organisasi?"
+                                                      data-pesan="Kelompok {{ $organisasi->nama }} akan dihapus dari daftar organisasi."
+                                                      data-tombol="Hapus">
                                                 @csrf @method('DELETE')
                                                 <button type="submit"
                                                         class="rounded-md px-2.5 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50">

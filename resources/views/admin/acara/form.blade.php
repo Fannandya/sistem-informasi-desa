@@ -16,6 +16,7 @@
     {{-- ----------------------- Data acara ----------------------- --}}
     <form method="POST"
           action="{{ $ubah ? route('admin.acara.update', $acara) : route('admin.acara.store') }}"
+          data-lacak-perubahan
           class="space-y-5 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
         @csrf
         @if ($ubah) @method('PUT') @endif
@@ -138,7 +139,11 @@
                 @foreach ($acara->foto as $foto)
                     <form id="hapus-foto-{{ $foto->id }}" method="POST"
                           action="{{ route('admin.acara.foto.hapus', [$acara, $foto]) }}"
-                          onsubmit="return confirm('Hapus foto ini?')" class="hidden">
+                          data-konfirmasi data-bahaya
+                          data-judul="Hapus foto?"
+                          data-pesan="Foto ini akan dihapus permanen dari galeri acara."
+                          data-tombol="Hapus Foto"
+                          class="hidden">
                         @csrf @method('DELETE')
                     </form>
                 @endforeach
