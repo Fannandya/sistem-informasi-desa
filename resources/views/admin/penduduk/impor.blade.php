@@ -2,8 +2,6 @@
 
 @section('judul', 'Impor Data Warga')
 
-@php $hasil = session('hasilImpor'); @endphp
-
 @section('konten')
 <div class="max-w-3xl space-y-6">
 
@@ -12,82 +10,6 @@
             &larr; Kembali ke Data Warga
         </a>
     </nav>
-
-    {{-- ------------------ Hasil impor terakhir ------------------ --}}
-    @if ($hasil)
-        <div class="space-y-4 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-            <h2 class="text-sm font-semibold text-slate-900">Hasil Impor</h2>
-
-            <div class="grid gap-3 sm:grid-cols-3">
-                <div class="rounded-xl bg-emerald-50 p-4">
-                    <p class="text-2xl font-semibold text-emerald-700">{{ $hasil->berhasil }}</p>
-                    <p class="text-xs text-emerald-800">baris masuk</p>
-                </div>
-                <div class="rounded-xl bg-amber-50 p-4">
-                    <p class="text-2xl font-semibold text-amber-700">{{ count($hasil->duplikat) }}</p>
-                    <p class="text-xs text-amber-800">dilewati (ganda)</p>
-                </div>
-                <div class="rounded-xl bg-red-50 p-4">
-                    <p class="text-2xl font-semibold text-red-700">{{ count($hasil->gagal) }}</p>
-                    <p class="text-xs text-red-800">gagal</p>
-                </div>
-            </div>
-
-            @if ($hasil->gagal !== [])
-                <div>
-                    <h3 class="mb-2 text-sm font-medium text-slate-900">Baris yang gagal</h3>
-                    <div class="max-h-72 overflow-y-auto rounded-lg ring-1 ring-slate-200">
-                        <table class="w-full text-sm">
-                            <thead class="sticky top-0 bg-slate-50 text-left text-xs tracking-wider text-slate-500 uppercase">
-                                <tr>
-                                    <th class="px-3 py-2 font-semibold">Baris</th>
-                                    <th class="px-3 py-2 font-semibold">Nama</th>
-                                    <th class="px-3 py-2 font-semibold">Alasan</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-100">
-                                @foreach ($hasil->gagal as $baris)
-                                    <tr>
-                                        <td class="px-3 py-2 tabular-nums text-slate-500">{{ $baris['baris'] }}</td>
-                                        <td class="px-3 py-2 text-slate-900">{{ $baris['nama'] }}</td>
-                                        <td class="px-3 py-2 text-red-700">{{ $baris['alasan'] }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <p class="mt-2 text-xs text-slate-500">
-                        Perbaiki baris-baris ini di berkas asli, lalu unggah ulang. Baris yang sudah
-                        berhasil masuk akan terdeteksi sebagai ganda dan dilewati.
-                    </p>
-                </div>
-            @endif
-
-            @if ($hasil->duplikat !== [])
-                <div>
-                    <h3 class="mb-2 text-sm font-medium text-slate-900">Baris yang dilewati</h3>
-                    <div class="max-h-56 overflow-y-auto rounded-lg ring-1 ring-slate-200">
-                        <table class="w-full text-sm">
-                            <tbody class="divide-y divide-slate-100">
-                                @foreach ($hasil->duplikat as $baris)
-                                    <tr>
-                                        <td class="px-3 py-2 tabular-nums text-slate-500">{{ $baris['baris'] }}</td>
-                                        <td class="px-3 py-2 text-slate-900">{{ $baris['nama'] }}</td>
-                                        <td class="px-3 py-2 text-amber-700">{{ $baris['keterangan'] }}</td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <p class="mt-2 text-xs text-slate-500">
-                        Tanpa NIK atau nomor KK, kesamaan nama + tanggal lahir + wilayah adalah petunjuk
-                        terkuat yang tersedia — tetapi bukan kepastian. Periksa daftar ini bila ada warga
-                        berbeda yang kebetulan sama persis ketiganya.
-                    </p>
-                </div>
-            @endif
-        </div>
-    @endif
 
     {{-- ------------------ Form unggah ------------------ --}}
     <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
@@ -98,7 +20,13 @@
             {{ round(config('impor.maks_kb') / 1024) }} MB per berkas.
         </p>
 
-        <form method="POST" action="{{ route('admin.penduduk.impor.proses') }}"
+        <div class="mb-5 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-600">
+            Berkas <strong>tidak langsung disimpan</strong>. Setelah diunggah, Anda akan melihat
+            daftar lengkap data yang akan ditambahkan beserta data yang terdeteksi ganda,
+            lalu memutuskan sendiri apakah impor dilanjutkan atau dibatalkan.
+        </div>
+
+        <form method="POST" action="{{ route('admin.penduduk.impor.pratinjau') }}"
               enctype="multipart/form-data" class="space-y-5">
             @csrf
 
@@ -116,24 +44,11 @@
                 @enderror
             </div>
 
-            <label class="flex items-start gap-3 rounded-lg border border-slate-200 p-3">
-                <input type="checkbox" name="lewati_duplikat" value="1" checked
-                       class="mt-0.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
-                <span>
-                    <span class="block text-sm font-medium text-slate-900">Lewati baris yang terdeteksi ganda</span>
-                    <span class="block text-xs text-slate-500">
-                        Baris dianggap ganda bila nama, tanggal lahir, dan wilayahnya sama persis dengan
-                        warga yang sudah ada. Hilangkan centang bila desa Anda memang punya warga
-                        berbeda dengan ketiga data itu sama.
-                    </span>
-                </span>
-            </label>
-
             <div class="flex flex-wrap items-center gap-3 border-t border-slate-200 pt-5">
                 <button type="submit"
                         class="rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white
                                transition hover:bg-emerald-700">
-                    Mulai Impor
+                    Periksa Berkas
                 </button>
                 <a href="{{ route('admin.penduduk.impor.contoh') }}"
                    class="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700
@@ -190,8 +105,8 @@
         <div class="mt-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
             <p class="font-medium">Berkas tidak boleh memuat NIK, nomor KK, atau nomor telepon.</p>
             <p class="mt-1 text-xs">
-                Bila salah satunya ditemukan, seluruh berkas ditolak dan tidak ada satu baris pun
-                yang diimpor. Hapus kolom tersebut dari berkas sumber lebih dulu.
+                Bila salah satunya ditemukan, seluruh berkas ditolak. Hapus kolom tersebut dari
+                berkas sumber lebih dulu.
             </p>
         </div>
 

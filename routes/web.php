@@ -93,7 +93,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::get('penduduk/impor', [ImporPendudukController::class, 'tampilkan'])->name('penduduk.impor');
         Route::get('penduduk/impor/contoh', [ImporPendudukController::class, 'contoh'])->name('penduduk.impor.contoh');
-        Route::post('penduduk/impor', [ImporPendudukController::class, 'proses'])->name('penduduk.impor.proses');
+        Route::post('penduduk/impor/pratinjau', [ImporPendudukController::class, 'pratinjau'])->name('penduduk.impor.pratinjau');
+        Route::post('penduduk/impor/proses', [ImporPendudukController::class, 'proses'])->name('penduduk.impor.proses');
+        Route::post('penduduk/impor/batal', [ImporPendudukController::class, 'batal'])->name('penduduk.impor.batal');
 
         // Arsip didaftarkan sebelum rute {penduduk} agar "arsip" tidak
         // ditangkap sebagai ID warga.
