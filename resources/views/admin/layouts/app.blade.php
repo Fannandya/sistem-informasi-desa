@@ -104,6 +104,11 @@
                 Galeri Acara
             </a>
 
+            <a href="{{ route('admin.teks-tampilan.index') }}"
+               class="{{ request()->routeIs('admin.teks-tampilan.*') ? $tautanAktif : $tautanBiasa }}">
+                Teks Tampilan
+            </a>
+
             <a href="{{ route('admin.pengaturan') }}"
                class="{{ request()->routeIs('admin.pengaturan*') ? $tautanAktif : $tautanBiasa }}">
                 Pengaturan Desa

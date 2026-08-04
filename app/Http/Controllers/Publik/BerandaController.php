@@ -10,6 +10,7 @@ use App\Models\Pengurus;
 use App\Models\PotensiDesa;
 use App\Models\PrestasiDesa;
 use App\Queries\StatistikPublik;
+use App\Support\Teks;
 use Illuminate\View\View;
 
 /**
@@ -17,25 +18,26 @@ use Illuminate\View\View;
  *
  * Setiap bagian hanya memuat cuplikan, bukan seluruh data. Halaman muka desa
  * sering dibuka lewat koneksi seluler; memuat ratusan kartu di satu halaman
- * membuatnya lambat tanpa memberi manfaat apa pun.
+ * membuatnya lambat tanpa memberi manfaat apa pun. Jumlah cuplikan diatur
+ * admin lewat CMS Teks Tampilan (grup 'kuota'), bukan lagi hardcode.
  */
 class BerandaController extends Controller
 {
     public function __invoke(StatistikPublik $statistik): View
     {
         return view('publik.beranda', [
-            'potensi' => PotensiDesa::query()->tampil()->urut()->take(6)->get(),
+            'potensi' => PotensiDesa::query()->tampil()->urut()->take(Teks::angka('kuota.beranda.potensi'))->get(),
 
             'beritaUtama' => BeritaDesa::query()->terbit()->where('utama', true)->with('kategori')->first()
                 ?? BeritaDesa::query()->terbit()->with('kategori')->terbaru()->first(),
 
-            'berita' => BeritaDesa::query()->terbit()->with('kategori')->terbaru()->take(4)->get(),
+            'berita' => BeritaDesa::query()->terbit()->with('kategori')->terbaru()->take(Teks::angka('kuota.beranda.berita'))->get(),
 
-            'acara' => AcaraDesa::query()->terbit()->withCount('foto')->with('foto')->terbaru()->take(6)->get(),
+            'acara' => AcaraDesa::query()->terbit()->withCount('foto')->with('foto')->terbaru()->take(Teks::angka('kuota.beranda.acara'))->get(),
 
-            'fasilitas' => FasilitasUmum::query()->tampil()->orderBy('kategori')->take(4)->get(),
+            'fasilitas' => FasilitasUmum::query()->tampil()->orderBy('kategori')->take(Teks::angka('kuota.beranda.fasilitas'))->get(),
 
-            'prestasi' => PrestasiDesa::query()->tampil()->terbaru()->take(3)->get(),
+            'prestasi' => PrestasiDesa::query()->tampil()->terbaru()->take(Teks::angka('kuota.beranda.prestasi'))->get(),
 
             // Hanya pengurus inti; daftar lengkap ada di halaman khususnya.
             'pengurus' => Pengurus::query()
@@ -45,7 +47,7 @@ class BerandaController extends Controller
                 ->orderBy('ref_organisasi.urutan')
                 ->orderBy('pengurus_desa.urutan')
                 ->select('pengurus_desa.*')
-                ->take(4)
+                ->take(Teks::angka('kuota.beranda.pengurus'))
                 ->get(),
 
             'statistik' => $statistik->ringkasan(),
