@@ -9,13 +9,17 @@ use App\Http\Controllers\Admin\ImporPendudukController;
 use App\Http\Controllers\Admin\PendudukController;
 use App\Http\Controllers\Admin\PengaturanDesaController;
 use App\Http\Controllers\Admin\PengurusController;
+use App\Http\Controllers\Admin\FasilitasController;
 use App\Http\Controllers\Admin\PotensiController;
+use App\Http\Controllers\Admin\PrestasiController;
 use App\Http\Controllers\Admin\RefOrganisasiController;
 use App\Http\Controllers\Admin\RefPekerjaanController;
 use App\Http\Controllers\Admin\RekapKkController;
 use App\Http\Controllers\Admin\StatistikController;
 use App\Http\Controllers\Admin\WilayahController;
+use App\Http\Controllers\Publik\FasilitasController as FasilitasPublikController;
 use App\Http\Controllers\Publik\PotensiController as PotensiPublikController;
+use App\Http\Controllers\Publik\PrestasiController as PrestasiPublikController;
 use App\Http\Controllers\Publik\StrukturOrganisasiController;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +38,9 @@ Route::name('publik.')->group(function () {
 
     Route::get('potensi', [PotensiPublikController::class, 'index'])->name('potensi.index');
     Route::get('potensi/{potensi}', [PotensiPublikController::class, 'show'])->name('potensi.show');
+
+    Route::get('fasilitas', FasilitasPublikController::class)->name('fasilitas');
+    Route::get('prestasi', PrestasiPublikController::class)->name('prestasi');
 });
 
 /*
@@ -120,6 +127,23 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('potensi/{potensi}', [PotensiController::class, 'update'])->name('potensi.update');
         Route::delete('potensi/{potensi}', [PotensiController::class, 'destroy'])->name('potensi.destroy');
         Route::post('potensi/{potensi}/tampil', [PotensiController::class, 'ubahTampil'])->name('potensi.tampil');
+
+        // --- Fasilitas & prestasi ---
+        Route::get('fasilitas', [FasilitasController::class, 'index'])->name('fasilitas.index');
+        Route::get('fasilitas/tambah', [FasilitasController::class, 'create'])->name('fasilitas.create');
+        Route::post('fasilitas', [FasilitasController::class, 'store'])->name('fasilitas.store');
+        Route::get('fasilitas/{fasilita}/ubah', [FasilitasController::class, 'edit'])->name('fasilitas.edit');
+        Route::put('fasilitas/{fasilita}', [FasilitasController::class, 'update'])->name('fasilitas.update');
+        Route::delete('fasilitas/{fasilita}', [FasilitasController::class, 'destroy'])->name('fasilitas.destroy');
+        Route::post('fasilitas/{fasilita}/tampil', [FasilitasController::class, 'ubahTampil'])->name('fasilitas.tampil');
+
+        Route::get('prestasi', [PrestasiController::class, 'index'])->name('prestasi.index');
+        Route::get('prestasi/tambah', [PrestasiController::class, 'create'])->name('prestasi.create');
+        Route::post('prestasi', [PrestasiController::class, 'store'])->name('prestasi.store');
+        Route::get('prestasi/{prestasi}/ubah', [PrestasiController::class, 'edit'])->name('prestasi.edit');
+        Route::put('prestasi/{prestasi}', [PrestasiController::class, 'update'])->name('prestasi.update');
+        Route::delete('prestasi/{prestasi}', [PrestasiController::class, 'destroy'])->name('prestasi.destroy');
+        Route::post('prestasi/{prestasi}/tampil', [PrestasiController::class, 'ubahTampil'])->name('prestasi.tampil');
 
         // --- Data referensi ---
         Route::get('wilayah', [WilayahController::class, 'index'])->name('wilayah.index');

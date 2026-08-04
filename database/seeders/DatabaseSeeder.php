@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             RekapKkSeeder::class,
             PengurusSeeder::class,
             PotensiSeeder::class,
+            FasilitasPrestasiSeeder::class,
         ]);
     }
 }

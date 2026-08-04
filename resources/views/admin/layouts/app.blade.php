@@ -79,6 +79,16 @@
                 Potensi Desa
             </a>
 
+            <a href="{{ route('admin.fasilitas.index') }}"
+               class="{{ request()->routeIs('admin.fasilitas.*') ? $tautanAktif : $tautanBiasa }}">
+                Fasilitas Umum
+            </a>
+
+            <a href="{{ route('admin.prestasi.index') }}"
+               class="{{ request()->routeIs('admin.prestasi.*') ? $tautanAktif : $tautanBiasa }}">
+                Prestasi Desa
+            </a>
+
             <a href="{{ route('admin.pengaturan') }}"
                class="{{ request()->routeIs('admin.pengaturan*') ? $tautanAktif : $tautanBiasa }}">
                 Pengaturan Desa
