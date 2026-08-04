@@ -15,6 +15,7 @@ class DatabaseSeeder extends Seeder
             RefPekerjaanSeeder::class,
             PendudukSeeder::class,
             RekapKkSeeder::class,
+            PengurusSeeder::class,
         ]);
     }
 }

@@ -69,6 +69,11 @@
             {{-- Menu konten publik ditambahkan saat fitur terkait dikerjakan (08–13). --}}
             <p class="px-3 pt-5 pb-2 text-xs font-semibold tracking-wider text-slate-500 uppercase">Desa</p>
 
+            <a href="{{ route('admin.pengurus.index') }}"
+               class="{{ request()->routeIs('admin.pengurus.*', 'admin.organisasi.*') ? $tautanAktif : $tautanBiasa }}">
+                Struktur Organisasi
+            </a>
+
             <a href="{{ route('admin.pengaturan') }}"
                class="{{ request()->routeIs('admin.pengaturan*') ? $tautanAktif : $tautanBiasa }}">
                 Pengaturan Desa

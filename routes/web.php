@@ -8,10 +8,13 @@ use App\Http\Controllers\Admin\EksporPendudukController;
 use App\Http\Controllers\Admin\ImporPendudukController;
 use App\Http\Controllers\Admin\PendudukController;
 use App\Http\Controllers\Admin\PengaturanDesaController;
+use App\Http\Controllers\Admin\PengurusController;
+use App\Http\Controllers\Admin\RefOrganisasiController;
 use App\Http\Controllers\Admin\RefPekerjaanController;
 use App\Http\Controllers\Admin\RekapKkController;
 use App\Http\Controllers\Admin\StatistikController;
 use App\Http\Controllers\Admin\WilayahController;
+use App\Http\Controllers\Publik\StrukturOrganisasiController;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Facades\Route;
 
@@ -23,6 +26,10 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::view('/', 'welcome')->name('beranda');
+
+Route::name('publik.')->group(function () {
+    Route::get('struktur-organisasi', StrukturOrganisasiController::class)->name('struktur');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -85,6 +92,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('rekap-kk/{tahun}', [RekapKkController::class, 'simpan'])->name('rekap-kk.simpan');
         Route::post('rekap-kk/{tahun}/salin', [RekapKkController::class, 'salinTahunSebelumnya'])
             ->name('rekap-kk.salin');
+
+        // --- Struktur organisasi ---
+        Route::get('pengurus', [PengurusController::class, 'index'])->name('pengurus.index');
+        Route::get('pengurus/tambah', [PengurusController::class, 'create'])->name('pengurus.create');
+        Route::post('pengurus', [PengurusController::class, 'store'])->name('pengurus.store');
+        Route::get('pengurus/{pengurus}/ubah', [PengurusController::class, 'edit'])->name('pengurus.edit');
+        Route::put('pengurus/{pengurus}', [PengurusController::class, 'update'])->name('pengurus.update');
+        Route::delete('pengurus/{pengurus}', [PengurusController::class, 'destroy'])->name('pengurus.destroy');
+        Route::post('pengurus/{pengurus}/tampil', [PengurusController::class, 'ubahTampil'])->name('pengurus.tampil');
+        Route::post('pengurus/{pengurus}/geser', [PengurusController::class, 'geser'])->name('pengurus.geser');
+
+        Route::post('organisasi', [RefOrganisasiController::class, 'store'])->name('organisasi.store');
+        Route::put('organisasi/{organisasi}', [RefOrganisasiController::class, 'update'])->name('organisasi.update');
+        Route::delete('organisasi/{organisasi}', [RefOrganisasiController::class, 'destroy'])->name('organisasi.destroy');
 
         // --- Data referensi ---
         Route::get('wilayah', [WilayahController::class, 'index'])->name('wilayah.index');
