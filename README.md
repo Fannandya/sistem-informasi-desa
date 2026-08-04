@@ -175,6 +175,45 @@ Ini disengaja: menyimpan lalu menampilkan ulang HTML mentah dari admin akan menj
 
 ---
 
+## Data Penduduk
+
+Yang **tidak** disimpan, dan tidak boleh ditambahkan: NIK, nomor Kartu Keluarga, nomor telepon warga, dan alamat rumah detail. Larangan ini dijaga pengujian otomatis dengan **daftar putih** — kolom baru apa pun pada tabel `penduduk` akan menggagalkan tes, sehingga penambahannya harus disengaja dan ditinjau ulang terhadap PRD §2.4.
+
+### Umur tidak disimpan
+
+Yang disimpan adalah tanggal lahir; umur dihitung terhadap hari ini setiap kali dibutuhkan. Angka umur yang disimpan akan basi tanpa ada yang menyadarinya — ada tes yang memajukan waktu lima tahun dan memastikan umurnya ikut bergeser.
+
+Penyaringan kelompok umur memakai rentang tanggal lahir, bukan menghitung umur di dalam SQL: fungsi penghitung umur berbeda antara MySQL dan SQLite. Ada tes yang membandingkan hasil saringan SQL dengan perhitungan PHP untuk setiap kelompok agar keduanya tidak menyimpang diam-diam.
+
+### Kelahiran bukan "baris bertambah"
+
+Menambah warga bukan berarti kelahiran, dan mengarsipkan bukan berarti kematian. Setiap warga punya penanda mutasi:
+
+| Metrik | Sumber |
+|---|---|
+| Kelahiran | `jenis_masuk = lahir` — bukan pendatang, bukan pendataan awal |
+| Kematian | `alasan_keluar = meninggal` — bukan pindah keluar, bukan data duplikat |
+
+Tanpa pembeda ini, satu kali impor 2.000 warga akan terbaca sebagai ledakan kelahiran, dan setiap pembersihan data ganda akan terbaca sebagai kematian.
+
+### Arsip, bukan hapus
+
+Warga yang keluar dari daftar aktif diarsipkan beserta sebabnya, dan dapat dipulihkan dari **Data Warga → Arsip Warga**. Pemulihan mengosongkan alasan dan tanggal keluar, supaya warga yang dipulihkan tidak tetap terhitung pada statistik kematian.
+
+### Impor Excel/CSV
+
+**Data Warga → Impor.** Unduh berkas contoh lebih dulu untuk melihat susunan kolomnya.
+
+- Batas 2.000 baris dan 5 MB per berkas (tidak ada queue worker di shared hosting — lihat PRD §8).
+- Berkas yang memuat kolom NIK, nomor KK, atau nomor telepon **ditolak seluruhnya** sebelum satu baris pun diproses.
+- Wilayah dan pekerjaan yang belum terdaftar **tidak dibuat otomatis**. Salah ketik nama dusun akan diam-diam menambah wilayah palsu dan memecah statistik sebaran, jadi barisnya dilaporkan gagal.
+- Baris yang gagal dilaporkan beserta nomor barisnya di berkas asli dan alasannya, sehingga bisa diperbaiki lalu diunggah ulang.
+- Seluruh proses berjalan dalam satu transaksi: impor yang gagal di tengah jalan tidak meninggalkan separuh data.
+
+**Deteksi ganda.** Tanpa NIK atau nomor KK tidak ada kunci unik yang benar-benar pasti. Sistem memakai kombinasi **nama + tanggal lahir + wilayah** — petunjuk terkuat yang tersedia, tetapi bukan kepastian. Baris yang dilewati ditampilkan agar admin bisa memeriksanya, dan deteksi ini bisa dimatikan bila desa memang punya dua warga dengan ketiga data itu sama.
+
+---
+
 ## Deployment ke Shared Hosting cPanel
 
 Batasan yang mengikat desain aplikasi ada di [PRD §8](PRD.md). Ringkasnya:
@@ -194,6 +233,7 @@ Batasan yang mengikat desain aplikasi ada di [PRD §8](PRD.md). Ringkasnya:
 | 1 | 01 Autentikasi Admin | Selesai |
 | 1 | 02 Integrasi Penyimpanan R2 | Selesai — berjalan di disk lokal, tinggal isi kredensial R2 |
 | 1 | 03 Pengaturan & Identitas Desa | Selesai |
-| 2 | 04–07 Data penduduk, rekap KK, statistik, ekspor | Belum |
+| 2 | 04 Data Penduduk | Selesai |
+| 2 | 05–07 Rekap KK, statistik, ekspor | Belum |
 | 3 | 08–13 Konten desa | Belum |
 | 4 | 14–15 Etalase publik | Belum |

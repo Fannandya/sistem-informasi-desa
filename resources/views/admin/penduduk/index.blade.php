@@ -14,10 +14,16 @@
             </p>
         </div>
 
-        <a href="{{ route('admin.penduduk.create') }}"
-           class="rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700">
-            Tambah Warga
-        </a>
+        <div class="flex items-center gap-2">
+            <a href="{{ route('admin.penduduk.impor') }}"
+               class="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+                Impor
+            </a>
+            <a href="{{ route('admin.penduduk.create') }}"
+               class="rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700">
+                Tambah Warga
+            </a>
+        </div>
     </div>
 
     {{-- Saringan --}}
@@ -119,6 +125,10 @@
                         <a href="{{ route('admin.penduduk.create') }}"
                            class="rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-700">
                             Tambah Warga
+                        </a>
+                        <a href="{{ route('admin.penduduk.impor') }}"
+                           class="ml-2 rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                            Impor dari Excel
                         </a>
                     @endif
                 </div>
