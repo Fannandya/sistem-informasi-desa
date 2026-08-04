@@ -10,10 +10,10 @@
 <body class="h-full bg-slate-100 text-slate-800" x-data="{ sidebarTerbuka: false }">
 
     {{-- Sidebar --}}
-    <aside class="fixed inset-y-0 left-0 z-40 w-64 -translate-x-full bg-slate-900 text-slate-300 transition-transform lg:translate-x-0"
+    <aside class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col -translate-x-full bg-slate-900 text-slate-300 transition-transform lg:translate-x-0"
            :class="sidebarTerbuka && 'translate-x-0'">
 
-        <div class="flex h-16 items-center gap-3 border-b border-slate-800 px-5">
+        <div class="flex h-16 shrink-0 items-center gap-3 border-b border-slate-800 px-5">
             @if (filled($desa->logo))
                 <img src="{{ $desa->urlLogo() }}" alt="Logo {{ $desa->nama_desa }}"
                      class="h-9 w-9 shrink-0 rounded-lg object-cover">
@@ -28,7 +28,7 @@
             </div>
         </div>
 
-        <nav class="space-y-1 px-3 py-4 text-sm">
+        <nav class="scrollbar-gelap flex-1 space-y-1 overflow-y-auto overscroll-contain px-3 py-4 text-sm">
             @php
                 $tautanAktif = 'flex items-center gap-3 rounded-lg bg-slate-800 px-3 py-2.5 font-medium text-white';
                 $tautanBiasa = 'flex items-center gap-3 rounded-lg px-3 py-2.5 transition hover:bg-slate-800 hover:text-white';
@@ -72,6 +72,11 @@
             <a href="{{ route('admin.pengurus.index') }}"
                class="{{ request()->routeIs('admin.pengurus.*', 'admin.organisasi.*') ? $tautanAktif : $tautanBiasa }}">
                 Struktur Organisasi
+            </a>
+
+            <a href="{{ route('admin.organisasi.index') }}"
+               class="{{ request()->routeIs('admin.organisasi.*') ? $tautanAktif : $tautanBiasa }}">
+                Kelola Organisasi
             </a>
 
             <a href="{{ route('admin.potensi.index') }}"

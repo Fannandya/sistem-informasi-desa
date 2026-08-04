@@ -15,6 +15,25 @@
     display: none !important;
 }
 
+/* Scrollbar halus untuk area gelap (sidebar admin). */
+.scrollbar-gelap {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(71 85 105 / 0.6) transparent;
+}
+.scrollbar-gelap::-webkit-scrollbar {
+    width: 6px;
+}
+.scrollbar-gelap::-webkit-scrollbar-track {
+    background: transparent;
+}
+.scrollbar-gelap::-webkit-scrollbar-thumb {
+    background-color: rgb(71 85 105 / 0.6);
+    border-radius: 9999px;
+}
+.scrollbar-gelap::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(100 116 139 / 0.8);
+}
+
 /*
  * Gaya isi berita.
  *

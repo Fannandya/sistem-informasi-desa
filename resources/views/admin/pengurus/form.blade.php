@@ -16,7 +16,7 @@
     @if ($organisasiList->isEmpty())
         <div class="rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800">
             Belum ada kelompok organisasi. Tambahkan lebih dulu di halaman
-            <a href="{{ route('admin.pengurus.index') }}" class="underline">Struktur Organisasi</a>.
+            <a href="{{ route('admin.organisasi.index') }}" class="underline">Kelola Organisasi</a>.
         </div>
     @else
         <form method="POST"

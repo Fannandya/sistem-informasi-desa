@@ -21,104 +21,19 @@
         </div>
     </div>
 
-    {{-- ------------------------- Kelola organisasi ------------------------- --}}
-    <div x-data="{ buka: {{ $organisasiList->isEmpty() ? 'true' : 'false' }} }"
-         class="rounded-2xl bg-white shadow-sm ring-1 ring-slate-200">
-
-        <button type="button" @click="buka = !buka"
-                class="flex w-full items-center justify-between px-5 py-4 text-left">
-            <span>
-                <span class="block text-sm font-semibold text-slate-900">Kelompok Organisasi</span>
-                <span class="block text-xs text-slate-500">
-                    {{ $organisasiList->count() }} kelompok · urutannya menentukan susunan di halaman publik
-                </span>
-            </span>
-            <svg class="h-4 w-4 text-slate-400 transition" :class="buka && 'rotate-180'"
-                 fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-            </svg>
-        </button>
-
-        <div x-show="buka" x-cloak class="border-t border-slate-200 p-5">
-            <form method="POST" action="{{ route('admin.organisasi.store') }}"
-                  class="mb-5 flex flex-wrap items-end gap-3">
-                @csrf
-                <div class="min-w-48 flex-1">
-                    <label class="mb-1 block text-xs text-slate-500">Nama Organisasi</label>
-                    <input name="nama" required placeholder="mis. Karang Taruna"
-                           class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
-                </div>
-                <div class="w-28">
-                    <label class="mb-1 block text-xs text-slate-500">Urutan</label>
-                    <input name="urutan" type="number" value="0"
-                           class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
-                </div>
-                <button type="submit"
-                        class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">
-                    Tambah
-                </button>
-            </form>
-
-            @if ($organisasiList->isEmpty())
-                <p class="text-sm text-slate-500">
-                    Belum ada kelompok organisasi. Tambahkan minimal satu sebelum mencatat pengurus.
-                </p>
-            @else
-                <div class="divide-y divide-slate-100">
-                    @foreach ($organisasiList as $organisasi)
-                        <div x-data="{ ubah: false }" class="flex flex-wrap items-center gap-3 py-2.5">
-                            <span class="w-10 text-xs text-slate-400" x-show="!ubah">#{{ $organisasi->urutan }}</span>
-                            <span class="flex-1 text-sm font-medium text-slate-900" x-show="!ubah">
-                                {{ $organisasi->nama }}
-                            </span>
-                            <span class="text-xs text-slate-500" x-show="!ubah">
-                                {{ $organisasi->pengurus_count }} pengurus
-                            </span>
-                            <div class="flex items-center gap-1" x-show="!ubah">
-                                <button type="button" @click="ubah = true"
-                                        class="rounded-md px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-200">
-                                    Ubah
-                                </button>
-                                @if ($organisasi->pengurus_count > 0)
-                                    <span class="cursor-not-allowed px-2.5 py-1 text-xs text-slate-300"
-                                          title="Masih dipakai {{ $organisasi->pengurus_count }} pengurus">Hapus</span>
-                                @else
-                                    <form method="POST" action="{{ route('admin.organisasi.destroy', $organisasi) }}"
-                                          onsubmit="return confirm('Hapus organisasi {{ $organisasi->nama }}?')">
-                                        @csrf @method('DELETE')
-                                        <button type="submit"
-                                                class="rounded-md px-2.5 py-1 text-xs font-medium text-red-700 hover:bg-red-50">
-                                            Hapus
-                                        </button>
-                                    </form>
-                                @endif
-                            </div>
-
-                            <form method="POST" action="{{ route('admin.organisasi.update', $organisasi) }}"
-                                  class="flex w-full flex-wrap items-end gap-3" x-show="ubah" x-cloak>
-                                @csrf @method('PUT')
-                                <div class="min-w-40 flex-1">
-                                    <input name="nama" value="{{ $organisasi->nama }}" required
-                                           class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
-                                </div>
-                                <div class="w-24">
-                                    <input name="urutan" type="number" value="{{ $organisasi->urutan }}"
-                                           class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
-                                </div>
-                                <button type="submit"
-                                        class="rounded-lg bg-emerald-600 px-3 py-2 text-sm font-medium text-white hover:bg-emerald-700">
-                                    Simpan
-                                </button>
-                                <button type="button" @click="ubah = false"
-                                        class="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50">
-                                    Batal
-                                </button>
-                            </form>
-                        </div>
-                    @endforeach
-                </div>
-            @endif
+    {{-- Organisasi dikelola di halamannya sendiri agar halaman ini tetap
+         fokus pada pengurus. --}}
+    <div class="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-white px-5 py-4 shadow-sm ring-1 ring-slate-200">
+        <div>
+            <p class="text-sm font-semibold text-slate-900">Kelompok Organisasi</p>
+            <p class="mt-0.5 text-xs text-slate-500">
+                {{ $organisasiList->count() }} kelompok terdaftar · urutannya menentukan susunan di halaman publik
+            </p>
         </div>
+        <a href="{{ route('admin.organisasi.index') }}"
+           class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
+            Kelola Organisasi
+        </a>
     </div>
 
     {{-- --------------------------- Daftar pengurus --------------------------- --}}

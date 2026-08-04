@@ -138,9 +138,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('pengurus/{pengurus}/tampil', [PengurusController::class, 'ubahTampil'])->name('pengurus.tampil');
         Route::post('pengurus/{pengurus}/geser', [PengurusController::class, 'geser'])->name('pengurus.geser');
 
+        Route::get('organisasi', [RefOrganisasiController::class, 'index'])->name('organisasi.index');
         Route::post('organisasi', [RefOrganisasiController::class, 'store'])->name('organisasi.store');
         Route::put('organisasi/{organisasi}', [RefOrganisasiController::class, 'update'])->name('organisasi.update');
         Route::delete('organisasi/{organisasi}', [RefOrganisasiController::class, 'destroy'])->name('organisasi.destroy');
+        Route::post('organisasi/{organisasi}/geser', [RefOrganisasiController::class, 'geser'])->name('organisasi.geser');
 
         // --- Potensi desa ---
         Route::get('potensi', [PotensiController::class, 'index'])->name('potensi.index');
