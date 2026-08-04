@@ -214,6 +214,24 @@ Warga yang keluar dari daftar aktif diarsipkan beserta sebabnya, dan dapat dipul
 
 ---
 
+## Jumlah KK
+
+Nomor Kartu Keluarga sengaja tidak disimpan, sehingga jumlah keluarga **tidak bisa dihitung otomatis** dari data warga. Angkanya diinput admin per RT lewat **Panel Admin → Rekap KK**, lalu dijumlahkan sistem.
+
+Satu hal yang membedakan halaman ini dari form biasa: **kosong dan nol bukan hal yang sama**. Isian kosong berarti "RT ini belum direkap"; angka `0` berarti "sudah diperiksa, memang tidak ada KK". Tanpa pembedaan itu, sistem tidak bisa tahu apakah total yang ditampilkan sudah lengkap atau masih kurang.
+
+Karena itu setiap tampilan Jumlah KK mencantumkan tahun datanya, dan dashboard admin menandai bila masih ada RT yang kosong:
+
+> Jumlah KK **94** · data tahun 2026 · ⚠ 3 RT belum diisi
+
+**Periode data.** Angka selalu diambil dari tahun rekap **terakhir yang memiliki data**, bukan otomatis tahun berjalan. Awal tahun, sebelum admin sempat merekap, memakai tahun berjalan akan menampilkan "0 KK" seolah seluruh keluarga desa lenyap.
+
+Aturan ini dipusatkan di `App\Queries\RingkasanKk` dan dipakai bersama oleh dashboard admin dan halaman statistik publik, sehingga keduanya tidak mungkin menampilkan angka berbeda. Bedanya hanya penanda "belum lengkap", yang muncul di panel admin saja.
+
+**Salin tahun sebelumnya.** Tombol ini memuat angka tahun lalu ke formulir sebagai titik awal, tetapi **tidak langsung menyimpannya** — admin masih harus memeriksa lalu menekan Simpan. Menyimpan langsung akan membuat angka tahun lalu tercatat sebagai angka tahun ini meski belum diverifikasi siapa pun.
+
+---
+
 ## Deployment ke Shared Hosting cPanel
 
 Batasan yang mengikat desain aplikasi ada di [PRD §8](PRD.md). Ringkasnya:
@@ -234,6 +252,7 @@ Batasan yang mengikat desain aplikasi ada di [PRD §8](PRD.md). Ringkasnya:
 | 1 | 02 Integrasi Penyimpanan R2 | Selesai — berjalan di disk lokal, tinggal isi kredensial R2 |
 | 1 | 03 Pengaturan & Identitas Desa | Selesai |
 | 2 | 04 Data Penduduk | Selesai |
-| 2 | 05–07 Rekap KK, statistik, ekspor | Belum |
+| 2 | 05 Rekap KK per Wilayah | Selesai |
+| 2 | 06–07 Statistik warga, ekspor | Belum |
 | 3 | 08–13 Konten desa | Belum |
 | 4 | 14–15 Etalase publik | Belum |

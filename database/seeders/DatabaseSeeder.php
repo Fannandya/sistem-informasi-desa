@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             WilayahSeeder::class,
             RefPekerjaanSeeder::class,
             PendudukSeeder::class,
+            RekapKkSeeder::class,
         ]);
     }
 }

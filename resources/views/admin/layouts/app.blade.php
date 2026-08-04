@@ -51,6 +51,11 @@
                 Arsip Warga
             </a>
 
+            <a href="{{ route('admin.rekap-kk.index') }}"
+               class="{{ request()->routeIs('admin.rekap-kk.*') ? $tautanAktif : $tautanBiasa }}">
+                Rekap KK
+            </a>
+
             <a href="{{ route('admin.wilayah.index') }}"
                class="{{ request()->routeIs('admin.wilayah.*') ? $tautanAktif : $tautanBiasa }}">
                 Wilayah

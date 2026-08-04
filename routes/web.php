@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\ImporPendudukController;
 use App\Http\Controllers\Admin\PendudukController;
 use App\Http\Controllers\Admin\PengaturanDesaController;
 use App\Http\Controllers\Admin\RefPekerjaanController;
+use App\Http\Controllers\Admin\RekapKkController;
 use App\Http\Controllers\Admin\WilayahController;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Facades\Route;
@@ -64,6 +65,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('penduduk/{penduduk}', [PendudukController::class, 'update'])
             ->withTrashed()->name('penduduk.update');
         Route::delete('penduduk/{penduduk}', [PendudukController::class, 'arsipkan'])->name('penduduk.arsipkan');
+
+        // --- Rekap KK ---
+        Route::get('rekap-kk', [RekapKkController::class, 'index'])->name('rekap-kk.index');
+        Route::post('rekap-kk/{tahun}', [RekapKkController::class, 'simpan'])->name('rekap-kk.simpan');
+        Route::post('rekap-kk/{tahun}/salin', [RekapKkController::class, 'salinTahunSebelumnya'])
+            ->name('rekap-kk.salin');
 
         // --- Data referensi ---
         Route::get('wilayah', [WilayahController::class, 'index'])->name('wilayah.index');
