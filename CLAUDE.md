@@ -1,8 +1,15 @@
 # CLAUDE.md — Peta Proyek Sistem Informasi Desa
 
-> **Tujuan berkas ini:** agen di sesi baru cukup membaca berkas ini untuk tahu
-> struktur, rute, dan aturan proyek — tanpa memindai seluruh folder.
-> Bila ada perubahan struktur/rute/aturan, **perbarui berkas ini di commit yang sama**.
+> **MANDAT — wajib dipatuhi:** Berkas ini adalah **acuan utama proyek**. Di
+> sesi baru cukup baca berkas ini untuk memahami proyek — **jangan memindai
+> ulang seluruh folder** hanya untuk "memverifikasi" isi berkas ini; hemat
+> token dengan menjadikannya satu-satunya konteks awal.
+>
+> Seluruh aturan di §3 dan konvensi di berkas ini **bersifat mengikat** —
+> jangan dilanggar kecuali pengguna memintanya secara eksplisit. Bila
+> struktur/rute/aturan berubah, **perbarui berkas ini di commit yang sama**;
+> menyinkronkannya adalah bagian dari definisi "selesai", bukan pekerjaan
+> tambahan.
 >
 > Status terakhir diverifikasi: 109 rute, 18 commit, 428 tes lulus (1202 asersi).
 
@@ -624,6 +631,7 @@ Spesifikasi per fitur ada di `features/01-*.md` … `features/15-*.md`
 | `06ea468` | Impor warga: admin yang memutuskan, bukan sistem |
 | `a92d30e` | Kelola Organisasi sebagai halaman tersendiri |
 | `2099701` | Hapus permanen warga, pusat dialog, dan dirty tracking |
+| `a4a5ad2` | Tambah CLAUDE.md sebagai peta proyek untuk sesi baru |
 
 Seluruh 15 fitur PRD sudah selesai.
 
@@ -647,7 +655,7 @@ lengkap belum pernah dirampungkan.
 - `axios` ikut ter-bundle tapi tidak dipakai.
 
 **Aksesibilitas / SEO / Ops**
-- Hanya 5 `aria-label` di seluruh lapisan view.
+- Hanya 6 `aria-label` di seluruh lapisan view.
 - `robots.txt` menuliskan `http://localhost:8000/sitemap.xml` secara hardcode.
 - Belum ada CI/CD, Docker, security header, maupun rate limiting global.
 - README belum memuat panduan `storage:link`, `config:cache`, `route:cache`.

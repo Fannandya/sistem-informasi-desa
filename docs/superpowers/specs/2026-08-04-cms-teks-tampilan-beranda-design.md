@@ -115,10 +115,15 @@ Teks::angka(string $kunci): int
 ```
 
 - `ambil()`: `TeksTampilan::semua()[$kunci] ?? null`, jika null/kosong pakai
-  `config("teks-tampilan.{$kunci}.default")`, lalu `strtr($nilai, $ganti)`
-  bila `$ganti` diisi. Jika kunci tidak terdaftar di config sama sekali,
-  kembalikan kunci itu sendiri (memudahkan mendeteksi kunci yang lupa
-  didaftarkan, sama seperti pola fallback yang disarankan `ANALISIS-CMS.md`).
+  `config('teks-tampilan')[$kunci]['default'] ?? $kunci`, lalu
+  `strtr($nilai, $ganti)` bila `$ganti` diisi. Jika kunci tidak terdaftar di
+  config sama sekali, kembalikan kunci itu sendiri (memudahkan mendeteksi
+  kunci yang lupa didaftarkan, sama seperti pola fallback yang disarankan
+  `ANALISIS-CMS.md`).
+  > **Akses config wajib langsung**, bukan `config("teks-tampilan.{$kunci}.default")`
+  > — Laravel mengurai `.` di `config()` sebagai pemisah bersarang, sehingga
+  > kunci datar bertitik seperti `beranda.hero.cta_profil` tidak pernah
+  > ditemukan lewat dot-path (terverifikasi: hasilnya `null`).
 - `angka()`: sama, tapi `(int)` hasilnya.
 
 Nilai kosong (`''`) yang tersimpan di DB diperlakukan sama seperti `null`
@@ -147,16 +152,36 @@ Menyisip di `routes/web.php`, grup admin terautentikasi, dekat rute
 
 ### Request `App\Http\Requests\Admin\UpdateTeksTampilanRequest`
 
-- `rules()`: baca `config("teks-tampilan")`, filter berdasarkan `grup` dari
-  route param, bangun aturan per kunci berdasarkan `tipe`:
+> **Perangkap Laravel yang wajib dihindari (terverifikasi di mesin lokal):**
+> kunci teks tampilan memakai titik (`beranda.hero.cta_profil`), tetapi
+> Laravel memperlakukan `.` sebagai pemisah bersarang — pada nama field form,
+> `$request->input()`, `$request->validated()`, maupun `config()`.
+> `<input name="beranda.hero.cta_profil">` diurai menjadi
+> `['beranda']['hero']['cta_profil']`, jadi kunci asli hilang dan
+> `validated()` tidak pernah menghasilkan kunci bertitik datar.
+> Karena itu **kontrak HTTP memakai kunci termanggl**: titik diganti `__`
+> (contoh `beranda__hero__cta_profil`). Bentuk bertitik hanya dipakai di
+> dalam aplikasi (config, DB, view render), bukan di nama field.
+
+Kontrak request:
+
+- **Nama field form**: `nilai[<kunci termanggl>]` — satu level array.
+  `nilai` adalah segmen tunggal, sehingga Laravel menyimpannya apa adanya
+  tanpa memecah kunci termangglnya (terverifikasi, contoh `E` pada uji).
+- **`rules()`**: baca `config('teks-tampilan')`, filter berdasarkan `grup`
+  dari route param, bangun aturan per kunci berdasarkan `tipe`, dengan nama
+  aturan `'nilai.<kunci termanggl>'`:
   - `teks`/`textarea` → `['nullable', 'string', 'max:{maks}']`
   - `angka` → `['nullable', 'integer', 'min:{min}', 'max:{max}']`
-- Whitelist otomatis: hanya kunci yang terdaftar di config untuk grup ini
-  yang punya aturan, sehingga hanya kunci itu yang muncul di `validated()` —
-  input tambahan/tidak dikenal diabaikan tanpa perlu pengecekan eksplisit.
-- `prepareForValidation()`: normalisasi string kosong (`''`) menjadi `null`
-  untuk seluruh kunci bertipe teks/textarea, supaya "mengosongkan field"
-  di form == "kembali ke default", bukan tersimpan sebagai string kosong.
+- **`prepareForValidation()`**: normalisasi isi `nilai` — seluruh nilai `''`
+  (teks/textarea **dan** angka) diubah `null`, supaya "mengosongkan field"
+  == "kembali ke default", bukan tersimpan string kosong maupun gagal
+  validasi `integer`.
+- **`validated()['nilai']`** berbentuk `[ '<kunci termanggl>' => nilai ]`.
+  Whitelist dijamin di sisi controller (lihat §4 Controller), bukan dengan
+  mengandalkan `validated()`.
+- **`attributes()`**: peta `'nilai.<kunci termanggl>'` → `label` dari config,
+  agar pesan validasi menyebut nama yang bisa dibaca admin.
 
 ### View `admin/teks-tampilan/index.blade.php`
 
