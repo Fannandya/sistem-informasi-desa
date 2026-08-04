@@ -14,24 +14,24 @@
 
 <div x-data="{ buka: false }" @click.outside="buka = false" class="relative">
     <button type="button" @click="buka = !buka"
-            class="flex items-center gap-1.5 rounded-lg border border-slate-300 px-4 py-2.5 text-sm
-                   font-medium text-slate-700 transition hover:bg-slate-50">
+            class="flex items-center gap-1.5 rounded-[12px] border border-outline px-4 py-2.5 text-sm
+                   font-medium text-on-surface transition hover:bg-surface-container">
         Ekspor
-        <svg class="h-3.5 w-3.5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+        <svg class="h-3.5 w-3.5 text-on-surface-variant" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
         </svg>
     </button>
 
     <div x-show="buka" x-cloak
-         class="absolute right-0 z-20 mt-2 w-64 rounded-xl bg-white p-2 shadow-lg ring-1 ring-slate-200">
+         class="absolute right-0 z-20 mt-2 w-64 rounded-[12px] bg-surface-container-lowest p-2 shadow-lg ring-1 ring-outline-variant">
 
         @if ($adaSaringan)
-            <p class="px-3 py-2 text-xs text-slate-500">
-                Mengunduh <strong class="text-slate-700">hasil saringan yang sedang tampil</strong>.
+            <p class="px-3 py-2 text-xs text-on-surface-variant">
+                Mengunduh <strong class="text-on-surface">hasil saringan yang sedang tampil</strong>.
             </p>
         @else
-            <p class="px-3 py-2 text-xs text-slate-500">
-                Mengunduh <strong class="text-slate-700">seluruh data</strong>{{ $arsip ? ' arsip' : ' warga aktif' }}.
+            <p class="px-3 py-2 text-xs text-on-surface-variant">
+                Mengunduh <strong class="text-on-surface">seluruh data</strong>{{ $arsip ? ' arsip' : ' warga aktif' }}.
             </p>
         @endif
 
@@ -53,13 +53,13 @@
                 <input type="hidden" name="format" value="{{ $format }}">
 
                 <button type="submit"
-                        class="w-full rounded-lg px-3 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-100">
+                        class="w-full rounded-[12px] px-3 py-2 text-left text-sm text-on-surface transition hover:bg-surface-container">
                     {{ $label }}
                 </button>
             </form>
         @endforeach
 
-        <p class="border-t border-slate-100 px-3 pt-2 pb-1 text-xs text-slate-400">
+        <p class="border-t border-outline-variant px-3 pt-2 pb-1 text-xs text-on-surface-variant">
             Berkas tidak memuat NIK, nomor KK, nomor telepon, maupun tanggal lahir.
         </p>
     </div>

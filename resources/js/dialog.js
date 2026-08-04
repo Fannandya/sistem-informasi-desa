@@ -39,17 +39,17 @@ const GAYA = {
     bahaya: {
         ikon: 'bg-red-100 text-red-600',
         tombol: 'bg-red-600 hover:bg-red-700 focus:ring-red-500/40',
-        jalur: 'M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z',
+        ikonMateri: 'warning',
     },
     sukses: {
         ikon: 'bg-emerald-100 text-emerald-600',
         tombol: 'bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-500/40',
-        jalur: 'M5 13l4 4L19 7',
+        ikonMateri: 'check_circle',
     },
     tanya: {
-        ikon: 'bg-slate-100 text-slate-600',
-        tombol: 'bg-emerald-600 hover:bg-emerald-700 focus:ring-emerald-500/40',
-        jalur: 'M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+        ikon: 'bg-primary/10 text-primary',
+        tombol: 'bg-primary hover:bg-primary-container focus:ring-primary/40',
+        ikonMateri: 'help',
     },
 };
 
@@ -76,7 +76,10 @@ export function bukaDialog(pilihan) {
     const gaya = GAYA[jenis] ?? GAYA.tanya;
 
     el.ikon.className = `flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${gaya.ikon}`;
-    el.ikon.querySelector('path').setAttribute('d', gaya.jalur);
+    const ikonSpan = el.ikon.querySelector('.material-symbols-outlined');
+    if (ikonSpan) {
+        ikonSpan.textContent = gaya.ikonMateri;
+    }
 
     el.judul.textContent = pilihan.judul ?? 'Konfirmasi';
 

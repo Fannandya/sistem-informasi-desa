@@ -8,10 +8,10 @@
 ])
 
 <div>
-    <label for="{{ $name }}" class="mb-1.5 block text-sm font-medium text-slate-700">
+    <label for="{{ $name }}" class="mb-1.5 block text-sm font-medium text-on-surface">
         {{ $label }}
         @if ($required)
-            <span class="text-red-500" aria-hidden="true">*</span>
+            <span class="text-error" aria-hidden="true">*</span>
         @endif
     </label>
 
@@ -21,16 +21,16 @@
         rows="{{ $rows }}"
         @if ($required) required @endif
         {{ $attributes->class([
-            'w-full rounded-lg border px-3 py-2.5 text-sm shadow-sm focus:ring-2 focus:outline-none',
-            'border-slate-300 focus:border-emerald-500 focus:ring-emerald-500/20' => ! $errors->has($name),
-            'border-red-400 focus:border-red-500 focus:ring-red-500/20' => $errors->has($name),
+            'w-full rounded-[12px] border px-3 py-2.5 text-sm shadow-sm focus:ring-2 focus:outline-none',
+            'border-outline-variant focus:border-primary focus:ring-primary/20' => ! $errors->has($name),
+            'border-error focus:border-error focus:ring-error/20' => $errors->has($name),
         ]) }}>{{ old($name, $value) }}</textarea>
 
     @if ($keterangan)
-        <p class="mt-1.5 text-xs text-slate-500">{{ $keterangan }}</p>
+        <p class="mt-1.5 text-xs text-on-surface-variant">{{ $keterangan }}</p>
     @endif
 
     @error($name)
-        <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
+        <p class="mt-1.5 text-sm text-error">{{ $message }}</p>
     @enderror
 </div>

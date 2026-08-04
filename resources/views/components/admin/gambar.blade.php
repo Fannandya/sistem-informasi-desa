@@ -25,10 +25,10 @@
             this.hapus = false;
         },
     }">
-    <p class="mb-1.5 text-sm font-medium text-slate-700">{{ $label }}</p>
+    <p class="mb-1.5 text-sm font-medium text-on-surface">{{ $label }}</p>
 
     <div class="flex items-start gap-4">
-        <div class="shrink-0 overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200">
+        <div class="shrink-0 overflow-hidden rounded-[12px] bg-surface-container-low ring-1 ring-outline-variant">
             <img :src="pratinjau" alt="Pratinjau {{ $label }}"
                  class="h-24 w-24 object-cover transition"
                  :class="hapus && 'opacity-30 grayscale'">
@@ -38,22 +38,22 @@
             <input id="{{ $name }}" name="{{ $name }}" type="file"
                    accept="{{ collect(config('unggahan.mime_diizinkan'))->implode(',') }}"
                    @change="pilih"
-                   class="block w-full text-sm text-slate-600
-                          file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-4 file:py-2
-                          file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200">
+                   class="block w-full text-sm text-on-surface-variant
+                          file:mr-3 file:rounded-[12px] file:border-0 file:bg-surface-container file:px-4 file:py-2
+                          file:text-sm file:font-medium file:text-on-surface hover:file:bg-surface-container-high">
 
-            <p class="mt-1.5 text-xs text-slate-500">
+            <p class="mt-1.5 text-xs text-on-surface-variant">
                 {{ $keterangan ? $keterangan . ' ' : '' }}Format {{ $format }}, maksimal {{ $maksMb }} MB.
             </p>
 
-            <label x-show="adaGambar" x-cloak class="mt-2 flex items-center gap-2 text-sm text-slate-600">
+            <label x-show="adaGambar" x-cloak class="mt-2 flex items-center gap-2 text-sm text-on-surface-variant">
                 <input type="checkbox" name="hapus_{{ $name }}" value="1" x-model="hapus"
-                       class="rounded border-slate-300 text-red-600 focus:ring-red-500">
+                       class="rounded border-outline-variant text-error focus:ring-error/20">
                 Hapus gambar ini
             </label>
 
             @error($name)
-                <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
+                <p class="mt-1.5 text-sm text-error">{{ $message }}</p>
             @enderror
         </div>
     </div>

@@ -19,19 +19,19 @@
 
     <noscript>
         @if ($muatan['status'])
-            <div class="mb-5 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800">
+            <div class="mb-5 rounded-[12px] border border-primary-fixed bg-primary-fixed/20 px-4 py-3 text-sm text-on-primary-container">
                 {{ $muatan['status'] }}
             </div>
         @endif
 
         @if ($muatan['galat'])
-            <div class="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <div class="mb-5 rounded-[12px] border border-tertiary-fixed bg-tertiary-fixed/20 px-4 py-3 text-sm text-on-tertiary-container">
                 {{ $muatan['galat'] }}
             </div>
         @endif
 
         @if ($muatan['kesalahan'])
-            <div class="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            <div class="mb-5 rounded-[12px] border border-error bg-error/10 px-4 py-3 text-sm text-on-error-container">
                 <p class="font-medium">Perubahan belum tersimpan.</p>
                 <ul class="mt-1.5 list-inside list-disc space-y-0.5">
                     @foreach ($muatan['kesalahan'] as $pesan)
