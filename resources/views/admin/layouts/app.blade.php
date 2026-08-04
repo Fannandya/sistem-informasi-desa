@@ -94,6 +94,11 @@
                 Berita Desa
             </a>
 
+            <a href="{{ route('admin.acara.index') }}"
+               class="{{ request()->routeIs('admin.acara.*') ? $tautanAktif : $tautanBiasa }}">
+                Galeri Acara
+            </a>
+
             <a href="{{ route('admin.pengaturan') }}"
                class="{{ request()->routeIs('admin.pengaturan*') ? $tautanAktif : $tautanBiasa }}">
                 Pengaturan Desa

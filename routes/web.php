@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\ImporPendudukController;
 use App\Http\Controllers\Admin\PendudukController;
 use App\Http\Controllers\Admin\PengaturanDesaController;
 use App\Http\Controllers\Admin\PengurusController;
+use App\Http\Controllers\Admin\AcaraController;
 use App\Http\Controllers\Admin\BeritaController;
 use App\Http\Controllers\Admin\FasilitasController;
 use App\Http\Controllers\Admin\KategoriBeritaController;
@@ -20,6 +21,7 @@ use App\Http\Controllers\Admin\RekapKkController;
 use App\Http\Controllers\Admin\StatistikController;
 use App\Http\Controllers\Admin\WilayahController;
 use App\Http\Controllers\Publik\BeritaController as BeritaPublikController;
+use App\Http\Controllers\Publik\GaleriController;
 use App\Http\Controllers\Publik\FasilitasController as FasilitasPublikController;
 use App\Http\Controllers\Publik\PotensiController as PotensiPublikController;
 use App\Http\Controllers\Publik\PrestasiController as PrestasiPublikController;
@@ -48,6 +50,9 @@ Route::name('publik.')->group(function () {
     Route::get('berita', [BeritaPublikController::class, 'index'])->name('berita.index');
     Route::get('berita/kategori/{kategori}', [BeritaPublikController::class, 'index'])->name('berita.kategori');
     Route::get('berita/{berita}', [BeritaPublikController::class, 'show'])->name('berita.show');
+
+    Route::get('galeri', [GaleriController::class, 'index'])->name('galeri.index');
+    Route::get('galeri/{acara}', [GaleriController::class, 'show'])->name('galeri.show');
 });
 
 /*
@@ -164,6 +169,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
         Route::post('kategori-berita', [KategoriBeritaController::class, 'store'])->name('kategori-berita.store');
         Route::delete('kategori-berita/{kategori}', [KategoriBeritaController::class, 'destroy'])->name('kategori-berita.destroy');
+
+        // --- Galeri acara ---
+        Route::get('acara', [AcaraController::class, 'index'])->name('acara.index');
+        Route::get('acara/tulis', [AcaraController::class, 'create'])->name('acara.create');
+        Route::post('acara', [AcaraController::class, 'store'])->name('acara.store');
+        Route::get('acara/{acara}/ubah', [AcaraController::class, 'edit'])->name('acara.edit');
+        Route::put('acara/{acara}', [AcaraController::class, 'update'])->name('acara.update');
+        Route::delete('acara/{acara}', [AcaraController::class, 'destroy'])->name('acara.destroy');
+        Route::post('acara/{acara}/status', [AcaraController::class, 'ubahStatus'])->name('acara.status');
+        Route::post('acara/{acara}/foto', [AcaraController::class, 'unggahFoto'])->name('acara.foto.unggah');
+        Route::put('acara/{acara}/foto', [AcaraController::class, 'perbaruiFoto'])->name('acara.foto.perbarui');
+        Route::delete('acara/{acara}/foto/{foto}', [AcaraController::class, 'hapusFoto'])->name('acara.foto.hapus');
 
         // --- Data referensi ---
         Route::get('wilayah', [WilayahController::class, 'index'])->name('wilayah.index');
