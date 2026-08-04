@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             PengurusSeeder::class,
             PotensiSeeder::class,
             FasilitasPrestasiSeeder::class,
+            BeritaSeeder::class,
         ]);
     }
 }

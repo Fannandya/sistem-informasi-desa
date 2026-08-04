@@ -12,6 +12,7 @@ export default defineConfig({
                 // yang benar-benar menampilkan grafik, bukan di setiap
                 // halaman admin dan publik.
                 'resources/js/grafik.js',
+                'resources/js/editor.js',
             ],
             refresh: true,
         }),

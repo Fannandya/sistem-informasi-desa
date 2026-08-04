@@ -9,7 +9,9 @@ use App\Http\Controllers\Admin\ImporPendudukController;
 use App\Http\Controllers\Admin\PendudukController;
 use App\Http\Controllers\Admin\PengaturanDesaController;
 use App\Http\Controllers\Admin\PengurusController;
+use App\Http\Controllers\Admin\BeritaController;
 use App\Http\Controllers\Admin\FasilitasController;
+use App\Http\Controllers\Admin\KategoriBeritaController;
 use App\Http\Controllers\Admin\PotensiController;
 use App\Http\Controllers\Admin\PrestasiController;
 use App\Http\Controllers\Admin\RefOrganisasiController;
@@ -17,6 +19,7 @@ use App\Http\Controllers\Admin\RefPekerjaanController;
 use App\Http\Controllers\Admin\RekapKkController;
 use App\Http\Controllers\Admin\StatistikController;
 use App\Http\Controllers\Admin\WilayahController;
+use App\Http\Controllers\Publik\BeritaController as BeritaPublikController;
 use App\Http\Controllers\Publik\FasilitasController as FasilitasPublikController;
 use App\Http\Controllers\Publik\PotensiController as PotensiPublikController;
 use App\Http\Controllers\Publik\PrestasiController as PrestasiPublikController;
@@ -41,6 +44,10 @@ Route::name('publik.')->group(function () {
 
     Route::get('fasilitas', FasilitasPublikController::class)->name('fasilitas');
     Route::get('prestasi', PrestasiPublikController::class)->name('prestasi');
+
+    Route::get('berita', [BeritaPublikController::class, 'index'])->name('berita.index');
+    Route::get('berita/kategori/{kategori}', [BeritaPublikController::class, 'index'])->name('berita.kategori');
+    Route::get('berita/{berita}', [BeritaPublikController::class, 'show'])->name('berita.show');
 });
 
 /*
@@ -144,6 +151,19 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('prestasi/{prestasi}', [PrestasiController::class, 'update'])->name('prestasi.update');
         Route::delete('prestasi/{prestasi}', [PrestasiController::class, 'destroy'])->name('prestasi.destroy');
         Route::post('prestasi/{prestasi}/tampil', [PrestasiController::class, 'ubahTampil'])->name('prestasi.tampil');
+
+        // --- Berita ---
+        Route::get('berita', [BeritaController::class, 'index'])->name('berita.index');
+        Route::get('berita/tulis', [BeritaController::class, 'create'])->name('berita.create');
+        Route::post('berita', [BeritaController::class, 'store'])->name('berita.store');
+        Route::get('berita/{berita}/ubah', [BeritaController::class, 'edit'])->name('berita.edit');
+        Route::put('berita/{berita}', [BeritaController::class, 'update'])->name('berita.update');
+        Route::delete('berita/{berita}', [BeritaController::class, 'destroy'])->name('berita.destroy');
+        Route::post('berita/{berita}/status', [BeritaController::class, 'ubahStatus'])->name('berita.status');
+        Route::post('berita/{berita}/utama', [BeritaController::class, 'jadikanUtama'])->name('berita.utama');
+
+        Route::post('kategori-berita', [KategoriBeritaController::class, 'store'])->name('kategori-berita.store');
+        Route::delete('kategori-berita/{kategori}', [KategoriBeritaController::class, 'destroy'])->name('kategori-berita.destroy');
 
         // --- Data referensi ---
         Route::get('wilayah', [WilayahController::class, 'index'])->name('wilayah.index');

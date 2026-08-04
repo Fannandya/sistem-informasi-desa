@@ -14,3 +14,44 @@
 [x-cloak] {
     display: none !important;
 }
+
+/*
+ * Gaya isi berita.
+ *
+ * Keluaran editor Trix berupa HTML polos tanpa kelas, jadi penataannya
+ * dilakukan lewat selektor turunan di sini.
+ */
+.prose-desa {
+    color: var(--color-slate-700);
+    line-height: 1.75;
+}
+.prose-desa > * + * { margin-top: 1.1em; }
+.prose-desa h2 { font-size: 1.4rem; font-weight: 600; color: var(--color-slate-900); margin-top: 1.8em; }
+.prose-desa h3 { font-size: 1.15rem; font-weight: 600; color: var(--color-slate-900); margin-top: 1.5em; }
+.prose-desa ul { list-style: disc; padding-left: 1.5rem; }
+.prose-desa ol { list-style: decimal; padding-left: 1.5rem; }
+.prose-desa li + li { margin-top: 0.35em; }
+.prose-desa a { color: var(--color-emerald-700); text-decoration: underline; }
+.prose-desa a:hover { color: var(--color-emerald-800); }
+.prose-desa blockquote {
+    border-left: 3px solid var(--color-slate-300);
+    padding-left: 1rem;
+    color: var(--color-slate-500);
+    font-style: italic;
+}
+.prose-desa img { border-radius: 0.75rem; max-width: 100%; height: auto; }
+
+/* Editor Trix di panel admin */
+trix-editor {
+    min-height: 20rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-slate-300);
+    padding: 0.75rem;
+    background: #fff;
+}
+trix-editor:focus {
+    outline: none;
+    border-color: var(--color-emerald-500);
+    box-shadow: 0 0 0 2px rgb(16 185 129 / 0.2);
+}
+trix-toolbar .trix-button-group { border-color: var(--color-slate-300); }

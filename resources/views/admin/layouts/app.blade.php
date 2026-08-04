@@ -89,6 +89,11 @@
                 Prestasi Desa
             </a>
 
+            <a href="{{ route('admin.berita.index') }}"
+               class="{{ request()->routeIs('admin.berita.*', 'admin.kategori-berita.*') ? $tautanAktif : $tautanBiasa }}">
+                Berita Desa
+            </a>
+
             <a href="{{ route('admin.pengaturan') }}"
                class="{{ request()->routeIs('admin.pengaturan*') ? $tautanAktif : $tautanBiasa }}">
                 Pengaturan Desa
