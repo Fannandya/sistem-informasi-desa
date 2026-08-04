@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use App\Enums\KategoriPotensi;
 use App\Models\Concerns\PunyaGambar;
 use App\Models\Concerns\PunyaSlug;
 use App\Services\LayananUnggahGambar;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 
 class PotensiDesa extends Model
@@ -16,7 +16,7 @@ class PotensiDesa extends Model
 
     protected $table = 'potensi_desa';
 
-    protected $guarded = [];
+    protected $fillable = ['nama', 'slug', 'kategori_potensi_id', 'deskripsi_singkat', 'deskripsi', 'foto', 'kontak', 'tampil', 'urutan'];
 
     protected array $kolomGambar = ['foto'];
 
@@ -25,10 +25,14 @@ class PotensiDesa extends Model
     protected function casts(): array
     {
         return [
-            'kategori' => KategoriPotensi::class,
             'tampil' => 'boolean',
             'urutan' => 'integer',
         ];
+    }
+
+    public function kategori(): BelongsTo
+    {
+        return $this->belongsTo(RefKategoriPotensi::class, 'kategori_potensi_id');
     }
 
     public function scopeTampil(Builder $query): Builder

@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Enums\KategoriFasilitas;
 use App\Enums\TingkatPrestasi;
 use App\Models\FasilitasUmum;
 use App\Models\PrestasiDesa;
+use App\Models\RefKategoriFasilitas;
 use App\Models\Wilayah;
 use Illuminate\Database\Seeder;
 
@@ -16,24 +16,31 @@ class FasilitasPrestasiSeeder extends Seeder
         $wilayah = Wilayah::urut()->get();
 
         if (! FasilitasUmum::exists()) {
+            $pendidikan = RefKategoriFasilitas::where('nama', 'Pendidikan')->first()?->id;
+            $kesehatan = RefKategoriFasilitas::where('nama', 'Kesehatan')->first()?->id;
+            $ibadah = RefKategoriFasilitas::where('nama', 'Ibadah')->first()?->id;
+            $pemerintahan = RefKategoriFasilitas::where('nama', 'Pemerintahan')->first()?->id;
+            $olahraga = RefKategoriFasilitas::where('nama', 'Olahraga')->first()?->id;
+            $umum = RefKategoriFasilitas::where('nama', 'Umum')->first()?->id;
+
             $fasilitas = [
-                ['SDN Sukamaju 01', KategoriFasilitas::Pendidikan, 'Sekolah dasar negeri dengan 6 ruang kelas dan perpustakaan.'],
-                ['SDN Sukamaju 02', KategoriFasilitas::Pendidikan, 'Sekolah dasar negeri di Dusun Sukasari.'],
-                ['PAUD Melati', KategoriFasilitas::Pendidikan, 'Pendidikan anak usia dini yang dikelola PKK desa.'],
-                ['Puskesmas Pembantu Sukamaju', KategoriFasilitas::Kesehatan, 'Melayani pemeriksaan umum setiap Senin sampai Jumat.'],
-                ['Posyandu Anggrek', KategoriFasilitas::Kesehatan, 'Posyandu balita dan lansia, buka setiap tanggal 10.'],
-                ['Masjid Al-Ikhlas', KategoriFasilitas::Ibadah, 'Masjid jami desa dengan kapasitas sekitar 400 jemaah.'],
-                ['Musala Nurul Huda', KategoriFasilitas::Ibadah, 'Musala di Dusun Cimekar.'],
-                ['Balai Desa Sukamaju', KategoriFasilitas::Pemerintahan, 'Tempat musyawarah desa dan pelayanan administrasi warga.'],
-                ['Lapangan Bola Desa', KategoriFasilitas::Olahraga, 'Lapangan sepak bola yang juga dipakai untuk upacara dan senam warga.'],
-                ['Lapangan Voli Krajan', KategoriFasilitas::Olahraga, 'Lapangan voli di samping balai dusun.'],
-                ['Pasar Desa Sukamaju', KategoriFasilitas::Umum, 'Pasar tradisional yang ramai setiap Selasa dan Sabtu.'],
+                ['SDN Sukamaju 01', $pendidikan, 'Sekolah dasar negeri dengan 6 ruang kelas dan perpustakaan.'],
+                ['SDN Sukamaju 02', $pendidikan, 'Sekolah dasar negeri di Dusun Sukasari.'],
+                ['PAUD Melati', $pendidikan, 'Pendidikan anak usia dini yang dikelola PKK desa.'],
+                ['Puskesmas Pembantu Sukamaju', $kesehatan, 'Melayani pemeriksaan umum setiap Senin sampai Jumat.'],
+                ['Posyandu Anggrek', $kesehatan, 'Posyandu balita dan lansia, buka setiap tanggal 10.'],
+                ['Masjid Al-Ikhlas', $ibadah, 'Masjid jami desa dengan kapasitas sekitar 400 jemaah.'],
+                ['Musala Nurul Huda', $ibadah, 'Musala di Dusun Cimekar.'],
+                ['Balai Desa Sukamaju', $pemerintahan, 'Tempat musyawarah desa dan pelayanan administrasi warga.'],
+                ['Lapangan Bola Desa', $olahraga, 'Lapangan sepak bola yang juga dipakai untuk upacara dan senam warga.'],
+                ['Lapangan Voli Krajan', $olahraga, 'Lapangan voli di samping balai dusun.'],
+                ['Pasar Desa Sukamaju', $umum, 'Pasar tradisional yang ramai setiap Selasa dan Sabtu.'],
             ];
 
-            foreach ($fasilitas as $i => [$nama, $kategori, $deskripsi]) {
+            foreach ($fasilitas as $i => [$nama, $kategoriId, $deskripsi]) {
                 FasilitasUmum::create([
                     'nama' => $nama,
-                    'kategori' => $kategori,
+                    'kategori_fasilitas_id' => $kategoriId,
                     'deskripsi' => $deskripsi,
                     'wilayah_id' => $wilayah->isNotEmpty() ? $wilayah[$i % $wilayah->count()]->id : null,
                     'tampil' => true,

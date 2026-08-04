@@ -14,7 +14,7 @@
 @section('konten')
 
 {{-- ============================== HERO ============================== --}}
-<section class="relative overflow-hidden bg-on-surface"
+<section class="relative w-full h-[600px] md:h-[819px] flex items-center justify-center overflow-hidden bg-on-surface"
          x-data="carousel()" x-init="init()">
     {{-- Carousel images --}}
     <div class="absolute inset-0 overflow-hidden">
@@ -23,24 +23,23 @@
             <img :src="@js($layanan->url($item->path))"
                  alt="{{ $item->judul }}"
                  x-show="currentIndex === {{ $loop->index }}"
-                 class="h-full w-full object-cover opacity-45 transition-opacity duration-1000">
+                 class="h-full w-full object-cover transition-opacity duration-1000">
         @empty
             @if (filled($desa->foto_sampul))
                 <img src="{{ $desa->urlSampul() }}" alt=""
-                     class="h-full w-full object-cover opacity-45">
+                     class="h-full w-full object-cover">
             @endif
         @endforelse
     </div>
+    <div class="absolute inset-0 bg-primary/60 mix-blend-multiply"></div>
 
     {{-- Navigation indicators --}}
     @if ($carousel->isNotEmpty())
-        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex gap-2">
+        <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
             @foreach ($carousel as $item)
                 <button type="button"
                         @click="goToSlide({{ $loop->index }})"
-                        :class="currentIndex === {{ $loop->index }}
-                            ? 'w-8 bg-white'
-                            : 'w-2 bg-white/50'"
+                        :class="currentIndex === {{ $loop->index }} ? 'w-8 bg-white' : 'w-2 bg-white/50'"
                         class="h-2 rounded-full transition-all duration-300"
                         :aria-label="'Slide ' + {{ $loop->index + 1 }}">
                 </button>
@@ -48,34 +47,32 @@
         </div>
     @endif
 
-    <div class="relative mx-auto max-w-6xl px-4 py-24 sm:px-6 sm:py-32">
-        <div class="max-w-2xl">
-            @if ($desa->wilayahLengkap())
-                <p class="text-sm font-medium tracking-wider text-primary uppercase">
-                    {{ $desa->wilayahLengkap() }}
-                </p>
-            @endif
+    <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
+        @if ($desa->wilayahLengkap())
+            <p class="text-sm font-medium tracking-wider text-on-primary/80 uppercase mb-4 drop-shadow">
+                {{ $desa->wilayahLengkap() }}
+            </p>
+        @endif
 
-            <h1 class="mt-3 text-4xl leading-tight font-semibold text-white sm:text-5xl font-headline">
-                {{ Teks::ambil('beranda.hero.sapaan') }}<br>{{ $desa->nama_desa }}
-            </h1>
+        <h1 class="font-display-lg text-4xl md:text-5xl font-bold text-on-primary mb-6 drop-shadow-md leading-tight">
+            {{ Teks::ambil('beranda.hero.sapaan') }}<br>{{ $desa->nama_desa }}
+        </h1>
 
-            @if (filled($desa->meta_description) || filled($desa->visi))
-                <p class="mt-5 text-lg leading-relaxed text-on-surface/80">
-                    {{ Str::limit($desa->meta_description ?: $desa->visi, Teks::angka('kuota.beranda.limit_sapaan')) }}
-                </p>
-            @endif
+        @if (filled($desa->meta_description) || filled($desa->visi))
+            <p class="font-body-lg text-lg text-on-primary/90 mb-10 drop-shadow max-w-2xl mx-auto leading-relaxed">
+                {{ Str::limit($desa->meta_description ?: $desa->visi, Teks::angka('kuota.beranda.limit_sapaan')) }}
+            </p>
+        @endif
 
-            <div class="mt-8 flex flex-wrap gap-3">
-                <a href="{{ route('publik.profil') }}"
-                   class="rounded-[12px] bg-primary px-5 py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-fixed">
-                    {{ Teks::ambil('beranda.hero.cta_profil') }}
-                </a>
-                <a href="#potensi"
-                   class="rounded-[12px] border border-white/30 px-5 py-3 text-sm font-semibold text-white transition hover:bg-surface-container-lowest/10">
-                    {{ Teks::ambil('beranda.hero.cta_potensi') }}
-                </a>
-            </div>
+        <div class="flex flex-wrap justify-center gap-4">
+            <a href="{{ route('publik.profil') }}"
+               class="bg-secondary text-on-secondary px-8 py-3 rounded-lg font-label-md text-sm hover:bg-surface-tint transition-all shadow-lg hover:-translate-y-1">
+                {{ Teks::ambil('beranda.hero.cta_profil') }}
+            </a>
+            <a href="#potensi"
+               class="border-2 border-on-primary/50 text-on-primary px-8 py-3 rounded-lg font-label-md text-sm hover:bg-on-primary/10 transition-all shadow-lg hover:-translate-y-1 backdrop-blur-sm">
+                {{ Teks::ambil('beranda.hero.cta_potensi') }}
+            </a>
         </div>
     </div>
 </section>
@@ -115,91 +112,105 @@ function carousel() {
 </script>
 @endpush
 
-{{-- ============================ STATISTIK ============================ --}}
-<section id="statistik" class="border-b border-outline-variant bg-surface-container-low py-14">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6">
-        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            @foreach ([
-                [Teks::ambil('beranda.statistik.label_penduduk'), number_format($statistik['jumlah_penduduk'], 0, ',', '.'), Teks::ambil('beranda.statistik.satuan_jiwa')],
-                [Teks::ambil('beranda.statistik.label_kk'), $statistik['jumlah_kk'] !== null ? number_format($statistik['jumlah_kk'], 0, ',', '.') : null, Teks::ambil('beranda.statistik.satuan_keluarga')],
-                [Teks::ambil('beranda.statistik.label_laki'), number_format($statistik['laki'], 0, ',', '.'), Teks::ambil('beranda.statistik.satuan_jiwa')],
-                [Teks::ambil('beranda.statistik.label_perempuan'), number_format($statistik['perempuan'], 0, ',', '.'), Teks::ambil('beranda.statistik.satuan_jiwa')],
-            ] as [$label, $nilai, $satuan])
-                @if ($nilai !== null)
-                    <div class="text-center">
-                        <p class="text-3xl font-semibold text-on-surface sm:text-4xl">{{ $nilai }}</p>
-                        <p class="mt-1 text-sm font-medium text-on-surface">{{ $label }}</p>
-                        <p class="text-xs text-on-surface-variant">{{ $satuan }}</p>
-                    </div>
-                @endif
-            @endforeach
-        </div>
-
-        <div class="mt-8 text-center">
-            <a href="{{ route('publik.statistik') }}"
-               class="text-sm font-medium text-primary hover:text-primary-container">
-                {{ Teks::ambil('beranda.statistik.tautan') }}
-            </a>
-        </div>
-    </div>
-</section>
-
 {{-- ========================== SEKILAS DESA ========================== --}}
 @if (filled($desa->visi) || filled($desa->sejarah))
-    <section id="profil" class="py-16">
-        <div class="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-2">
+    <section id="profil" class="py-16 px-6 md:px-12 bg-surface">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             <div>
-                <h2 class="text-2xl font-semibold text-on-surface">{{ Teks::ambil('beranda.sekilas.prefix') }} {{ $desa->nama_desa }}</h2>
-                <p class="mt-4 leading-relaxed text-on-surface-variant">
+                <h2 class="font-headline-lg text-3xl font-bold text-primary mb-4">{{ Teks::ambil('beranda.sekilas.prefix') }} {{ $desa->nama_desa }}</h2>
+                <div class="w-16 h-1 bg-secondary rounded-full mb-6"></div>
+                <p class="font-body-md text-base text-on-surface-variant mb-8 leading-relaxed">
                     {{ Str::limit(strip_tags($desa->sejarah ?: $desa->visi), Teks::angka('kuota.beranda.limit_sekilas')) }}
                 </p>
                 <a href="{{ route('publik.profil') }}"
-                   class="mt-6 inline-block rounded-[12px] border border-outline-variant px-5 py-2.5 text-sm font-medium text-on-surface transition hover:bg-surface-container-low">
+                   class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
                     {{ Teks::ambil('beranda.sekilas.cta') }}
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
             </div>
 
             @if ($desa->misiSebagaiDaftar())
-                <div class="rounded-[12px] bg-surface-container-low p-6">
-                    <h3 class="mb-4 text-sm font-semibold tracking-wider text-on-surface-variant uppercase">{{ Teks::ambil('beranda.sekilas.judul_misi') }}</h3>
-                    <ol class="list-decimal space-y-2 pl-5 text-sm text-on-surface">
+                <div class="relative rounded-xl overflow-hidden shadow-[0px_10px_30px_rgba(0,0,0,0.1)] bg-surface-container-lowest p-8 border border-outline-variant/30">
+                    <h3 class="mb-4 text-sm font-semibold tracking-wider text-primary uppercase">{{ Teks::ambil('beranda.sekilas.judul_misi') }}</h3>
+                    <ol class="list-decimal space-y-3 pl-5 text-sm text-on-surface-variant leading-relaxed">
                         @foreach (array_slice($desa->misiSebagaiDaftar(), 0, 4) as $misi)
                             <li>{{ $misi }}</li>
                         @endforeach
                     </ol>
+                </div>
+            @else
+                <div class="relative h-96 rounded-xl overflow-hidden shadow-[0px_10px_30px_rgba(0,0,0,0.1)] bg-primary-container/10 flex items-center justify-center border border-outline-variant/30">
+                    <span class="material-symbols-outlined text-6xl text-primary/30">landscape</span>
                 </div>
             @endif
         </div>
     </section>
 @endif
 
+{{-- ============================ STATISTIK ============================ --}}
+<section id="statistik" class="py-16 px-6 md:px-12 bg-surface-container-lowest">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-12">
+            <h2 class="font-headline-lg text-3xl font-bold text-primary mb-4">Data Demografi</h2>
+            <p class="font-body-md text-base text-on-surface-variant">Gambaran umum kependudukan desa secara aktual.</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            @php
+                $statData = [
+                    ['icon' => 'group', 'color' => 'bg-primary-fixed text-on-primary-fixed', 'label' => Teks::ambil('beranda.statistik.label_penduduk'), 'nilai' => number_format($statistik['jumlah_penduduk'], 0, ',', '.'), 'satuan' => Teks::ambil('beranda.statistik.satuan_jiwa')],
+                    ['icon' => 'family_restroom', 'color' => 'bg-secondary-fixed text-on-secondary-fixed', 'label' => Teks::ambil('beranda.statistik.label_kk'), 'nilai' => $statistik['jumlah_kk'] !== null ? number_format($statistik['jumlah_kk'], 0, ',', '.') : null, 'satuan' => Teks::ambil('beranda.statistik.satuan_keluarga')],
+                    ['icon' => 'man', 'color' => 'bg-tertiary-fixed text-on-tertiary-fixed', 'label' => Teks::ambil('beranda.statistik.label_laki'), 'nilai' => number_format($statistik['laki'], 0, ',', '.'), 'satuan' => Teks::ambil('beranda.statistik.satuan_jiwa')],
+                    ['icon' => 'woman', 'color' => 'bg-error-container text-on-error-container', 'label' => Teks::ambil('beranda.statistik.label_perempuan'), 'nilai' => number_format($statistik['perempuan'], 0, ',', '.'), 'satuan' => Teks::ambil('beranda.statistik.satuan_jiwa')],
+                ];
+            @endphp
+            @foreach ($statData as $stat)
+                @if ($stat['nilai'] !== null)
+                    <div class="bg-surface-container-lowest/80 backdrop-blur-md border border-outline-variant/30 shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-8 rounded-xl text-center hover:-translate-y-2 transition-transform duration-300">
+                        <div class="w-16 h-16 mx-auto {{ $stat['color'] }} rounded-full flex items-center justify-center mb-6">
+                            <span class="material-symbols-outlined text-3xl">{{ $stat['icon'] }}</span>
+                        </div>
+                        <div class="font-display-lg text-4xl font-bold text-primary mb-2">{{ $stat['nilai'] }}</div>
+                        <div class="font-label-md text-sm text-on-surface-variant">{{ $stat['label'] }}</div>
+                    </div>
+                @endif
+            @endforeach
+        </div>
+        <div class="mt-10 text-center">
+            <a href="{{ route('publik.statistik') }}"
+               class="text-sm font-medium text-primary underline hover:text-primary-container transition-colors">
+                {{ Teks::ambil('beranda.statistik.tautan') }}
+            </a>
+        </div>
+    </div>
+</section>
+
 {{-- ============================ POTENSI ============================ --}}
 @if ($potensi->isNotEmpty())
-    <section id="potensi" class="border-t border-outline-variant py-16">
-        <div class="mx-auto max-w-6xl px-4 sm:px-6">
-            <div class="mb-8 flex flex-wrap items-end justify-between gap-3">
+    <section id="potensi" class="py-16 px-6 md:px-12 bg-surface border-t border-outline-variant/30">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
                 <div>
-                    <h2 class="text-2xl font-semibold text-on-surface">{{ Teks::ambil('beranda.potensi.judul') }}</h2>
-                    <p class="mt-1.5 text-on-surface-variant">{{ Teks::ambil('beranda.potensi.subjudul') }}</p>
+                    <h2 class="font-headline-lg text-3xl font-bold text-primary">{{ Teks::ambil('beranda.potensi.judul') }}</h2>
+                    <p class="mt-2 text-on-surface-variant">{{ Teks::ambil('beranda.potensi.subjudul') }}</p>
                 </div>
                 <a href="{{ route('publik.potensi.index') }}"
-                   class="text-sm font-medium text-primary hover:text-primary-container">{{ Teks::ambil('beranda.potensi.tautan') }}</a>
+                   class="text-sm font-medium text-primary hover:text-primary-container underline transition-colors">{{ Teks::ambil('beranda.potensi.tautan') }}</a>
             </div>
 
             <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($potensi as $item)
                     <a href="{{ route('publik.potensi.show', $item) }}"
-                       class="group overflow-hidden rounded-[12px] border border-outline-variant transition hover:border-outline-variant hover:shadow-md">
-                        <div class="aspect-[4/3] overflow-hidden bg-slate-100">
+                       class="group overflow-hidden rounded-xl border border-outline-variant/30 bg-surface-container-lowest shadow-[0px_4px_20px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1">
+                        <div class="aspect-[4/3] overflow-hidden bg-surface-container-highest">
                             <img src="{{ $item->urlFotoKecil() }}" alt="{{ $item->nama }}" loading="lazy"
-                                 class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
+                                 class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110">
                         </div>
-                        <div class="p-5">
-                            <span class="rounded-full px-2.5 py-1 text-xs font-medium {{ $item->kategori->warna() }}">
+                        <div class="p-6">
+                            <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $item->kategori->warna() }}">
                                 {{ $item->kategori->label() }}
                             </span>
-                            <h3 class="mt-3 font-semibold text-on-surface group-hover:text-primary">{{ $item->nama }}</h3>
-                            <p class="mt-1.5 line-clamp-2 text-sm text-on-surface-variant">{{ $item->ringkasan() }}</p>
+                            <h3 class="mt-4 text-xl font-bold text-on-surface group-hover:text-primary transition-colors">{{ $item->nama }}</h3>
+                            <p class="mt-2 line-clamp-2 text-sm text-on-surface-variant">{{ $item->ringkasan() }}</p>
                         </div>
                     </a>
                 @endforeach
@@ -210,53 +221,57 @@ function carousel() {
 
 {{-- ============================= BERITA ============================= --}}
 @if ($beritaUtama)
-    <section id="berita" class="border-t border-outline-variant bg-surface-container-low py-16">
-        <div class="mx-auto max-w-6xl px-4 sm:px-6">
-            <div class="mb-8 flex flex-wrap items-end justify-between gap-3">
+    <section id="berita" class="py-16 px-6 md:px-12 bg-surface-container-lowest border-t border-outline-variant/30">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
                 <div>
-                    <h2 class="text-2xl font-semibold text-on-surface">{{ Teks::ambil('beranda.berita.judul') }}</h2>
-                    <p class="mt-1.5 text-on-surface-variant">{{ Teks::ambil('beranda.berita.subjudul') }}</p>
+                    <h2 class="font-headline-lg text-3xl font-bold text-primary">{{ Teks::ambil('beranda.berita.judul') }}</h2>
+                    <p class="mt-2 text-on-surface-variant">{{ Teks::ambil('beranda.berita.subjudul') }}</p>
                 </div>
                 <a href="{{ route('publik.berita.index') }}"
-                   class="text-sm font-medium text-primary hover:text-primary-container">{{ Teks::ambil('beranda.berita.tautan') }}</a>
+                   class="text-sm font-medium text-primary hover:text-primary-container underline transition-colors">{{ Teks::ambil('beranda.berita.tautan') }}</a>
             </div>
 
-            <div class="grid gap-6 lg:grid-cols-2">
+            <div class="grid gap-8 lg:grid-cols-2">
                 <a href="{{ route('publik.berita.show', $beritaUtama) }}"
-                   class="group overflow-hidden rounded-[12px] bg-surface-container-lowest transition hover:shadow-md">
-                    <div class="aspect-[16/9] overflow-hidden bg-slate-100">
+                   class="group overflow-hidden rounded-xl bg-surface border border-outline-variant/30 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1">
+                    <div class="aspect-[16/9] overflow-hidden bg-surface-container-highest">
                         <img src="{{ $beritaUtama->urlSampul() }}" alt="{{ $beritaUtama->judul }}" loading="lazy"
-                             class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
+                             class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
                     </div>
-                    <div class="p-6">
+                    <div class="p-8">
                         @if ($beritaUtama->kategori)
-                            <span class="rounded-full bg-primary-fixed/20 px-2.5 py-1 text-xs font-medium text-primary">
+                            <span class="rounded-full bg-primary-container text-on-primary-container px-3 py-1 text-xs font-semibold">
                                 {{ $beritaUtama->kategori->nama }}
                             </span>
                         @endif
-                        <h3 class="mt-3 text-xl font-semibold text-on-surface group-hover:text-primary">
+                        <h3 class="mt-4 text-2xl font-bold text-on-surface group-hover:text-primary transition-colors leading-snug">
                             {{ $beritaUtama->judul }}
                         </h3>
-                        <p class="mt-2 line-clamp-2 text-sm text-on-surface-variant">{{ $beritaUtama->ringkasanTampil() }}</p>
-                        <p class="mt-3 text-xs text-on-surface-variant">
+                        <p class="mt-3 line-clamp-2 text-base text-on-surface-variant leading-relaxed">{{ $beritaUtama->ringkasanTampil() }}</p>
+                        <div class="mt-5 flex items-center text-xs text-on-surface-variant font-medium">
+                            <span class="material-symbols-outlined text-[16px] mr-1">calendar_today</span>
                             {{ $beritaUtama->tanggal_terbit?->translatedFormat('d F Y') }}
-                        </p>
+                        </div>
                     </div>
                 </a>
 
                 <div class="space-y-4">
                     @foreach ($berita->where('id', '!=', $beritaUtama->id)->take(Teks::angka('kuota.beranda.berita_samping')) as $item)
                         <a href="{{ route('publik.berita.show', $item) }}"
-                           class="group flex gap-4 rounded-[12px] bg-surface-container-lowest p-4 transition hover:shadow-md">
-                            <img src="{{ $item->urlSampulKecil() }}" alt="" loading="lazy"
-                                 class="h-20 w-28 shrink-0 rounded-[12px] bg-slate-100 object-cover">
-                            <div class="min-w-0">
-                                <h3 class="line-clamp-2 font-medium text-on-surface group-hover:text-primary">
+                           class="group flex flex-col sm:flex-row gap-5 rounded-xl border border-outline-variant/30 bg-surface p-4 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)] hover:-translate-x-1">
+                            <div class="h-32 sm:h-28 w-full sm:w-36 shrink-0 overflow-hidden rounded-lg bg-surface-container-highest">
+                                <img src="{{ $item->urlSampulKecil() }}" alt="" loading="lazy"
+                                     class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110">
+                            </div>
+                            <div class="min-w-0 flex flex-col justify-center py-1">
+                                <h3 class="line-clamp-2 text-lg font-bold text-on-surface group-hover:text-primary transition-colors leading-tight">
                                     {{ $item->judul }}
                                 </h3>
-                                <p class="mt-1 text-xs text-on-surface-variant">
+                                <div class="mt-3 flex items-center text-xs text-on-surface-variant font-medium">
+                                    <span class="material-symbols-outlined text-[14px] mr-1">calendar_today</span>
                                     {{ $item->tanggal_terbit?->translatedFormat('d F Y') }}
-                                </p>
+                                </div>
                             </div>
                         </a>
                     @endforeach
@@ -268,28 +283,33 @@ function carousel() {
 
 {{-- ============================= GALERI ============================= --}}
 @if ($acara->isNotEmpty())
-    <section id="galeri" class="border-t border-outline-variant py-16">
-        <div class="mx-auto max-w-6xl px-4 sm:px-6">
-            <div class="mb-8 flex flex-wrap items-end justify-between gap-3">
+    <section id="galeri" class="py-16 px-6 md:px-12 bg-surface border-t border-outline-variant/30">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
                 <div>
-                    <h2 class="text-2xl font-semibold text-on-surface">{{ Teks::ambil('beranda.galeri.judul') }}</h2>
-                    <p class="mt-1.5 text-on-surface-variant">{{ Teks::ambil('beranda.galeri.subjudul') }}</p>
+                    <h2 class="font-headline-lg text-3xl font-bold text-primary">{{ Teks::ambil('beranda.galeri.judul') }}</h2>
+                    <p class="mt-2 text-on-surface-variant">{{ Teks::ambil('beranda.galeri.subjudul') }}</p>
                 </div>
                 <a href="{{ route('publik.galeri.index') }}"
-                   class="text-sm font-medium text-primary hover:text-primary-container">{{ Teks::ambil('beranda.galeri.tautan') }}</a>
+                   class="text-sm font-medium text-primary hover:text-primary-container underline transition-colors">{{ Teks::ambil('beranda.galeri.tautan') }}</a>
             </div>
 
-            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 @foreach ($acara as $item)
                     <a href="{{ route('publik.galeri.show', $item) }}"
-                       class="group relative aspect-[4/3] overflow-hidden rounded-[12px] bg-slate-100">
+                       class="group relative aspect-[4/3] overflow-hidden rounded-xl bg-surface-container-highest shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
                         <img src="{{ $item->urlSampulKecil() }}" alt="{{ $item->judul }}" loading="lazy"
-                             class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
-                        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-900/85 to-transparent p-4">
-                            <p class="line-clamp-2 text-sm font-medium text-white">{{ $item->judul }}</p>
-                            <p class="mt-0.5 text-xs text-white/70">
+                             class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-inverse-surface/90 to-transparent pt-12 pb-5 px-5">
+                            <p class="line-clamp-2 text-lg font-bold text-inverse-on-surface">{{ $item->judul }}</p>
+                            <p class="mt-1 flex items-center text-xs text-inverse-on-surface/80 font-medium">
+                                <span class="material-symbols-outlined text-[14px] mr-1">event</span>
                                 {{ $item->tanggal_acara->translatedFormat('d M Y') }}
-                                @if ($item->foto_count > 1) · {{ $item->foto_count }} {{ Teks::ambil('beranda.galeri.suffix_foto') }} @endif
+                                @if ($item->foto_count > 1) 
+                                    <span class="mx-2">•</span>
+                                    <span class="material-symbols-outlined text-[14px] mr-1">photo_library</span>
+                                    {{ $item->foto_count }} {{ Teks::ambil('beranda.galeri.suffix_foto') }} 
+                                @endif
                             </p>
                         </div>
                     </a>
@@ -301,24 +321,26 @@ function carousel() {
 
 {{-- ===================== FASILITAS & PRESTASI ===================== --}}
 @if ($fasilitas->isNotEmpty() || $prestasi->isNotEmpty())
-    <section class="border-t border-outline-variant bg-surface-container-low py-16">
-        <div class="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-2">
+    <section class="py-16 px-6 md:px-12 bg-surface-container-lowest border-t border-outline-variant/30">
+        <div class="max-w-7xl mx-auto grid gap-12 lg:grid-cols-2">
 
             @if ($fasilitas->isNotEmpty())
                 <div>
-                    <div class="mb-5 flex items-end justify-between gap-3">
-                        <h2 class="text-2xl font-semibold text-on-surface">{{ Teks::ambil('beranda.fasilitas.judul') }}</h2>
+                    <div class="mb-8 flex items-end justify-between gap-4">
+                        <h2 class="font-headline-lg text-3xl font-bold text-primary">{{ Teks::ambil('beranda.fasilitas.judul') }}</h2>
                         <a href="{{ route('publik.fasilitas') }}"
-                           class="text-sm font-medium text-primary hover:text-primary-container">{{ Teks::ambil('beranda.tautan_lihat_semua') }}</a>
+                           class="text-sm font-medium text-primary hover:text-primary-container underline">{{ Teks::ambil('beranda.tautan_lihat_semua') }}</a>
                     </div>
-                    <div class="space-y-3">
+                    <div class="space-y-4">
                         @foreach ($fasilitas as $item)
-                            <div class="flex items-center gap-4 rounded-[12px] bg-surface-container-lowest p-4">
-                                <img src="{{ $item->urlFotoKecil() }}" alt="" loading="lazy"
-                                     class="h-14 w-14 shrink-0 rounded-[12px] bg-slate-100 object-cover">
+                            <div class="flex items-center gap-5 rounded-xl border border-outline-variant/30 bg-surface p-4 shadow-[0px_4px_15px_rgba(0,0,0,0.02)] transition-colors hover:border-primary/50">
+                                <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-surface-container-highest">
+                                    <img src="{{ $item->urlFotoKecil() }}" alt="" loading="lazy"
+                                         class="h-full w-full object-cover">
+                                </div>
                                 <div class="min-w-0">
-                                    <p class="truncate font-medium text-on-surface">{{ $item->nama }}</p>
-                                    <span class="rounded-full px-2 py-0.5 text-xs {{ $item->kategori->warna() }}">
+                                    <p class="truncate text-lg font-bold text-on-surface">{{ $item->nama }}</p>
+                                    <span class="mt-1 inline-block rounded-full px-3 py-1 text-xs font-semibold {{ $item->kategori->warna() }}">
                                         {{ $item->kategori->label() }}
                                     </span>
                                 </div>
@@ -330,23 +352,23 @@ function carousel() {
 
             @if ($prestasi->isNotEmpty())
                 <div>
-                    <div class="mb-5 flex items-end justify-between gap-3">
-                        <h2 class="text-2xl font-semibold text-on-surface">{{ Teks::ambil('beranda.prestasi.judul') }}</h2>
+                    <div class="mb-8 flex items-end justify-between gap-4">
+                        <h2 class="font-headline-lg text-3xl font-bold text-primary">{{ Teks::ambil('beranda.prestasi.judul') }}</h2>
                         <a href="{{ route('publik.prestasi') }}"
-                           class="text-sm font-medium text-primary hover:text-primary-container">{{ Teks::ambil('beranda.tautan_lihat_semua') }}</a>
+                           class="text-sm font-medium text-primary hover:text-primary-container underline">{{ Teks::ambil('beranda.tautan_lihat_semua') }}</a>
                     </div>
-                    <div class="space-y-3">
+                    <div class="space-y-4">
                         @foreach ($prestasi as $item)
-                            <div class="rounded-[12px] bg-surface-container-lowest p-4">
-                                <div class="flex flex-wrap items-center gap-2">
-                                    <span class="font-semibold text-on-surface tabular-nums">{{ $item->tahun }}</span>
+                            <div class="rounded-xl border border-outline-variant/30 bg-surface p-5 shadow-[0px_4px_15px_rgba(0,0,0,0.02)] border-l-4 border-l-tertiary transition-colors hover:bg-surface-container-low">
+                                <div class="flex flex-wrap items-center gap-3">
+                                    <span class="font-bold text-tertiary tabular-nums">{{ $item->tahun }}</span>
                                     @if ($item->tingkat)
-                                        <span class="rounded-full px-2 py-0.5 text-xs {{ $item->tingkat->warna() }}">
+                                        <span class="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider {{ $item->tingkat->warna() }}">
                                             {{ $item->tingkat->label() }}
                                         </span>
                                     @endif
                                 </div>
-                                <p class="mt-1 font-medium text-on-surface">{{ $item->judul }}</p>
+                                <p class="mt-2 text-lg font-bold text-on-surface leading-snug">{{ $item->judul }}</p>
                             </div>
                         @endforeach
                     </div>
@@ -358,64 +380,29 @@ function carousel() {
 
 {{-- ============================ PENGURUS ============================ --}}
 @if ($pengurus->isNotEmpty())
-    <section id="pengurus" class="border-t border-outline-variant py-16">
-        <div class="mx-auto max-w-6xl px-4 sm:px-6">
-            <div class="mb-8 flex flex-wrap items-end justify-between gap-3">
+    <section id="pengurus" class="py-16 px-6 md:px-12 bg-surface border-t border-outline-variant/30">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
                 <div>
-                    <h2 class="text-2xl font-semibold text-on-surface">{{ Teks::ambil('beranda.pengurus.judul') }}</h2>
-                    <p class="mt-1.5 text-on-surface-variant">{{ Teks::ambil('beranda.pengurus.subjudul') }}</p>
+                    <h2 class="font-headline-lg text-3xl font-bold text-primary">{{ Teks::ambil('beranda.pengurus.judul') }}</h2>
+                    <p class="mt-2 text-on-surface-variant">{{ Teks::ambil('beranda.pengurus.subjudul') }}</p>
                 </div>
                 <a href="{{ route('publik.struktur') }}"
-                   class="text-sm font-medium text-primary hover:text-primary-container">{{ Teks::ambil('beranda.pengurus.tautan') }}</a>
+                   class="text-sm font-medium text-primary hover:text-primary-container underline">{{ Teks::ambil('beranda.pengurus.tautan') }}</a>
             </div>
 
-            <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 @foreach ($pengurus as $orang)
-                    <div class="rounded-[12px] border border-outline-variant p-5 text-center">
-                        <img src="{{ $orang->urlFotoKecil() }}" alt="Foto {{ $orang->nama }}" loading="lazy"
-                             class="mx-auto h-24 w-24 rounded-full bg-slate-100 object-cover">
-                        <p class="mt-3 font-semibold text-on-surface">{{ $orang->nama }}</p>
-                        <p class="text-sm text-primary">{{ $orang->jabatan }}</p>
+                    <div class="rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-6 text-center shadow-[0px_4px_20px_rgba(0,0,0,0.03)] hover:-translate-y-1 transition-transform">
+                        <div class="mx-auto h-28 w-28 overflow-hidden rounded-full border-4 border-surface p-1 shadow-sm">
+                            <img src="{{ $orang->urlFotoKecil() }}" alt="Foto {{ $orang->nama }}" loading="lazy"
+                                 class="h-full w-full rounded-full bg-surface-container-highest object-cover">
+                        </div>
+                        <p class="mt-4 text-lg font-bold text-on-surface">{{ $orang->nama }}</p>
+                        <p class="mt-1 text-sm font-medium text-primary">{{ $orang->jabatan }}</p>
                     </div>
                 @endforeach
             </div>
-        </div>
-    </section>
-@endif
-
-{{-- ============================= KONTAK ============================= --}}
-@if ($desa->punyaKontak() || filled($desa->peta_embed))
-    <section id="kontak" class="border-t border-outline-variant bg-surface-container-low py-16">
-        <div class="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-2">
-            <div>
-                <h2 class="text-2xl font-semibold text-on-surface">{{ Teks::ambil('beranda.kontak.judul') }}</h2>
-                <p class="mt-2 text-on-surface-variant">
-                    {{ Teks::ambil('beranda.kontak.kalimat', ['{nama}' => $desa->nama_desa]) }}
-                </p>
-
-                <dl class="mt-6 space-y-3 text-sm">
-                    @foreach ([
-                        Teks::ambil('beranda.kontak.label_alamat') => $desa->alamat_kantor,
-                        Teks::ambil('beranda.kontak.label_telepon') => $desa->telepon_kantor,
-                        Teks::ambil('beranda.kontak.label_email') => $desa->email,
-                    ] as $label => $nilai)
-                        @if (filled($nilai))
-                            <div class="flex gap-3">
-                                <dt class="w-20 shrink-0 text-on-surface-variant">{{ $label }}</dt>
-                                <dd class="text-slate-800">{{ $nilai }}</dd>
-                            </div>
-                        @endif
-                    @endforeach
-                </dl>
-            </div>
-
-            @if (filled($desa->peta_embed))
-                <div class="overflow-hidden rounded-[12px] ring-1 ring-outline-variant">
-                    <iframe src="{{ $desa->peta_embed }}" class="h-72 w-full" style="border:0"
-                            loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-                            title="Peta lokasi {{ $desa->nama_desa }}"></iframe>
-                </div>
-            @endif
         </div>
     </section>
 @endif

@@ -13,6 +13,8 @@ class DatabaseSeeder extends Seeder
             PengaturanDesaSeeder::class,
             WilayahSeeder::class,
             RefPekerjaanSeeder::class,
+            RefKategoriPotensiSeeder::class,
+            RefKategoriFasilitasSeeder::class,
             PendudukSeeder::class,
             RekapKkSeeder::class,
             PengurusSeeder::class,

@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\KategoriFasilitas;
 use App\Models\Concerns\PunyaGambar;
 use App\Services\LayananUnggahGambar;
 use Illuminate\Database\Eloquent\Builder;
@@ -15,16 +14,20 @@ class FasilitasUmum extends Model
 
     protected $table = 'fasilitas_umum';
 
-    protected $guarded = [];
+    protected $fillable = ['nama', 'kategori_fasilitas_id', 'deskripsi', 'alamat', 'wilayah_id', 'foto', 'tampil'];
 
     protected array $kolomGambar = ['foto'];
 
     protected function casts(): array
     {
         return [
-            'kategori' => KategoriFasilitas::class,
             'tampil' => 'boolean',
         ];
+    }
+
+    public function kategori(): BelongsTo
+    {
+        return $this->belongsTo(RefKategoriFasilitas::class, 'kategori_fasilitas_id');
     }
 
     public function wilayah(): BelongsTo

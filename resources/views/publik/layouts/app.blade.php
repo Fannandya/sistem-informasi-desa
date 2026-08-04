@@ -31,56 +31,50 @@
 <body class="flex min-h-full flex-col bg-surface-container-lowest text-slate-800">
 
     {{-- ------------------------------ Kop ------------------------------ --}}
-    <header x-data="{ menu: false }"
-            class="sticky top-0 z-40 border-b border-outline-variant bg-surface-container-lowest/90 backdrop-blur">
-        <div class="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
-
-            <a href="{{ route('beranda') }}" class="flex min-w-0 items-center gap-3">
+    <header x-data="{ menu: false }" class="bg-surface-container-lowest shadow-sm z-50 top-0 sticky">
+        <div class="flex justify-between items-center w-full px-6 max-w-7xl mx-auto h-16">
+            <a href="{{ route('beranda') }}" class="flex items-center gap-3">
                 @if (filled($desa->logo))
                     <img src="{{ $desa->urlLogo() }}" alt="Logo {{ $desa->nama_desa }}"
-                         class="h-10 w-10 shrink-0 rounded-[12px] object-cover">
+                         class="h-10 w-10 shrink-0 rounded-lg object-cover">
                 @else
-                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-[12px] bg-primary font-bold text-white">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary font-bold text-white">
                         {{ mb_strtoupper(mb_substr($desa->nama_desa, 0, 1)) }}
                     </div>
                 @endif
-                <span class="min-w-0">
-                    <span class="block truncate font-semibold text-on-surface">{{ $desa->nama_desa }}</span>
-                    @if ($desa->wilayahLengkap())
-                        <span class="block truncate text-xs text-on-surface-variant">{{ $desa->wilayahLengkap() }}</span>
-                    @endif
-                </span>
+                <div class="font-headline-md text-xl font-bold text-primary hidden sm:block">{{ $desa->nama_desa }}</div>
             </a>
-
-            <nav class="ml-auto hidden items-center gap-1 text-sm lg:flex">
+            
+            <nav class="hidden md:flex space-x-8">
                 @foreach (\App\Support\MenuPublik::tautan() as $tautan)
                     <a href="{{ $tautan['url'] }}"
-                       class="rounded-[12px] px-3 py-2 transition
-                              {{ $tautan['aktif'] ? 'bg-primary-fixed/20 font-medium text-primary' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
+                       class="font-label-md text-sm transition-colors {{ $tautan['aktif'] ? 'text-primary border-b-2 border-primary pb-1' : 'text-on-surface-variant hover:text-primary' }}">
                         {{ $tautan['label'] }}
                     </a>
                 @endforeach
             </nav>
-
-            <button type="button" @click="menu = !menu"
-                    class="ml-auto rounded-[12px] p-2 text-on-surface-variant hover:bg-surface-container-low lg:hidden"
-                    aria-label="Buka menu">
-                <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path x-show="!menu" stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
-                    <path x-show="menu" x-cloak stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
+            
+            <a href="{{ url('/admin') }}" class="bg-primary-container text-on-primary-container px-4 py-2 rounded-lg font-label-md text-sm hover:bg-surface-tint hover:text-on-primary transition-colors hidden md:block">
+                Masuk Portal
+            </a>
+            
+            <button type="button" @click="menu = !menu" class="md:hidden text-on-surface">
+                <span class="material-symbols-outlined" x-show="!menu">menu</span>
+                <span class="material-symbols-outlined" x-show="menu" x-cloak>close</span>
             </button>
         </div>
 
-        <nav x-show="menu" x-cloak class="border-t border-outline-variant bg-surface-container-lowest lg:hidden">
-            <div class="mx-auto max-w-6xl px-4 py-2 sm:px-6">
+        <nav x-show="menu" x-cloak class="border-t border-outline-variant bg-surface-container-lowest md:hidden">
+            <div class="mx-auto max-w-7xl px-4 py-2 sm:px-6">
                 @foreach (\App\Support\MenuPublik::tautan() as $tautan)
                     <a href="{{ $tautan['url'] }}"
-                       class="block rounded-[12px] px-3 py-2.5 text-sm transition
-                              {{ $tautan['aktif'] ? 'bg-primary-fixed/20 font-medium text-primary' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
+                       class="block rounded-lg px-3 py-2.5 text-sm transition {{ $tautan['aktif'] ? 'bg-primary-fixed/20 font-medium text-primary' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
                         {{ $tautan['label'] }}
                     </a>
                 @endforeach
+                <a href="{{ url('/admin') }}" class="block mt-2 rounded-lg px-3 py-2.5 text-sm font-medium text-on-primary-container bg-primary-container text-center">
+                    Masuk Portal
+                </a>
             </div>
         </nav>
     </header>
@@ -90,58 +84,55 @@
     </main>
 
     {{-- ----------------------------- Footer ----------------------------- --}}
-    <footer class="mt-16 border-t border-outline-variant bg-surface-container-low">
-        <div class="mx-auto grid max-w-6xl gap-8 px-4 py-12 sm:px-6 md:grid-cols-3">
-
+    <footer class="mt-16 bg-primary dark:bg-primary-container w-full">
+        <div class="py-16 px-6 grid grid-cols-1 md:grid-cols-3 gap-10 max-w-7xl mx-auto">
             <div>
-                <p class="font-semibold text-on-surface">{{ $desa->nama_desa }}</p>
+                <div class="font-headline-md text-2xl font-bold text-on-primary mb-6">{{ $desa->nama_desa }}</div>
                 @if ($desa->wilayahLengkap())
-                    <p class="mt-1 text-sm text-on-surface-variant">{{ $desa->wilayahLengkap() }}</p>
+                    <p class="font-body-md text-base text-on-primary/80 mb-2">{{ $desa->wilayahLengkap() }}</p>
                 @endif
                 @if (filled($desa->alamat_kantor))
-                    <p class="mt-3 text-sm text-on-surface-variant">{{ $desa->alamat_kantor }}</p>
+                    <p class="font-body-md text-base text-on-primary/80 mb-4">{{ $desa->alamat_kantor }}</p>
+                @endif
+                <p class="font-body-md text-base text-on-primary/80 mb-4">{{ \App\Support\Teks::ambil('footer.pengelola') }}</p>
+                <p class="font-label-sm text-xs text-on-primary/80">&copy; {{ now()->year }} {{ $desa->nama_desa }}. Hak Cipta Dilindungi.</p>
+            </div>
+            
+            <div class="flex flex-col space-y-4">
+                <h3 class="font-headline-md text-xl text-on-primary mb-4">{{ \App\Support\Teks::ambil('footer.kolom_kontak') }}</h3>
+                @if (filled($desa->telepon_kantor))
+                    <a href="tel:{{ preg_replace('/\D/', '', $desa->telepon_kantor) }}" class="font-label-sm text-sm text-on-primary underline hover:text-white transition-colors">{{ $desa->telepon_kantor }}</a>
+                @endif
+                @if (filled($desa->email))
+                    <a href="mailto:{{ $desa->email }}" class="font-label-sm text-sm text-on-primary underline hover:text-white transition-colors">{{ $desa->email }}</a>
+                @endif
+                
+                @if ($desa->medsosTerisi())
+                    <div class="mt-4 flex gap-3 text-sm">
+                        @foreach ($desa->medsosTerisi() as $nama => $url)
+                            <a href="{{ $url }}" target="_blank" rel="noopener noreferrer"
+                               class="capitalize text-on-primary/80 underline hover:text-white transition-colors">{{ $nama }}</a>
+                        @endforeach
+                    </div>
+                @endif
+                
+                <h3 class="font-headline-md text-xl text-on-primary mt-6 mb-4">{{ \App\Support\Teks::ambil('footer.kolom_halaman') }}</h3>
+                <div class="flex flex-col space-y-2">
+                    @foreach (\App\Support\MenuPublik::tautan() as $tautan)
+                        <a href="{{ $tautan['url'] }}" class="font-label-sm text-sm text-on-primary/80 hover:text-white transition-colors">{{ $tautan['label'] }}</a>
+                    @endforeach
+                </div>
+            </div>
+            
+            <div class="h-48 bg-surface-container-highest rounded-lg overflow-hidden relative">
+                @if (filled($desa->peta_embed))
+                    <iframe src="{{ $desa->peta_embed }}" class="absolute inset-0 w-full h-full" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                @else
+                    <div class="absolute inset-0 flex items-center justify-center text-on-surface-variant font-label-md text-sm bg-surface-variant/50">
+                        [Peta Desa Belum Diatur]
+                    </div>
                 @endif
             </div>
-
-            @if ($desa->punyaKontak())
-                <div>
-                    <p class="text-xs font-semibold tracking-wider text-on-surface-variant uppercase">{{ \App\Support\Teks::ambil('footer.kolom_kontak') }}</p>
-                    <ul class="mt-3 space-y-1.5 text-sm text-on-surface-variant">
-                        @if (filled($desa->telepon_kantor))
-                            <li><a href="tel:{{ preg_replace('/\D/', '', $desa->telepon_kantor) }}"
-                                   class="hover:text-primary">{{ $desa->telepon_kantor }}</a></li>
-                        @endif
-                        @if (filled($desa->email))
-                            <li><a href="mailto:{{ $desa->email }}" class="hover:text-primary">{{ $desa->email }}</a></li>
-                        @endif
-                        @if (filled($desa->website))
-                            <li><a href="{{ $desa->website }}" class="hover:text-primary">{{ $desa->website }}</a></li>
-                        @endif
-                    </ul>
-
-                    @if ($desa->medsosTerisi())
-                        <div class="mt-4 flex gap-3 text-sm">
-                            @foreach ($desa->medsosTerisi() as $nama => $url)
-                                <a href="{{ $url }}" target="_blank" rel="noopener noreferrer"
-                                   class="capitalize text-on-surface-variant underline hover:text-primary">{{ $nama }}</a>
-                            @endforeach
-                        </div>
-                    @endif
-                </div>
-            @endif
-
-            <div>
-                <p class="text-xs font-semibold tracking-wider text-on-surface-variant uppercase">{{ \App\Support\Teks::ambil('footer.kolom_halaman') }}</p>
-                <ul class="mt-3 space-y-1.5 text-sm">
-                    @foreach (\App\Support\MenuPublik::tautan() as $tautan)
-                        <li><a href="{{ $tautan['url'] }}" class="text-on-surface-variant hover:text-primary">{{ $tautan['label'] }}</a></li>
-                    @endforeach
-                </ul>
-            </div>
-        </div>
-
-        <div class="border-t border-outline-variant px-4 py-5 text-center text-xs text-on-surface-variant sm:px-6">
-            &copy; {{ now()->year }} {{ $desa->nama_desa }}. {{ \App\Support\Teks::ambil('footer.pengelola') }}
         </div>
     </footer>
 

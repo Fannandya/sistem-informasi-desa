@@ -22,6 +22,8 @@ use App\Http\Controllers\Admin\StatistikController;
 use App\Http\Controllers\Admin\TeksTampilanController;
 use App\Http\Controllers\Admin\WilayahController;
 use App\Http\Controllers\Admin\CarouselImageController;
+use App\Http\Controllers\Admin\RefKategoriPotensiController;
+use App\Http\Controllers\Admin\RefKategoriFasilitasController;
 use App\Http\Controllers\Publik\BerandaController;
 use App\Http\Controllers\Publik\BeritaController as BeritaPublikController;
 use App\Http\Controllers\Publik\SitemapController;
@@ -209,6 +211,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('pekerjaan', [RefPekerjaanController::class, 'store'])->name('pekerjaan.store');
         Route::put('pekerjaan/{pekerjaan}', [RefPekerjaanController::class, 'update'])->name('pekerjaan.update');
         Route::delete('pekerjaan/{pekerjaan}', [RefPekerjaanController::class, 'destroy'])->name('pekerjaan.destroy');
+
+        Route::get('kategori-potensi', [RefKategoriPotensiController::class, 'index'])->name('ref-kategori-potensi.index');
+        Route::post('kategori-potensi', [RefKategoriPotensiController::class, 'store'])->name('ref-kategori-potensi.store');
+        Route::put('kategori-potensi/{refKategoriPotensi}', [RefKategoriPotensiController::class, 'update'])->name('ref-kategori-potensi.update');
+        Route::delete('kategori-potensi/{refKategoriPotensi}', [RefKategoriPotensiController::class, 'destroy'])->name('ref-kategori-potensi.destroy');
+        Route::post('kategori-potensi/{refKategoriPotensi}/geser', [RefKategoriPotensiController::class, 'geser'])->name('ref-kategori-potensi.geser');
+
+        Route::get('kategori-fasilitas', [RefKategoriFasilitasController::class, 'index'])->name('ref-kategori-fasilitas.index');
+        Route::post('kategori-fasilitas', [RefKategoriFasilitasController::class, 'store'])->name('ref-kategori-fasilitas.store');
+        Route::put('kategori-fasilitas/{refKategoriFasilitas}', [RefKategoriFasilitasController::class, 'update'])->name('ref-kategori-fasilitas.update');
+        Route::delete('kategori-fasilitas/{refKategoriFasilitas}', [RefKategoriFasilitasController::class, 'destroy'])->name('ref-kategori-fasilitas.destroy');
+        Route::post('kategori-fasilitas/{refKategoriFasilitas}/geser', [RefKategoriFasilitasController::class, 'geser'])->name('ref-kategori-fasilitas.geser');
 
         // --- Carousel gambar hero ---
         Route::get('carousel', [CarouselImageController::class, 'index'])->name('carousel.index');
