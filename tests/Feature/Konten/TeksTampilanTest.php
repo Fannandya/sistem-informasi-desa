@@ -3,6 +3,7 @@
 namespace Tests\Feature\Konten;
 
 use App\Models\Admin;
+use App\Models\RefKategoriPotensi;
 use App\Models\TeksTampilan;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -22,6 +23,7 @@ class TeksTampilanTest extends TestCase
             'email' => 'admin@desa.test',
             'password' => 'rahasia123',
         ]);
+        RefKategoriPotensi::create(['nama' => 'UMKM', 'urutan' => 1]);
     }
 
     // ------------------------------------------------------------------
@@ -251,7 +253,7 @@ class TeksTampilanTest extends TestCase
     public function test_kuota_potensi_mengubah_jumlah_kartu_di_beranda(): void
     {
         foreach (range(1, 5) as $i) {
-            \App\Models\PotensiDesa::create(['nama' => "Potensi {$i}", 'kategori' => 'umkm', 'tampil' => true]);
+            \App\Models\PotensiDesa::create(['nama' => "Potensi {$i}", 'kategori_potensi_id' => 1, 'tampil' => true]);
         }
 
         TeksTampilan::create(['kunci' => 'kuota.beranda.potensi', 'nilai' => '2', 'grup' => 'kuota']);
@@ -264,7 +266,7 @@ class TeksTampilanTest extends TestCase
     public function test_kuota_default_potensi_tetap_enam(): void
     {
         foreach (range(1, 20) as $i) {
-            \App\Models\PotensiDesa::create(['nama' => "Potensi {$i}", 'kategori' => 'umkm', 'tampil' => true]);
+            \App\Models\PotensiDesa::create(['nama' => "Potensi {$i}", 'kategori_potensi_id' => 1, 'tampil' => true]);
         }
 
         $response = $this->get(route('beranda'))->assertOk();

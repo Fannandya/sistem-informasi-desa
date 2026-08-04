@@ -1,7 +1,5 @@
 <?php
 
-use App\Enums\KategoriFasilitas;
-use App\Enums\KategoriPotensi;
 use App\Enums\TingkatPrestasi;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -21,7 +19,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama', 120);
             $table->string('slug', 140)->unique();
-            $table->enum('kategori', array_column(KategoriPotensi::cases(), 'value'));
+            $table->foreignId('kategori_potensi_id')->nullable()->constrained('ref_kategori_potensi')->restrictOnDelete();
             $table->string('deskripsi_singkat', 255)->nullable();
             $table->text('deskripsi')->nullable();
             $table->string('foto')->nullable();
@@ -31,13 +29,13 @@ return new class extends Migration
             $table->timestamps();
 
             $table->index(['tampil', 'urutan']);
-            $table->index('kategori');
+            $table->index('kategori_potensi_id');
         });
 
         Schema::create('fasilitas_umum', function (Blueprint $table) {
             $table->id();
             $table->string('nama', 120);
-            $table->enum('kategori', array_column(KategoriFasilitas::cases(), 'value'));
+            $table->foreignId('kategori_fasilitas_id')->nullable()->constrained('ref_kategori_fasilitas')->restrictOnDelete();
             $table->text('deskripsi')->nullable();
             $table->string('alamat', 255)->nullable();
             $table->foreignId('wilayah_id')->nullable()->constrained('wilayah')->nullOnDelete();
@@ -45,7 +43,7 @@ return new class extends Migration
             $table->boolean('tampil')->default(true);
             $table->timestamps();
 
-            $table->index(['tampil', 'kategori']);
+            $table->index(['tampil', 'kategori_fasilitas_id']);
         });
 
         Schema::create('prestasi_desa', function (Blueprint $table) {

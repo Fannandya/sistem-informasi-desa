@@ -22,15 +22,8 @@
         <x-admin.field name="nama" label="Nama Fasilitas" :value="$fasilitas->nama" required
                        placeholder="mis. SDN Sukamaju 01" />
 
-        <div>
-            <x-admin.select name="kategori" label="Kategori" required :value="$fasilitas->kategori?->value"
-                            :pilihan="\App\Enums\KategoriFasilitas::pilihan()" />
-            <div class="mt-2 space-y-0.5 rounded-lg bg-slate-50 p-3 text-xs text-slate-500">
-                @foreach (\App\Enums\KategoriFasilitas::cases() as $k)
-                    <p><span class="font-medium text-slate-600">{{ $k->label() }}:</span> {{ $k->contoh() }}</p>
-                @endforeach
-            </div>
-        </div>
+        <x-admin.select name="kategori_fasilitas_id" label="Kategori" required :value="$fasilitas->kategori_fasilitas_id"
+                        :pilihan="\App\Models\RefKategoriFasilitas::urut()->pluck('nama', 'id')" />
 
         <x-admin.textarea name="deskripsi" label="Deskripsi" rows="5" :value="$fasilitas->deskripsi" />
 

@@ -5,6 +5,7 @@ namespace Tests\Feature\Admin;
 use App\Models\Admin;
 use App\Models\Penduduk;
 use App\Models\PotensiDesa;
+use App\Models\RefKategoriPotensi;
 use App\Models\Wilayah;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -31,6 +32,7 @@ class DialogKonfirmasiTest extends TestCase
 
         $this->admin = Admin::create(['nama' => 'A', 'email' => 'a@desa.test', 'password' => 'rahasia123']);
         $this->wilayah = Wilayah::create(['dusun' => 'Krajan', 'rw' => '001', 'rt' => '001']);
+        RefKategoriPotensi::create(['nama' => 'UMKM', 'urutan' => 1]);
     }
 
     private function sebagaiAdmin()
@@ -69,7 +71,7 @@ class DialogKonfirmasiTest extends TestCase
     public function test_tidak_ada_confirm_bawaan_peramban_di_halaman_admin(): void
     {
         $this->warga();
-        PotensiDesa::create(['nama' => 'Keripik', 'kategori' => 'umkm', 'tampil' => true]);
+        PotensiDesa::create(['nama' => 'Keripik', 'kategori_potensi_id' => 1, 'tampil' => true]);
 
         foreach ([
             'admin.penduduk.index',

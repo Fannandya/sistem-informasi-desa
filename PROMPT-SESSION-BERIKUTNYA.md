@@ -1,6 +1,3 @@
-# 🚀 PROMPT untuk Next Session — Copy & Paste Langsung
-
-Gunakan prompt di bawah **EXACTLY** di session baru agar agent langsung paham konteks dan tidak perlu re-read seluruh project.
 
 ---
 
@@ -103,46 +100,6 @@ ESTIMATED TIME: ~90 min total
 
 Mulai dari Priority 1 sekarang juga!
 ```
-
----
-
-## Alternatif: Prompt Ringkas (Jika Context Sudah Loaded)
-
-Jika memory sudah ter-load, gunakan prompt ini saja:
-
-```
-Continue Fitur 17 Tahap 1 Completion — Follow docs/TODO-KATEGORI.md Priority 1-5.
-
-Current status: Infrastructure 80% done (commit 1bf5463), 20 tests failing (expected).
-
-TASK TODAY:
-1. Update 4 controllers (Priority 1) — 30 min
-2. Update 2 admin forms (Priority 2) — 15 min
-3. Update 2 public views (Priority 3) — 15 min
-4. Fix 20 failing tests (Priority 4) — 20 min
-5. Cleanup enums + CLAUDE.md (Priority 5) — 10 min
-
-After each Priority, run: php artisan test
-Target: 463+ tests passing by end of session.
-
-REFERENCE: docs/TODO-KATEGORI.md (exact code snippets)
-
-Final commit: "Fitur 17 (1/3) — Kategori Potensi & Fasilitas: Complete"
-```
-
----
-
-## Prompt Minimal (Saat Memory Fully Loaded)
-
-```
-Lanjutkan Fitur 17 (1/3) Kategori Potensi & Fasilitas.
-
-FOLLOW Priority 1-5 di docs/TODO-KATEGORI.md.
-TARGET: 463+ tests passing.
-COMMIT: "Fitur 17 (1/3) — Kategori Potensi & Fasilitas: Complete"
-```
-
----
 
 ## Testing Checklist untuk Session Berikutnya
 

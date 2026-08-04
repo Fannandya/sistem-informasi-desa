@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\KategoriFasilitas;
 use App\Exceptions\UnggahanGagal;
 use App\Http\Controllers\Admin\Concerns\MengelolaGambar;
 use App\Http\Controllers\Controller;
@@ -20,18 +19,18 @@ class FasilitasController extends Controller
 
     public function index(Request $request): View
     {
-        $kategori = KategoriFasilitas::tryFrom((string) $request->input('kategori'));
+        $kategoriId = $request->input('kategori');
 
         return view('admin.fasilitas.index', [
             'daftar' => FasilitasUmum::query()
                 ->with('wilayah')
-                ->when($kategori, fn ($q) => $q->where('kategori', $kategori))
+                ->when($kategoriId, fn ($q) => $q->where('kategori_fasilitas_id', $kategoriId))
                 ->when($request->input('q'), fn ($q, $kata) => $q->where('nama', 'like', "%{$kata}%"))
-                ->orderBy('kategori')
+                ->orderBy('kategori_fasilitas_id')
                 ->orderBy('nama')
                 ->paginate(25)
                 ->withQueryString(),
-            'kategori' => $kategori,
+            'kategoriId' => $kategoriId,
             'kata' => $request->input('q'),
         ]);
     }
@@ -79,7 +78,7 @@ class FasilitasController extends Controller
     {
         $data = $request->validate([
             'nama' => ['required', 'string', 'max:120'],
-            'kategori' => ['required', Rule::enum(KategoriFasilitas::class)],
+            'kategori_fasilitas_id' => ['required', 'exists:ref_kategori_fasilitas,id'],
             'deskripsi' => ['nullable', 'string', 'max:5000'],
             'alamat' => ['nullable', 'string', 'max:255'],
             'wilayah_id' => ['nullable', 'exists:wilayah,id'],

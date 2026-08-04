@@ -8,6 +8,7 @@ use App\Models\BeritaDesa;
 use App\Models\Penduduk;
 use App\Models\PengaturanDesa;
 use App\Models\PotensiDesa;
+use App\Models\RefKategoriPotensi;
 use App\Models\RekapKk;
 use App\Models\Wilayah;
 use App\Queries\StatistikPublik;
@@ -33,6 +34,7 @@ class HalamanPublikTest extends TestCase
         ])->save();
 
         $this->krajan = Wilayah::create(['dusun' => 'Krajan', 'rw' => '001', 'rt' => '001']);
+        RefKategoriPotensi::create(['nama' => 'UMKM', 'urutan' => 1]);
     }
 
     private function warga(int $jumlah, array $atribut = []): void
@@ -108,7 +110,7 @@ class HalamanPublikTest extends TestCase
 
     public function test_bagian_muncul_setelah_datanya_ada(): void
     {
-        PotensiDesa::create(['nama' => 'Keripik Bu Sari', 'kategori' => 'umkm', 'tampil' => true]);
+        PotensiDesa::create(['nama' => 'Keripik Bu Sari', 'kategori_potensi_id' => 1, 'tampil' => true]);
         BeritaDesa::create(['judul' => 'Musyawarah Desa', 'isi' => '<p>Isi</p>', 'status' => 'terbit', 'tanggal_terbit' => now()]);
         AcaraDesa::create(['judul' => 'Kerja Bakti', 'tanggal_acara' => now(), 'status' => 'terbit']);
 
@@ -136,7 +138,7 @@ class HalamanPublikTest extends TestCase
     public function test_landing_hanya_memuat_cuplikan_bukan_seluruh_data(): void
     {
         foreach (range(1, 20) as $i) {
-            PotensiDesa::create(['nama' => "Potensi {$i}", 'kategori' => 'umkm', 'tampil' => true]);
+            PotensiDesa::create(['nama' => "Potensi {$i}", 'kategori_potensi_id' => 1, 'tampil' => true]);
         }
 
         $response = $this->get(route('beranda'))->assertOk();

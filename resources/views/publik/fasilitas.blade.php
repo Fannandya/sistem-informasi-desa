@@ -23,33 +23,31 @@
         <div class="mb-10 flex flex-wrap gap-2">
             <a href="{{ route('publik.fasilitas') }}"
                class="rounded-full px-4 py-2 text-sm font-medium transition
-                      {{ $kategori === null ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
+                      {{ $kategoriId === null ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
                 Semua
             </a>
-            @foreach (\App\Enums\KategoriFasilitas::cases() as $k)
-                @if ($jumlahPerKategori->has($k->value))
-                    <a href="{{ route('publik.fasilitas', ['kategori' => $k->value]) }}"
+            @foreach ($kategoriFilter as $k)
+                @if ($jumlahPerKategori->has($k->nama))
+                    <a href="{{ route('publik.fasilitas', ['kategori' => $k->id]) }}"
                        class="rounded-full px-4 py-2 text-sm font-medium transition
-                              {{ $kategori === $k ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
-                        {{ $k->label() }}
-                        <span class="ml-1 opacity-60">{{ $jumlahPerKategori[$k->value] }}</span>
+                              {{ $kategoriId === $k->id ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 hover:bg-slate-200' }}">
+                        {{ $k->nama }}
+                        <span class="ml-1 opacity-60">{{ $jumlahPerKategori[$k->nama] }}</span>
                     </a>
                 @endif
             @endforeach
         </div>
     @endif
 
-    @forelse (\App\Enums\KategoriFasilitas::cases() as $k)
-        @continue (! $kelompok->has($k->value))
-
+    @forelse ($kelompok as $kategoriNama => $items)
         <section class="mb-12">
             <div class="mb-5 flex items-baseline gap-3">
-                <h2 class="text-xl font-semibold text-slate-900">{{ $k->label() }}</h2>
-                <span class="text-sm text-slate-400">{{ $kelompok[$k->value]->count() }} tempat</span>
+                <h2 class="text-xl font-semibold text-slate-900">{{ $kategoriNama }}</h2>
+                <span class="text-sm text-slate-400">{{ $items->count() }} tempat</span>
             </div>
 
             <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                @foreach ($kelompok[$k->value] as $fasilitas)
+                @foreach ($items as $fasilitas)
                     <article class="overflow-hidden rounded-2xl border border-slate-200">
                         <div class="aspect-[16/10] overflow-hidden bg-slate-100">
                             <img src="{{ $fasilitas->urlFotoKecil() }}" alt="{{ $fasilitas->nama }}"
@@ -74,7 +72,7 @@
     @if ($kelompok->isEmpty())
         <div class="rounded-2xl border border-dashed border-slate-300 px-6 py-20 text-center">
             <p class="font-medium text-slate-900">
-                {{ $kategori ? 'Belum ada fasilitas pada kategori ini' : 'Data fasilitas belum tersedia' }}
+                {{ $kategoriId ? 'Belum ada fasilitas pada kategori ini' : 'Data fasilitas belum tersedia' }}
             </p>
             <p class="mx-auto mt-1 max-w-md text-sm text-slate-500">
                 Daftar sarana desa akan ditampilkan di sini setelah dilengkapi aparat desa.

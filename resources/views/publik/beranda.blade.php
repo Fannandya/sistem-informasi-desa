@@ -206,8 +206,8 @@ function carousel() {
                                  class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110">
                         </div>
                         <div class="p-6">
-                            <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $item->kategori->warna() }}">
-                                {{ $item->kategori->label() }}
+                            <span class="rounded-full px-3 py-1 text-xs font-semibold bg-primary-container text-on-primary-container">
+                                {{ $item->kategori?->nama ?? 'Lainnya' }}
                             </span>
                             <h3 class="mt-4 text-xl font-bold text-on-surface group-hover:text-primary transition-colors">{{ $item->nama }}</h3>
                             <p class="mt-2 line-clamp-2 text-sm text-on-surface-variant">{{ $item->ringkasan() }}</p>

@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Konten;
 
-use App\Enums\KategoriPotensi;
 use App\Models\Admin;
 use App\Models\PotensiDesa;
+use App\Models\RefKategoriPotensi;
 use App\Services\LayananUnggahGambar;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -25,6 +25,8 @@ class PotensiTest extends TestCase
         config()->set('unggahan.disk', 'public');
 
         $this->admin = Admin::create(['nama' => 'A', 'email' => 'a@desa.test', 'password' => 'rahasia123']);
+        RefKategoriPotensi::create(['nama' => 'UMKM', 'urutan' => 1]);
+        RefKategoriPotensi::create(['nama' => 'Wisata', 'urutan' => 2]);
     }
 
     private function sebagaiAdmin()
@@ -36,7 +38,7 @@ class PotensiTest extends TestCase
     {
         return PotensiDesa::create(array_merge([
             'nama' => 'Keripik Singkong Bu Sari',
-            'kategori' => KategoriPotensi::Umkm,
+            'kategori_potensi_id' => 1,
             'tampil' => true,
         ], $atribut));
     }
@@ -45,7 +47,7 @@ class PotensiTest extends TestCase
     {
         return array_merge([
             'nama' => 'Keripik Singkong Bu Sari',
-            'kategori' => 'umkm',
+            'kategori_potensi_id' => '1',
             'tampil' => '1',
         ], $ganti);
     }
@@ -128,14 +130,14 @@ class PotensiTest extends TestCase
     {
         $this->sebagaiAdmin()
             ->post(route('admin.potensi.store'), [])
-            ->assertSessionHasErrors(['nama', 'kategori']);
+            ->assertSessionHasErrors(['nama', 'kategori_potensi_id']);
     }
 
     public function test_kategori_di_luar_daftar_ditolak(): void
     {
         $this->sebagaiAdmin()
-            ->post(route('admin.potensi.store'), $this->dataValid(['kategori' => 'tambang-emas']))
-            ->assertSessionHasErrors('kategori');
+            ->post(route('admin.potensi.store'), $this->dataValid(['kategori_potensi_id' => 999]))
+            ->assertSessionHasErrors('kategori_potensi_id');
     }
 
     public function test_menghapus_potensi_ikut_menghapus_fotonya(): void
@@ -193,10 +195,10 @@ class PotensiTest extends TestCase
 
     public function test_katalog_bisa_disaring_per_kategori(): void
     {
-        $this->potensi(['nama' => 'Keripik UMKM', 'kategori' => KategoriPotensi::Umkm]);
-        $this->potensi(['nama' => 'Curug Wisata', 'kategori' => KategoriPotensi::Wisata]);
+        $this->potensi(['nama' => 'Keripik UMKM', 'kategori_potensi_id' => 1]);
+        $this->potensi(['nama' => 'Curug Wisata', 'kategori_potensi_id' => 2]);
 
-        $this->get(route('publik.potensi.index', ['kategori' => 'wisata']))
+        $this->get(route('publik.potensi.index', ['kategori' => 2]))
             ->assertOk()
             ->assertSee('Curug Wisata')
             ->assertDontSee('Keripik UMKM');

@@ -25,8 +25,8 @@
         <x-admin.field name="nama" label="Nama Potensi" :value="$potensi->nama" required
                        placeholder="mis. Keripik Singkong Bu Sari" />
 
-        <x-admin.select name="kategori" label="Kategori" required :value="$potensi->kategori?->value"
-                        :pilihan="\App\Enums\KategoriPotensi::pilihan()" />
+        <x-admin.select name="kategori_potensi_id" label="Kategori" required :value="$potensi->kategori_potensi_id"
+                        :pilihan="\App\Models\RefKategoriPotensi::urut()->pluck('nama', 'id')" />
 
         <div>
             <label for="deskripsi_singkat" class="mb-1.5 block text-sm font-medium text-slate-700">

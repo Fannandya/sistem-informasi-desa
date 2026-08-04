@@ -15,8 +15,8 @@
     </nav>
 
     <header class="mb-6">
-        <span class="rounded-full px-2.5 py-1 text-xs font-medium {{ $potensi->kategori->warna() }}">
-            {{ $potensi->kategori->label() }}
+        <span class="rounded-full px-2.5 py-1 text-xs font-medium bg-emerald-100 text-emerald-800">
+            {{ $potensi->kategori?->nama ?? 'Lainnya' }}
         </span>
         <h1 class="mt-3 text-3xl font-semibold text-slate-900">{{ $potensi->nama }}</h1>
         @if ($potensi->deskripsi_singkat)
@@ -43,7 +43,7 @@
     @if ($lainnya->isNotEmpty())
         <section class="mt-14 border-t border-slate-200 pt-10">
             <h2 class="mb-5 text-lg font-semibold text-slate-900">
-                {{ $potensi->kategori->label() }} lainnya
+                {{ $potensi->kategori?->nama ?? 'Lainnya' }} lainnya
             </h2>
             <div class="grid gap-5 sm:grid-cols-3">
                 @foreach ($lainnya as $lain)

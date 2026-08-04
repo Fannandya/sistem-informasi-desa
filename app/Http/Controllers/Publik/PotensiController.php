@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Publik;
 
-use App\Enums\KategoriPotensi;
 use App\Http\Controllers\Controller;
 use App\Models\PotensiDesa;
+use App\Models\RefKategoriPotensi;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -12,21 +12,23 @@ class PotensiController extends Controller
 {
     public function index(Request $request): View
     {
-        $kategori = KategoriPotensi::tryFrom((string) $request->input('kategori'));
+        $kategoriId = $request->input('kategori');
 
         return view('publik.potensi.index', [
             'daftar' => PotensiDesa::query()
                 ->tampil()
-                ->when($kategori, fn ($q) => $q->where('kategori', $kategori))
+                ->when($kategoriId, fn ($q) => $q->where('kategori_potensi_id', $kategoriId))
                 ->urut()
                 ->paginate(12)
                 ->withQueryString(),
-            'kategori' => $kategori,
-            'jumlahPerKategori' => PotensiDesa::query()
-                ->tampil()
-                ->selectRaw('kategori, COUNT(*) as total')
-                ->groupBy('kategori')
-                ->pluck('total', 'kategori'),
+            'kategoriId' => $kategoriId,
+            'kategoriFilter' => RefKategoriPotensi::urut()->get(),
+            'jumlahPerKategori' => RefKategoriPotensi::urut()
+                ->withCount(['potensi' => fn ($q) => $q->tampil()])
+                ->get()
+                ->pluck('potensi_count', 'nama')
+                ->sortByDesc(fn ($v) => $v)
+                ->take(6),
         ]);
     }
 
@@ -41,7 +43,7 @@ class PotensiController extends Controller
             'lainnya' => PotensiDesa::query()
                 ->tampil()
                 ->whereKeyNot($potensi->id)
-                ->where('kategori', $potensi->kategori)
+                ->where('kategori_potensi_id', $potensi->kategori_potensi_id)
                 ->urut()
                 ->take(3)
                 ->get(),

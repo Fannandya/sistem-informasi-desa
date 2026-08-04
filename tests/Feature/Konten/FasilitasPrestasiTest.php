@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\Konten;
 
-use App\Enums\KategoriFasilitas;
 use App\Enums\TingkatPrestasi;
 use App\Models\Admin;
 use App\Models\FasilitasUmum;
 use App\Models\PrestasiDesa;
+use App\Models\RefKategoriFasilitas;
 use App\Models\Wilayah;
 use App\Services\LayananUnggahGambar;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -28,6 +28,8 @@ class FasilitasPrestasiTest extends TestCase
         config()->set('unggahan.disk', 'public');
 
         $this->admin = Admin::create(['nama' => 'A', 'email' => 'a@desa.test', 'password' => 'rahasia123']);
+        RefKategoriFasilitas::create(['nama' => 'Pendidikan', 'urutan' => 1]);
+        RefKategoriFasilitas::create(['nama' => 'Kesehatan', 'urutan' => 2]);
     }
 
     private function sebagaiAdmin()
@@ -39,7 +41,7 @@ class FasilitasPrestasiTest extends TestCase
     {
         return FasilitasUmum::create(array_merge([
             'nama' => 'SDN Sukamaju 01',
-            'kategori' => KategoriFasilitas::Pendidikan,
+            'kategori_fasilitas_id' => 1,
             'tampil' => true,
         ], $atribut));
     }
@@ -63,7 +65,7 @@ class FasilitasPrestasiTest extends TestCase
         $this->sebagaiAdmin()
             ->post(route('admin.fasilitas.store'), [
                 'nama' => 'Puskesmas Pembantu',
-                'kategori' => 'kesehatan',
+                'kategori_fasilitas_id' => 2,
                 'tampil' => '1',
             ])
             ->assertRedirect(route('admin.fasilitas.index'));
@@ -74,8 +76,8 @@ class FasilitasPrestasiTest extends TestCase
     public function test_kategori_fasilitas_di_luar_daftar_ditolak(): void
     {
         $this->sebagaiAdmin()
-            ->post(route('admin.fasilitas.store'), ['nama' => 'X', 'kategori' => 'bandara'])
-            ->assertSessionHasErrors('kategori');
+            ->post(route('admin.fasilitas.store'), ['nama' => 'X', 'kategori_fasilitas_id' => 999])
+            ->assertSessionHasErrors('kategori_fasilitas_id');
     }
 
     public function test_menghapus_fasilitas_ikut_menghapus_fotonya(): void
@@ -92,8 +94,9 @@ class FasilitasPrestasiTest extends TestCase
 
     public function test_halaman_publik_fasilitas_dikelompokkan_per_kategori(): void
     {
-        $this->fasilitas(['nama' => 'SDN Satu', 'kategori' => KategoriFasilitas::Pendidikan]);
-        $this->fasilitas(['nama' => 'Masjid Al-Ikhlas', 'kategori' => KategoriFasilitas::Ibadah]);
+        $this->fasilitas(['nama' => 'SDN Satu', 'kategori_fasilitas_id' => 1]);
+        RefKategoriFasilitas::create(['nama' => 'Ibadah', 'urutan' => 3]);
+        $this->fasilitas(['nama' => 'Masjid Al-Ikhlas', 'kategori_fasilitas_id' => 3]);
 
         $this->get(route('publik.fasilitas'))
             ->assertOk()
@@ -104,11 +107,11 @@ class FasilitasPrestasiTest extends TestCase
 
     public function test_kategori_tanpa_isi_tidak_muncul_sebagai_judul_kosong(): void
     {
-        $this->fasilitas(['kategori' => KategoriFasilitas::Pendidikan]);
+        $this->fasilitas(['kategori_fasilitas_id' => 1]);
 
         $this->get(route('publik.fasilitas'))
             ->assertOk()
-            ->assertDontSee('Tempat Ibadah');
+            ->assertDontSee('Ibadah');
     }
 
     public function test_fasilitas_tersembunyi_tidak_muncul_di_publik(): void

@@ -11,7 +11,7 @@
 > menyinkronkannya adalah bagian dari definisi "selesai", bukan pekerjaan
 > tambahan.
 >
-> Status terakhir diverifikasi: 111 rute, 19 commit, 449 tes lulus (1243 asersi).
+> Status terakhir diverifikasi: 115 rute, 20 commit, 462 tes lulus (1290 asersi).
 
 ---
 
@@ -344,6 +344,7 @@ Migrasi di `database/migrations/`, semua bertanggal `2026_08_04_*` kecuali bawaa
 | `..._000003_create_penduduk_table` | `penduduk` |
 | `..._000004_create_rekap_kk_table` | `rekap_kk` |
 | `..._000005_create_pengurus_desa_table` | `ref_organisasi`, `pengurus_desa` |
+| `..._000005_5_create_ref_kategori_potensi_dan_fasilitas_tables` | `ref_kategori_potensi`, `ref_kategori_fasilitas` |
 | `..._000006_create_potensi_fasilitas_prestasi_tables` | `potensi_desa`, `fasilitas_umum`, `prestasi_desa` |
 | `..._000007_create_berita_dan_acara_tables` | `kategori_berita`, `berita_desa`, `acara_desa`, `foto_acara` |
 | `..._000008_create_teks_tampilan_table` | `teks_tampilan` |
@@ -382,9 +383,11 @@ Unique `(wilayah_id, tahun)`.
 **`pengurus_desa`** — `nama`, `jabatan`, `organisasi_id` (restrict), `wilayah_id`
 (nullOnDelete), `nomor_hp`, `foto`, `urutan`, `tampil`.
 
-**`potensi_desa`** — `nama`, `slug` (unique), `kategori`, `deskripsi_singkat`,
+**`ref_kategori_potensi`** — `nama` (unique), `urutan`.
+**`potensi_desa`** — `nama`, `slug` (unique), `kategori_potensi_id` (restrictOnDelete), `deskripsi_singkat`,
 `deskripsi`, `foto`, `kontak`, `tampil`, `urutan`.
-**`fasilitas_umum`** — `nama`, `kategori`, `deskripsi`, `alamat`, `wilayah_id`, `foto`, `tampil`.
+**`ref_kategori_fasilitas`** — `nama` (unique), `urutan`.
+**`fasilitas_umum`** — `nama`, `kategori_fasilitas_id` (restrictOnDelete), `deskripsi`, `alamat`, `wilayah_id`, `foto`, `tampil`.
 **`prestasi_desa`** — `judul`, `tahun`, `tingkat`, `penyelenggara`, `deskripsi`, `foto`, `tampil`.
 
 **`kategori_berita`** — `nama`, `slug`.
@@ -418,8 +421,6 @@ auto-scroll 4 detik. Disaring tampil=true dan diurutkan urutan asc di halaman pu
 | `JenisMasuk` | `lahir`, `pindah_masuk`, `pendataan_awal` |
 | `AlasanKeluar` | `meninggal`, `pindah_keluar`, `duplikat` |
 | `KelompokUmur` | `balita_anak`, `anak_sekolah`, `remaja`, `dewasa_muda`, `dewasa`, `lansia`, `tidak_diketahui` |
-| `KategoriPotensi` | `umkm`, `hasil_bumi`, `wisata`, `kerajinan` |
-| `KategoriFasilitas` | `pendidikan`, `kesehatan`, `ibadah`, `pemerintahan`, `olahraga`, `umum` |
 | `TingkatPrestasi` | `desa`, `kecamatan`, `kabupaten`, `provinsi`, `nasional` |
 
 Semua punya `label()` dan `pilihan()` statis untuk dropdown. Beberapa punya

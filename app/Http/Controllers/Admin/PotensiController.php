@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Enums\KategoriPotensi;
 use App\Exceptions\UnggahanGagal;
 use App\Http\Controllers\Admin\Concerns\MengelolaGambar;
 use App\Http\Controllers\Controller;
@@ -19,15 +18,15 @@ class PotensiController extends Controller
 
     public function index(Request $request): View
     {
-        $kategori = KategoriPotensi::tryFrom((string) $request->input('kategori'));
+        $kategoriId = $request->input('kategori');
 
         return view('admin.potensi.index', [
             'daftar' => PotensiDesa::query()
-                ->when($kategori, fn ($q) => $q->where('kategori', $kategori))
+                ->when($kategoriId, fn ($q) => $q->where('kategori_potensi_id', $kategoriId))
                 ->urut()
                 ->paginate(25)
                 ->withQueryString(),
-            'kategori' => $kategori,
+            'kategoriId' => $kategoriId,
         ]);
     }
 
@@ -74,7 +73,7 @@ class PotensiController extends Controller
     {
         $data = $request->validate([
             'nama' => ['required', 'string', 'max:120'],
-            'kategori' => ['required', Rule::enum(KategoriPotensi::class)],
+            'kategori_potensi_id' => ['required', 'exists:ref_kategori_potensi,id'],
             'deskripsi_singkat' => ['nullable', 'string', 'max:255'],
             'deskripsi' => ['nullable', 'string', 'max:20000'],
             'kontak' => ['nullable', 'string', 'max:120'],

@@ -28,13 +28,13 @@
                           focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none">
         </div>
         <div class="w-56">
-            <x-admin.select name="kategori" label="Kategori" :value="$kategori?->value"
-                            :pilihan="\App\Enums\KategoriFasilitas::pilihan()" kosong="Semua kategori" />
+            <x-admin.select name="kategori" label="Kategori" :value="$kategoriId"
+                            :pilihan="\App\Models\RefKategoriFasilitas::urut()->pluck('nama', 'id')" kosong="Semua kategori" />
         </div>
         <button type="submit" class="rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800">
             Terapkan
         </button>
-        @if ($kategori || $kata)
+        @if ($kategoriId || $kata)
             <a href="{{ route('admin.fasilitas.index') }}"
                class="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
                 Bersihkan
@@ -73,8 +73,8 @@
                                     </div>
                                 </td>
                                 <td class="px-4 py-3">
-                                    <span class="rounded-full px-2.5 py-1 text-xs font-medium {{ $fasilitas->kategori->warna() }}">
-                                        {{ $fasilitas->kategori->label() }}
+                                    <span class="rounded-full px-2.5 py-1 text-xs font-medium bg-emerald-100 text-emerald-800">
+                                        {{ $fasilitas->kategori?->nama ?? 'Lainnya' }}
                                     </span>
                                 </td>
                                 <td class="px-4 py-3 text-slate-600">{{ $fasilitas->lokasiTerbaca() ?? '—' }}</td>

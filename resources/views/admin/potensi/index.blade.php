@@ -23,13 +23,13 @@
 
     <form method="GET" class="flex flex-wrap items-end gap-3">
         <div class="w-56">
-            <x-admin.select name="kategori" label="Saring kategori" :value="$kategori?->value"
-                            :pilihan="\App\Enums\KategoriPotensi::pilihan()" kosong="Semua kategori" />
+            <x-admin.select name="kategori" label="Saring kategori" :value="$kategoriId"
+                            :pilihan="\App\Models\RefKategoriPotensi::urut()->pluck('nama', 'id')" kosong="Semua kategori" />
         </div>
         <button type="submit" class="rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800">
             Terapkan
         </button>
-        @if ($kategori)
+        @if ($kategoriId)
             <a href="{{ route('admin.potensi.index') }}"
                class="rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50">
                 Bersihkan
@@ -72,8 +72,8 @@
                                     </div>
                                 </td>
                                 <td class="px-4 py-3">
-                                    <span class="rounded-full px-2.5 py-1 text-xs font-medium {{ $potensi->kategori->warna() }}">
-                                        {{ $potensi->kategori->label() }}
+                                    <span class="rounded-full px-2.5 py-1 text-xs font-medium bg-emerald-100 text-emerald-800">
+                                        {{ $potensi->kategori?->nama ?? 'Lainnya' }}
                                     </span>
                                 </td>
                                 <td class="px-4 py-3 text-slate-500 tabular-nums">{{ $potensi->urutan }}</td>
