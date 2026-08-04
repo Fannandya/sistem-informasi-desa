@@ -494,6 +494,33 @@ Trait pembantu controller untuk simpan/ganti/hapus gambar via `LayananUnggahGamb
 Layout admin memuat: `app.css`, `app.js`, `dialog.js`. Grafik & editor
 di-`@push('skrip')` dari halaman terkait.
 
+### Design Tokens — `resources/css/app.css` (Tailwind 4 `@theme`)
+**Tema Terra** (fitur 16): Palet hijau/earth-tone, fonts Literata + Nunito Sans, ikon Material Symbols.
+
+**Warna** (40+ token):
+- Primary: `#4a7c59` (forest green) + container/fixed variants
+- Secondary: `#6b6358` (warm taupe) + container/fixed variants
+- Tertiary: `#705c30` (warm brown) + container/fixed variants
+- Error: `#b83230` (red) + container variant
+- Surface: 7 tingkatan dari `#faf6f0` (terang) hingga `#e4e0d8` (gelap)
+- On-surface / On-surface-variant: untuk text (`#2e3230`, `#4a4e4a`)
+- Outline / Outline-variant: untuk border (`#74796e`, `#c4c8bc`)
+
+**Font** (via `@theme --font-*` + Google Fonts links di layout):
+- `--font-headline`, `--font-display`: Literata (serif, display/headline)
+- `--font-body`, `--font-label`: Nunito Sans (humanist sans, body/label)
+
+**Radius:** Konsisten `0.75rem` (12px) di semua elemen (tokens `rounded-[12px]`).
+
+**Ikon:** Material Symbols Outlined. Migrasi dari inline SVG:
+- Old: `<svg class="h-4 w-4"><path d="M..." /></svg>`
+- New: `<span class="material-symbols-outlined">nama_ikon</span>`
+- Perubahan JS di `dialog.js`: swap `textContent` span daripada path `d` attribute.
+
+**Komponen yang memakai tokens:**
+- Admin: `field`, `select`, `textarea`, `gambar`, `simpan`, `kartu-grafik`, `tombol-ekspor`, `notifikasi`, `pusat-dialog`, `dialog-arsip`
+- Public: semua halaman inherit tokens otomatis (landing page, profil, struktur, statistik, dst.)
+
 ### Pusat dialog — `resources/js/dialog.js` + `<x-admin.pusat-dialog />`
 Hanya **satu** modal di DOM. Tombol cukup menandai formulirnya dengan `data-*`.
 
