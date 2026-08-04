@@ -74,6 +74,11 @@
                 Struktur Organisasi
             </a>
 
+            <a href="{{ route('admin.potensi.index') }}"
+               class="{{ request()->routeIs('admin.potensi.*') ? $tautanAktif : $tautanBiasa }}">
+                Potensi Desa
+            </a>
+
             <a href="{{ route('admin.pengaturan') }}"
                class="{{ request()->routeIs('admin.pengaturan*') ? $tautanAktif : $tautanBiasa }}">
                 Pengaturan Desa

@@ -9,11 +9,13 @@ use App\Http\Controllers\Admin\ImporPendudukController;
 use App\Http\Controllers\Admin\PendudukController;
 use App\Http\Controllers\Admin\PengaturanDesaController;
 use App\Http\Controllers\Admin\PengurusController;
+use App\Http\Controllers\Admin\PotensiController;
 use App\Http\Controllers\Admin\RefOrganisasiController;
 use App\Http\Controllers\Admin\RefPekerjaanController;
 use App\Http\Controllers\Admin\RekapKkController;
 use App\Http\Controllers\Admin\StatistikController;
 use App\Http\Controllers\Admin\WilayahController;
+use App\Http\Controllers\Publik\PotensiController as PotensiPublikController;
 use App\Http\Controllers\Publik\StrukturOrganisasiController;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Facades\Route;
@@ -29,6 +31,9 @@ Route::view('/', 'welcome')->name('beranda');
 
 Route::name('publik.')->group(function () {
     Route::get('struktur-organisasi', StrukturOrganisasiController::class)->name('struktur');
+
+    Route::get('potensi', [PotensiPublikController::class, 'index'])->name('potensi.index');
+    Route::get('potensi/{potensi}', [PotensiPublikController::class, 'show'])->name('potensi.show');
 });
 
 /*
@@ -106,6 +111,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('organisasi', [RefOrganisasiController::class, 'store'])->name('organisasi.store');
         Route::put('organisasi/{organisasi}', [RefOrganisasiController::class, 'update'])->name('organisasi.update');
         Route::delete('organisasi/{organisasi}', [RefOrganisasiController::class, 'destroy'])->name('organisasi.destroy');
+
+        // --- Potensi desa ---
+        Route::get('potensi', [PotensiController::class, 'index'])->name('potensi.index');
+        Route::get('potensi/tambah', [PotensiController::class, 'create'])->name('potensi.create');
+        Route::post('potensi', [PotensiController::class, 'store'])->name('potensi.store');
+        Route::get('potensi/{potensi}/ubah', [PotensiController::class, 'edit'])->name('potensi.edit');
+        Route::put('potensi/{potensi}', [PotensiController::class, 'update'])->name('potensi.update');
+        Route::delete('potensi/{potensi}', [PotensiController::class, 'destroy'])->name('potensi.destroy');
+        Route::post('potensi/{potensi}/tampil', [PotensiController::class, 'ubahTampil'])->name('potensi.tampil');
 
         // --- Data referensi ---
         Route::get('wilayah', [WilayahController::class, 'index'])->name('wilayah.index');
