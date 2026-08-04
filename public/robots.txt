@@ -1,2 +1,9 @@
 User-agent: *
-Disallow:
+Allow: /
+
+# Panel admin tidak boleh diindeks: isinya data warga dan tidak ada gunanya
+# muncul di hasil pencarian.
+Disallow: /admin
+Disallow: /admin/
+
+Sitemap: http://localhost:8000/sitemap.xml

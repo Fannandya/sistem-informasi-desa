@@ -243,6 +243,33 @@ Aturan ini dipusatkan di `App\Queries\RingkasanKk` dan dipakai bersama oleh dash
 
 ---
 
+## Halaman Publik
+
+| Alamat | Isi |
+|---|---|
+| `/` | Halaman muka: hero, statistik, sekilas desa, potensi, berita, galeri, fasilitas & prestasi, pengurus, kontak |
+| `/profil` | Identitas, visi-misi, sejarah, letak geografis, peta |
+| `/statistik` | Grafik demografi agregat |
+| `/potensi`, `/potensi/{slug}` | Katalog dan detail potensi |
+| `/fasilitas`, `/prestasi` | Sarana desa dan capaiannya |
+| `/berita`, `/berita/{slug}` | Daftar dan halaman baca berita |
+| `/galeri`, `/galeri/{slug}` | Dokumentasi kegiatan dengan lightbox |
+| `/struktur-organisasi` | Susunan pengurus beserta kontak |
+| `/sitemap.xml`, `/robots.txt` | Untuk mesin pencari |
+
+Halaman muka hanya memuat **cuplikan** tiap bagian (6 potensi, 4 berita, 6 acara), masing-masing dengan tombol ke halaman khususnya. Bagian yang datanya belum ada tidak dirender sama sekali, sehingga tidak ada judul bagian yang menggantung tanpa isi.
+
+### Perlindungan statistik publik
+
+Angka di `/statistik` tunduk pada PRD §2.6 dan disaring **di lapisan data**, bukan disembunyikan lewat CSS — angka yang hanya di-*hide* tetap terkirim ke peramban dan terbaca lewat "lihat sumber halaman".
+
+- Kelompok berisi **kurang dari 5 orang** dikirim sebagai `null` dan ditampilkan `<5`. Di RT kecil, "1 orang lulusan S3" praktis menunjuk satu orang tertentu.
+- Rincian berhenti di **tingkat dusun**. Tidak pernah sampai RW atau RT.
+- Endpoint statistik publik **tidak menerima parameter apa pun** — menerima parameter berarti membuka jalan mempersempit hasil sampai kelompok kecil.
+- Ada tes yang memverifikasi respons publik tidak pernah memuat nama, tanggal lahir, maupun ID warga.
+
+---
+
 ## Deployment ke Shared Hosting cPanel
 
 Batasan yang mengikat desain aplikasi ada di [PRD §8](PRD.md). Ringkasnya:
@@ -267,5 +294,10 @@ Batasan yang mengikat desain aplikasi ada di [PRD §8](PRD.md). Ringkasnya:
 | 2 | 06 Statistik Warga (dashboard) | Selesai |
 | 2 | 07 Ekspor Data Penduduk | Selesai |
 | 3 | 08 Struktur Organisasi | Selesai |
-| 3 | 09–13 Potensi, fasilitas, prestasi, berita, galeri | Belum |
-| 4 | 14–15 Etalase publik | Belum |
+| 3 | 09 Potensi Desa | Selesai |
+| 3 | 10 Fasilitas Umum | Selesai |
+| 3 | 11 Prestasi Desa | Selesai |
+| 3 | 12 Berita Desa | Selesai |
+| 3 | 13 Galeri & Dokumentasi Acara | Selesai |
+| 4 | 14 Halaman Publik Desa | Selesai |
+| 4 | 15 Statistik Publik | Selesai |

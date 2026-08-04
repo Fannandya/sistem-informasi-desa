@@ -20,7 +20,10 @@ use App\Http\Controllers\Admin\RefPekerjaanController;
 use App\Http\Controllers\Admin\RekapKkController;
 use App\Http\Controllers\Admin\StatistikController;
 use App\Http\Controllers\Admin\WilayahController;
+use App\Http\Controllers\Publik\BerandaController;
 use App\Http\Controllers\Publik\BeritaController as BeritaPublikController;
+use App\Http\Controllers\Publik\SitemapController;
+use App\Http\Controllers\Publik\StatistikController as StatistikPublikController;
 use App\Http\Controllers\Publik\GaleriController;
 use App\Http\Controllers\Publik\FasilitasController as FasilitasPublikController;
 use App\Http\Controllers\Publik\PotensiController as PotensiPublikController;
@@ -36,9 +39,15 @@ use Illuminate\Support\Facades\Route;
 | Diisi pada fitur 14 (Halaman Publik Desa).
 */
 
-Route::view('/', 'welcome')->name('beranda');
+Route::get('/', BerandaController::class)->name('beranda');
+Route::get('sitemap.xml', SitemapController::class)->name('sitemap');
 
 Route::name('publik.')->group(function () {
+    Route::view('profil', 'publik.profil')->name('profil');
+
+    Route::get('statistik', [StatistikPublikController::class, 'halaman'])->name('statistik');
+    Route::get('statistik/data/{jenis}', [StatistikPublikController::class, 'data'])->name('statistik.data');
+
     Route::get('struktur-organisasi', StrukturOrganisasiController::class)->name('struktur');
 
     Route::get('potensi', [PotensiPublikController::class, 'index'])->name('potensi.index');
