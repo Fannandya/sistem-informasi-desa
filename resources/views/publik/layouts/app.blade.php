@@ -100,7 +100,7 @@
 
             @if ($desa->punyaKontak())
                 <div>
-                    <p class="text-xs font-semibold tracking-wider text-slate-500 uppercase">Kontak</p>
+                    <p class="text-xs font-semibold tracking-wider text-slate-500 uppercase">{{ \App\Support\Teks::ambil('footer.kolom_kontak') }}</p>
                     <ul class="mt-3 space-y-1.5 text-sm text-slate-600">
                         @if (filled($desa->telepon_kantor))
                             <li><a href="tel:{{ preg_replace('/\D/', '', $desa->telepon_kantor) }}"
@@ -126,7 +126,7 @@
             @endif
 
             <div>
-                <p class="text-xs font-semibold tracking-wider text-slate-500 uppercase">Halaman</p>
+                <p class="text-xs font-semibold tracking-wider text-slate-500 uppercase">{{ \App\Support\Teks::ambil('footer.kolom_halaman') }}</p>
                 <ul class="mt-3 space-y-1.5 text-sm">
                     @foreach (\App\Support\MenuPublik::tautan() as $tautan)
                         <li><a href="{{ $tautan['url'] }}" class="text-slate-600 hover:text-emerald-700">{{ $tautan['label'] }}</a></li>
@@ -136,7 +136,7 @@
         </div>
 
         <div class="border-t border-slate-200 px-4 py-5 text-center text-xs text-slate-500 sm:px-6">
-            &copy; {{ now()->year }} {{ $desa->nama_desa }}. Dikelola oleh Pemerintah Desa.
+            &copy; {{ now()->year }} {{ $desa->nama_desa }}. {{ \App\Support\Teks::ambil('footer.pengelola') }}
         </div>
     </footer>
 

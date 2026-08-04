@@ -11,7 +11,7 @@
 > menyinkronkannya adalah bagian dari definisi "selesai", bukan pekerjaan
 > tambahan.
 >
-> Status terakhir diverifikasi: 109 rute, 18 commit, 428 tes lulus (1202 asersi).
+> Status terakhir diverifikasi: 111 rute, 19 commit, 449 tes lulus (1243 asersi).
 
 ---
 
@@ -206,6 +206,13 @@ itu ikut berkurang.
 | POST | `admin/rekap-kk/{tahun}` | `admin.rekap-kk.simpan` | `RekapKkController::simpan` |
 | POST | `admin/rekap-kk/{tahun}/salin` | `admin.rekap-kk.salin` | `RekapKkController::salinTahunSebelumnya` |
 
+**Teks Tampilan**
+
+| Method | URI | Nama | Aksi |
+|---|---|---|---|
+| GET | `admin/teks-tampilan` | `admin.teks-tampilan.index` | `TeksTampilanController::tampilkan` |
+| PUT | `admin/teks-tampilan/{grup}` | `admin.teks-tampilan.perbarui` | `TeksTampilanController::perbarui` |
+
 **Struktur organisasi**
 
 | Method | URI | Nama | Aksi |
@@ -327,6 +334,7 @@ Migrasi di `database/migrations/`, semua bertanggal `2026_08_04_*` kecuali bawaa
 | `..._000005_create_pengurus_desa_table` | `ref_organisasi`, `pengurus_desa` |
 | `..._000006_create_potensi_fasilitas_prestasi_tables` | `potensi_desa`, `fasilitas_umum`, `prestasi_desa` |
 | `..._000007_create_berita_dan_acara_tables` | `kategori_berita`, `berita_desa`, `acara_desa`, `foto_acara` |
+| `..._000008_create_teks_tampilan_table` | `teks_tampilan` |
 
 Tabel `password_reset_tokens` **sengaja tidak dibuat** (tidak ada reset sandi publik).
 
@@ -376,6 +384,11 @@ Berita & acara **sengaja dipisah** (PRD §3.1): berita = artikel teks berkategor
 dengan satu sampul; acara = kumpulan foto dengan narasi singkat. Nilai `status`
 dibuat identik agar logika penyaringan bisa dipakai ulang.
 
+**`teks_tampilan`** — CMS key-value untuk teks & kuota tampilan publik.
+`kunci` (unique), `nilai` (nullable — kosong berarti pakai default dari
+`config/teks-tampilan.php`), `grup`, `admin_id`. Fase 1: hanya kunci
+`beranda.*`, `footer.*`, `menu.*`, `kuota.beranda.*` — lihat ANALISIS-CMS.md.
+
 ---
 
 ## 7. Struktur `app/`
@@ -412,6 +425,10 @@ Semua punya `label()` dan `pilihan()` statis untuk dropdown. Beberapa punya
   `urlThumbnail()`, `urlPlaceholder()`, `pathThumbnail()`, `disk()`.
 - **`EmbedPeta`** — `ekstrakUrl()`, `sah()`. Hanya mengambil `src` dari iframe.
 - **`MenuPublik::tautan()`** — daftar menu navigasi publik.
+- **`Teks`** — `ambil(string $kunci, array $ganti = []): string`,
+  `angka(string $kunci): int`. Sumber teks & kuota tampilan dinamis
+  (grup `beranda`, `footer`, `menu`, `kuota`). Cache → DB → default
+  `config('teks-tampilan')`.
 
 ### `app/Imports/` — alur impor 3 langkah
 | Kelas | Peran |
@@ -446,7 +463,8 @@ rusak di Excel). `kolomDiizinkan(bool $arsip)` menjaga privasi ekspor.
 
 ### `app/Http/Requests/Admin/`
 `LoginRequest`, `PendudukRequest`, `ArsipkanPendudukRequest`, `PengurusRequest`,
-`SimpanRekapKkRequest`, `UpdatePasswordRequest`, `UpdatePengaturanDesaRequest`.
+`SimpanRekapKkRequest`, `UpdatePasswordRequest`, `UpdatePengaturanDesaRequest`,
+`UpdateTeksTampilanRequest`.
 
 ### `app/Http/Controllers/Admin/Concerns/MengelolaGambar`
 Trait pembantu controller untuk simpan/ganti/hapus gambar via `LayananUnggahGambar`.
@@ -545,6 +563,10 @@ depan. Ada tes: `tests/Feature/Penduduk/ZonaWaktuTest.php`.
 
 `config/purifier.php` — sanitasi HTML isi berita (Trix).
 
+`config/teks-tampilan.php` — metadata (grup, label, tipe, default, batas
+validasi) untuk setiap kunci CMS Teks Tampilan fase 1. Menambah kunci baru
+di fase berikutnya cukup menambah entri di sini, tanpa migrasi baru.
+
 `lang/id/` — `validation.php` (ruleset Indonesia lengkap), `pagination.php`, `auth.php`.
 `APP_LOCALE=id` **tanpa** berkas ini membuat semua pesan validasi tampil sebagai
 `validation.required`. Ada tes: `tests/Feature/BahasaTest.php`.
@@ -565,7 +587,7 @@ depan. Ada tes: `tests/Feature/Penduduk/ZonaWaktuTest.php`.
 
 ## 11. Pengujian
 
-`phpunit.xml` → SQLite `:memory:`. **428 tes, 1202 asersi, semua lulus.**
+`phpunit.xml` → SQLite `:memory:`. **449 tes, 1243 asersi, semua lulus.**
 
 ```
 tests/Feature/BahasaTest.php                       lang/id lengkap
@@ -575,7 +597,7 @@ tests/Feature/Admin/GantiKataSandiTest.php
 tests/Feature/Admin/PengaturanDesaTest.php
 tests/Feature/Admin/PerintahAkunTest.php           perintah artisan admin:*
 tests/Feature/Admin/UnduhanTest.php                header pada StreamedResponse
-tests/Feature/Konten/{Acara,Berita,FasilitasPrestasi,KelolaOrganisasi,Pengurus,Potensi}Test.php
+tests/Feature/Konten/{Acara,Berita,FasilitasPrestasi,KelolaOrganisasi,Pengurus,Potensi,TeksTampilan}Test.php
 tests/Feature/Penduduk/DataReferensiTest.php
 tests/Feature/Penduduk/EksporPendudukTest.php
 tests/Feature/Penduduk/ImporPendudukTest.php       (butuh Storage::fake('local') di setUp)
@@ -632,6 +654,8 @@ Spesifikasi per fitur ada di `features/01-*.md` … `features/15-*.md`
 | `a92d30e` | Kelola Organisasi sebagai halaman tersendiri |
 | `2099701` | Hapus permanen warga, pusat dialog, dan dirty tracking |
 | `a4a5ad2` | Tambah CLAUDE.md sebagai peta proyek untuk sesi baru |
+| `72a5d02` | Perkuat mandat CLAUDE.md dan catat perangkap dot-notation di spec CMS |
+| `f66b887` | CMS Teks Tampilan: beranda, footer, menu, dan kuota dari admin panel |
 
 Seluruh 15 fitur PRD sudah selesai.
 
@@ -665,7 +689,7 @@ lengkap belum pernah dirampungkan.
 ## 15. Perintah Cepat
 
 ```powershell
-php artisan test                       # 428 tes
+php artisan test                       # 449 tes
 php artisan test --filter=NamaTest
 php artisan route:list --except-vendor # CATATAN: opsi --columns TIDAK ADA di Laravel 12
 php artisan migrate:fresh --seed

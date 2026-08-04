@@ -4,6 +4,8 @@
 @section('deskripsi', $desa->deskripsiMeta())
 
 @php
+    use App\Support\Teks;
+
     // Setiap bagian hanya dirender bila datanya ada, supaya tidak ada judul
     // bagian yang menggantung tanpa isi (PRD fitur 14).
     $seksi = fn ($kondisi) => $kondisi;
@@ -27,23 +29,23 @@
             @endif
 
             <h1 class="mt-3 text-4xl leading-tight font-semibold text-white sm:text-5xl">
-                Selamat Datang di<br>{{ $desa->nama_desa }}
+                {{ Teks::ambil('beranda.hero.sapaan') }}<br>{{ $desa->nama_desa }}
             </h1>
 
             @if (filled($desa->meta_description) || filled($desa->visi))
                 <p class="mt-5 text-lg leading-relaxed text-slate-200">
-                    {{ Str::limit($desa->meta_description ?: $desa->visi, 200) }}
+                    {{ Str::limit($desa->meta_description ?: $desa->visi, Teks::angka('kuota.beranda.limit_sapaan')) }}
                 </p>
             @endif
 
             <div class="mt-8 flex flex-wrap gap-3">
                 <a href="{{ route('publik.profil') }}"
                    class="rounded-lg bg-emerald-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-500">
-                    Kenali Desa Kami
+                    {{ Teks::ambil('beranda.hero.cta_profil') }}
                 </a>
                 <a href="#potensi"
                    class="rounded-lg border border-white/30 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10">
-                    Lihat Potensi Desa
+                    {{ Teks::ambil('beranda.hero.cta_potensi') }}
                 </a>
             </div>
         </div>
@@ -55,10 +57,10 @@
     <div class="mx-auto max-w-6xl px-4 sm:px-6">
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             @foreach ([
-                ['Jumlah Penduduk', number_format($statistik['jumlah_penduduk'], 0, ',', '.'), 'jiwa'],
-                ['Kepala Keluarga', $statistik['jumlah_kk'] !== null ? number_format($statistik['jumlah_kk'], 0, ',', '.') : null, 'keluarga'],
-                ['Laki-laki', number_format($statistik['laki'], 0, ',', '.'), 'jiwa'],
-                ['Perempuan', number_format($statistik['perempuan'], 0, ',', '.'), 'jiwa'],
+                [Teks::ambil('beranda.statistik.label_penduduk'), number_format($statistik['jumlah_penduduk'], 0, ',', '.'), Teks::ambil('beranda.statistik.satuan_jiwa')],
+                [Teks::ambil('beranda.statistik.label_kk'), $statistik['jumlah_kk'] !== null ? number_format($statistik['jumlah_kk'], 0, ',', '.') : null, Teks::ambil('beranda.statistik.satuan_keluarga')],
+                [Teks::ambil('beranda.statistik.label_laki'), number_format($statistik['laki'], 0, ',', '.'), Teks::ambil('beranda.statistik.satuan_jiwa')],
+                [Teks::ambil('beranda.statistik.label_perempuan'), number_format($statistik['perempuan'], 0, ',', '.'), Teks::ambil('beranda.statistik.satuan_jiwa')],
             ] as [$label, $nilai, $satuan])
                 @if ($nilai !== null)
                     <div class="text-center">
@@ -73,7 +75,7 @@
         <div class="mt-8 text-center">
             <a href="{{ route('publik.statistik') }}"
                class="text-sm font-medium text-emerald-700 hover:text-emerald-800">
-                Lihat Statistik Lengkap &rarr;
+                {{ Teks::ambil('beranda.statistik.tautan') }}
             </a>
         </div>
     </div>
@@ -84,19 +86,19 @@
     <section id="profil" class="py-16">
         <div class="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-2">
             <div>
-                <h2 class="text-2xl font-semibold text-slate-900">Sekilas {{ $desa->nama_desa }}</h2>
+                <h2 class="text-2xl font-semibold text-slate-900">{{ Teks::ambil('beranda.sekilas.prefix') }} {{ $desa->nama_desa }}</h2>
                 <p class="mt-4 leading-relaxed text-slate-600">
-                    {{ Str::limit(strip_tags($desa->sejarah ?: $desa->visi), 480) }}
+                    {{ Str::limit(strip_tags($desa->sejarah ?: $desa->visi), Teks::angka('kuota.beranda.limit_sekilas')) }}
                 </p>
                 <a href="{{ route('publik.profil') }}"
                    class="mt-6 inline-block rounded-lg border border-slate-300 px-5 py-2.5 text-sm font-medium text-slate-700 transition hover:bg-slate-50">
-                    Lihat Profil Lengkap
+                    {{ Teks::ambil('beranda.sekilas.cta') }}
                 </a>
             </div>
 
             @if ($desa->misiSebagaiDaftar())
                 <div class="rounded-2xl bg-slate-50 p-6">
-                    <h3 class="mb-4 text-sm font-semibold tracking-wider text-slate-500 uppercase">Misi Desa</h3>
+                    <h3 class="mb-4 text-sm font-semibold tracking-wider text-slate-500 uppercase">{{ Teks::ambil('beranda.sekilas.judul_misi') }}</h3>
                     <ol class="list-decimal space-y-2 pl-5 text-sm text-slate-700">
                         @foreach (array_slice($desa->misiSebagaiDaftar(), 0, 4) as $misi)
                             <li>{{ $misi }}</li>
@@ -114,11 +116,11 @@
         <div class="mx-auto max-w-6xl px-4 sm:px-6">
             <div class="mb-8 flex flex-wrap items-end justify-between gap-3">
                 <div>
-                    <h2 class="text-2xl font-semibold text-slate-900">Potensi Unggulan</h2>
-                    <p class="mt-1.5 text-slate-600">UMKM, hasil bumi, wisata, dan kerajinan desa.</p>
+                    <h2 class="text-2xl font-semibold text-slate-900">{{ Teks::ambil('beranda.potensi.judul') }}</h2>
+                    <p class="mt-1.5 text-slate-600">{{ Teks::ambil('beranda.potensi.subjudul') }}</p>
                 </div>
                 <a href="{{ route('publik.potensi.index') }}"
-                   class="text-sm font-medium text-emerald-700 hover:text-emerald-800">Lihat Semua Potensi &rarr;</a>
+                   class="text-sm font-medium text-emerald-700 hover:text-emerald-800">{{ Teks::ambil('beranda.potensi.tautan') }}</a>
             </div>
 
             <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -149,11 +151,11 @@
         <div class="mx-auto max-w-6xl px-4 sm:px-6">
             <div class="mb-8 flex flex-wrap items-end justify-between gap-3">
                 <div>
-                    <h2 class="text-2xl font-semibold text-slate-900">Berita Terbaru</h2>
-                    <p class="mt-1.5 text-slate-600">Kabar dan pengumuman dari pemerintah desa.</p>
+                    <h2 class="text-2xl font-semibold text-slate-900">{{ Teks::ambil('beranda.berita.judul') }}</h2>
+                    <p class="mt-1.5 text-slate-600">{{ Teks::ambil('beranda.berita.subjudul') }}</p>
                 </div>
                 <a href="{{ route('publik.berita.index') }}"
-                   class="text-sm font-medium text-emerald-700 hover:text-emerald-800">Lihat Berita Lebih Lengkap &rarr;</a>
+                   class="text-sm font-medium text-emerald-700 hover:text-emerald-800">{{ Teks::ambil('beranda.berita.tautan') }}</a>
             </div>
 
             <div class="grid gap-6 lg:grid-cols-2">
@@ -180,7 +182,7 @@
                 </a>
 
                 <div class="space-y-4">
-                    @foreach ($berita->where('id', '!=', $beritaUtama->id)->take(3) as $item)
+                    @foreach ($berita->where('id', '!=', $beritaUtama->id)->take(Teks::angka('kuota.beranda.berita_samping')) as $item)
                         <a href="{{ route('publik.berita.show', $item) }}"
                            class="group flex gap-4 rounded-2xl bg-white p-4 transition hover:shadow-md">
                             <img src="{{ $item->urlSampulKecil() }}" alt="" loading="lazy"
@@ -207,11 +209,11 @@
         <div class="mx-auto max-w-6xl px-4 sm:px-6">
             <div class="mb-8 flex flex-wrap items-end justify-between gap-3">
                 <div>
-                    <h2 class="text-2xl font-semibold text-slate-900">Galeri Kegiatan</h2>
-                    <p class="mt-1.5 text-slate-600">Dokumentasi acara dan kegiatan warga.</p>
+                    <h2 class="text-2xl font-semibold text-slate-900">{{ Teks::ambil('beranda.galeri.judul') }}</h2>
+                    <p class="mt-1.5 text-slate-600">{{ Teks::ambil('beranda.galeri.subjudul') }}</p>
                 </div>
                 <a href="{{ route('publik.galeri.index') }}"
-                   class="text-sm font-medium text-emerald-700 hover:text-emerald-800">Lihat Galeri Lengkap &rarr;</a>
+                   class="text-sm font-medium text-emerald-700 hover:text-emerald-800">{{ Teks::ambil('beranda.galeri.tautan') }}</a>
             </div>
 
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-3">
@@ -224,7 +226,7 @@
                             <p class="line-clamp-2 text-sm font-medium text-white">{{ $item->judul }}</p>
                             <p class="mt-0.5 text-xs text-white/70">
                                 {{ $item->tanggal_acara->translatedFormat('d M Y') }}
-                                @if ($item->foto_count > 1) · {{ $item->foto_count }} foto @endif
+                                @if ($item->foto_count > 1) · {{ $item->foto_count }} {{ Teks::ambil('beranda.galeri.suffix_foto') }} @endif
                             </p>
                         </div>
                     </a>
@@ -242,9 +244,9 @@
             @if ($fasilitas->isNotEmpty())
                 <div>
                     <div class="mb-5 flex items-end justify-between gap-3">
-                        <h2 class="text-2xl font-semibold text-slate-900">Fasilitas Desa</h2>
+                        <h2 class="text-2xl font-semibold text-slate-900">{{ Teks::ambil('beranda.fasilitas.judul') }}</h2>
                         <a href="{{ route('publik.fasilitas') }}"
-                           class="text-sm font-medium text-emerald-700 hover:text-emerald-800">Lihat Semua &rarr;</a>
+                           class="text-sm font-medium text-emerald-700 hover:text-emerald-800">{{ Teks::ambil('beranda.tautan_lihat_semua') }}</a>
                     </div>
                     <div class="space-y-3">
                         @foreach ($fasilitas as $item)
@@ -266,9 +268,9 @@
             @if ($prestasi->isNotEmpty())
                 <div>
                     <div class="mb-5 flex items-end justify-between gap-3">
-                        <h2 class="text-2xl font-semibold text-slate-900">Prestasi Desa</h2>
+                        <h2 class="text-2xl font-semibold text-slate-900">{{ Teks::ambil('beranda.prestasi.judul') }}</h2>
                         <a href="{{ route('publik.prestasi') }}"
-                           class="text-sm font-medium text-emerald-700 hover:text-emerald-800">Lihat Semua &rarr;</a>
+                           class="text-sm font-medium text-emerald-700 hover:text-emerald-800">{{ Teks::ambil('beranda.tautan_lihat_semua') }}</a>
                     </div>
                     <div class="space-y-3">
                         @foreach ($prestasi as $item)
@@ -297,11 +299,11 @@
         <div class="mx-auto max-w-6xl px-4 sm:px-6">
             <div class="mb-8 flex flex-wrap items-end justify-between gap-3">
                 <div>
-                    <h2 class="text-2xl font-semibold text-slate-900">Struktur Organisasi</h2>
-                    <p class="mt-1.5 text-slate-600">Aparat desa yang melayani warga.</p>
+                    <h2 class="text-2xl font-semibold text-slate-900">{{ Teks::ambil('beranda.pengurus.judul') }}</h2>
+                    <p class="mt-1.5 text-slate-600">{{ Teks::ambil('beranda.pengurus.subjudul') }}</p>
                 </div>
                 <a href="{{ route('publik.struktur') }}"
-                   class="text-sm font-medium text-emerald-700 hover:text-emerald-800">Lihat Struktur Lengkap &rarr;</a>
+                   class="text-sm font-medium text-emerald-700 hover:text-emerald-800">{{ Teks::ambil('beranda.pengurus.tautan') }}</a>
             </div>
 
             <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
@@ -323,16 +325,16 @@
     <section id="kontak" class="border-t border-slate-200 bg-slate-50 py-16">
         <div class="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-2">
             <div>
-                <h2 class="text-2xl font-semibold text-slate-900">Hubungi Kami</h2>
+                <h2 class="text-2xl font-semibold text-slate-900">{{ Teks::ambil('beranda.kontak.judul') }}</h2>
                 <p class="mt-2 text-slate-600">
-                    Kantor {{ $desa->nama_desa }} melayani warga pada hari kerja.
+                    {{ Teks::ambil('beranda.kontak.kalimat', ['{nama}' => $desa->nama_desa]) }}
                 </p>
 
                 <dl class="mt-6 space-y-3 text-sm">
                     @foreach ([
-                        'Alamat' => $desa->alamat_kantor,
-                        'Telepon' => $desa->telepon_kantor,
-                        'Email' => $desa->email,
+                        Teks::ambil('beranda.kontak.label_alamat') => $desa->alamat_kantor,
+                        Teks::ambil('beranda.kontak.label_telepon') => $desa->telepon_kantor,
+                        Teks::ambil('beranda.kontak.label_email') => $desa->email,
                     ] as $label => $nilai)
                         @if (filled($nilai))
                             <div class="flex gap-3">

@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\RefOrganisasiController;
 use App\Http\Controllers\Admin\RefPekerjaanController;
 use App\Http\Controllers\Admin\RekapKkController;
 use App\Http\Controllers\Admin\StatistikController;
+use App\Http\Controllers\Admin\TeksTampilanController;
 use App\Http\Controllers\Admin\WilayahController;
 use App\Http\Controllers\Publik\BerandaController;
 use App\Http\Controllers\Publik\BeritaController as BeritaPublikController;
@@ -207,6 +208,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('pekerjaan', [RefPekerjaanController::class, 'store'])->name('pekerjaan.store');
         Route::put('pekerjaan/{pekerjaan}', [RefPekerjaanController::class, 'update'])->name('pekerjaan.update');
         Route::delete('pekerjaan/{pekerjaan}', [RefPekerjaanController::class, 'destroy'])->name('pekerjaan.destroy');
+
+        // --- Teks tampilan (CMS beranda) ---
+        Route::get('teks-tampilan', [TeksTampilanController::class, 'tampilkan'])->name('teks-tampilan.index');
+        Route::put('teks-tampilan/{grup}', [TeksTampilanController::class, 'perbarui'])
+            ->name('teks-tampilan.perbarui');
 
         // Pengaturan desa — satu halaman, lima bagian dengan simpan terpisah.
         Route::get('pengaturan', [PengaturanDesaController::class, 'tampilkan'])->name('pengaturan');
