@@ -31,7 +31,7 @@ class RefPekerjaanSeeder extends Seeder
     public function run(): void
     {
         foreach (self::PEKERJAAN as $nama) {
-            RefPekerjaan::firstOrCreate(['nama' => $nama]);
+            RefPekerjaan::firstOrCreate(['nama' => $nama], ['is_template' => true]);
         }
     }
 }

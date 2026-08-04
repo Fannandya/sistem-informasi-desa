@@ -32,18 +32,25 @@ class RefPekerjaanController extends Controller
 
     public function destroy(RefPekerjaan $pekerjaan): RedirectResponse
     {
+        if ($pekerjaan->is_template) {
+            return redirect(route('admin.pekerjaan.index'))
+                ->withErrors(['nama' => 'Pekerjaan template tidak dapat dihapus.']);
+        }
+
         if ($pekerjaan->sedangDipakai()) {
-            return back()->with('galat', sprintf(
-                'Pekerjaan "%s" tidak dapat dihapus karena masih dipakai oleh %d data warga.',
-                $pekerjaan->nama,
-                $pekerjaan->jumlahPemakai(),
-            ));
+            return redirect(route('admin.pekerjaan.index'))
+                ->withErrors(['nama' => sprintf(
+                    'Pekerjaan "%s" tidak dapat dihapus karena masih dipakai oleh %d data warga.',
+                    $pekerjaan->nama,
+                    $pekerjaan->jumlahPemakai(),
+                )]);
         }
 
         $nama = $pekerjaan->nama;
         $pekerjaan->delete();
 
-        return back()->with('status', "Pekerjaan \"{$nama}\" dihapus.");
+        return redirect(route('admin.pekerjaan.index'))
+            ->with('status', "Pekerjaan \"{$nama}\" dihapus.");
     }
 
     private function simpan(RefPekerjaan $pekerjaan, Request $request, string $pesan): RedirectResponse

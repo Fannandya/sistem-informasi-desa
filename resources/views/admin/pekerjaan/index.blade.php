@@ -60,7 +60,12 @@
                                             Ubah
                                         </button>
 
-                                        @if ($pekerjaan->penduduk_count > 0)
+                                        @if ($pekerjaan->is_template)
+                                            <span class="cursor-not-allowed rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-300"
+                                                  title="Template pekerjaan tidak dapat dihapus">
+                                                Hapus
+                                            </span>
+                                        @elseif ($pekerjaan->penduduk_count > 0)
                                             <span class="cursor-not-allowed rounded-md px-2.5 py-1.5 text-xs font-medium text-slate-300"
                                                   title="Masih dipakai {{ $pekerjaan->penduduk_count }} data warga">
                                                 Hapus

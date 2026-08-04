@@ -154,7 +154,7 @@ class DataReferensiTest extends TestCase
 
         $this->sebagaiAdmin()
             ->delete(route('admin.pekerjaan.destroy', $pekerjaan))
-            ->assertSessionHas('galat');
+            ->assertSessionHasErrors(['nama']);
 
         $this->assertDatabaseHas('ref_pekerjaan', ['id' => $pekerjaan->id]);
     }
