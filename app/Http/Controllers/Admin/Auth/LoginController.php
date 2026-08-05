@@ -47,6 +47,7 @@ class LoginController extends Controller
         RateLimiter::clear($kunci);
 
         $request->session()->regenerate();
+        session(['last_activity' => time()]);
 
         $admin = Auth::guard('admin')->user();
         $admin->forceFill(['last_login_at' => now()])->save();

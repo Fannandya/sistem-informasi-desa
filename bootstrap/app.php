@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureAdminSessionIsFresh;
+use App\Http\Middleware\EnsureAdminSessionNotExpired;
 use App\Http\Middleware\PreventBackHistory;
 use App\Http\Middleware\RedirectIfAdminAuthenticated;
 use Illuminate\Foundation\Application;
@@ -23,6 +24,9 @@ return Application::configure(basePath: dirname(__DIR__))
         // Tamu yang membuka halaman admin diarahkan ke login admin,
         // bukan ke rute "login" bawaan Laravel yang tidak ada di sini.
         $middleware->redirectGuestsTo(fn () => route('admin.login'));
+
+        // Add session timeout check for admin routes
+        $middleware->append(EnsureAdminSessionNotExpired::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

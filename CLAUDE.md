@@ -11,7 +11,7 @@
 > menyinkronkannya adalah bagian dari definisi "selesai", bukan pekerjaan
 > tambahan.
 >
-> Status terakhir diverifikasi: 115 rute, 20 commit, 462 tes lulus (1290 asersi).
+> Status terakhir diverifikasi: 115 rute, 23 commit, 473 tes lulus (1315+ asersi).
 
 ---
 
@@ -110,6 +110,11 @@ Lihat §8.
 ### 3.9 Alur commit
 **Satu commit per fitur.** Kerjakan fitur → commit → lanjut fitur berikutnya.
 Pesan commit bahasa Indonesia, gaya: `Fitur 09 — Potensi Desa`.
+
+### 3.10 Session timeout 1 jam
+Admin session berakhir setelah **60 menit inaktif**. Middleware `EnsureAdminSessionNotExpired`
+menangani: (1) auto logout untuk regular request → redirect ke login dengan pesan, (2) AJAX request → return 401 JSON.
+`last_activity` session key di-update setiap request.
 
 ---
 
@@ -320,6 +325,7 @@ Rute health check bawaan: `GET /up`.
 | `tamu.admin` | `RedirectIfAdminAuthenticated` | admin yang sudah login tidak melihat halaman login |
 | `sesi.segar` | `EnsureAdminSessionIsFresh` | memaksa login ulang setelah sesi idle |
 | `tanpa.cache` | `PreventBackHistory` | mencegah halaman admin tersimpan di riwayat peramban |
+| — | `EnsureAdminSessionNotExpired` | check session timeout (1 jam inaktif), auto logout, return 401 untuk AJAX |
 
 `PreventBackHistory` **wajib** memakai `$response->headers->set(...)`, bukan
 `$response->withHeaders(...)` — `withHeaders()` tidak ada di `StreamedResponse`,
