@@ -78,29 +78,29 @@
         </div>
     </div>
 
-    {{-- Mini-stat cards mengambang di bawah hero (mobile: horizontal scroll, desktop: grid) --}}
-    <div class="absolute bottom-0 left-0 right-0 px-6 pb-6 translate-y-1/2 z-20">
+    {{-- Mini-stat cards (tetap di bawah hero, tidak overlap) --}}
+    <div class="relative -mt-12 md:-mt-16 px-6 z-20">
         <div class="max-w-7xl mx-auto">
             <div class="overflow-x-auto snap-x snap-mandatory scrollbar-hide md:overflow-visible md:grid md:grid-cols-4 md:gap-6 flex gap-4">
                 {{-- Penduduk --}}
-                <div class="snap-start shrink-0 w-[164px] md:w-full bg-primary text-on-primary rounded-2xl p-6 shadow-lg">
+                <div class="snap-start shrink-0 w-[160px] md:w-full bg-primary text-on-primary rounded-[12px] p-6 shadow-lg">
                     <div class="text-2xl font-bold mb-1">{{ number_format($statistik['jumlah_penduduk'], 0, ',', '.') }}</div>
                     <div class="text-xs font-medium text-on-primary/90">{{ Teks::ambil('beranda.statistik.label_penduduk') }}</div>
                 </div>
                 {{-- Luas Desa --}}
                 @if (filled($desa->luas_desa))
-                    <div class="snap-start shrink-0 w-[164px] md:w-full bg-surface-container-lowest text-on-surface border border-outline-variant/30 rounded-2xl p-6 shadow-lg">
+                    <div class="snap-start shrink-0 w-[160px] md:w-full bg-surface-container-lowest text-on-surface border border-outline-variant/30 rounded-[12px] p-6 shadow-lg">
                         <div class="text-2xl font-bold mb-1 text-on-surface">{{ number_format($desa->luas_desa, 1, ',', '.') }} ha</div>
                         <div class="text-xs font-medium text-on-surface-variant">Luas Wilayah</div>
                     </div>
                 @endif
                 {{-- Kecamatan --}}
-                <div class="snap-start shrink-0 w-[164px] md:w-full bg-surface-container-lowest text-on-surface border border-outline-variant/30 rounded-2xl p-6 shadow-lg">
+                <div class="snap-start shrink-0 w-[160px] md:w-full bg-surface-container-lowest text-on-surface border border-outline-variant/30 rounded-[12px] p-6 shadow-lg">
                     <div class="text-2xl font-bold mb-1 text-on-surface">{{ $desa->kecamatan ?? '—' }}</div>
                     <div class="text-xs font-medium text-on-surface-variant">Kecamatan</div>
                 </div>
                 {{-- Provinsi --}}
-                <div class="snap-start shrink-0 w-[164px] md:w-full bg-surface-container-lowest text-on-surface border border-outline-variant/30 rounded-2xl p-6 shadow-lg">
+                <div class="snap-start shrink-0 w-[160px] md:w-full bg-surface-container-lowest text-on-surface border border-outline-variant/30 rounded-[12px] p-6 shadow-lg">
                     <div class="text-2xl font-bold mb-1 text-on-surface">{{ $desa->provinsi ?? '—' }}</div>
                     <div class="text-xs font-medium text-on-surface-variant">Provinsi</div>
                 </div>
@@ -146,7 +146,7 @@ function carousel() {
 
 {{-- ========================== SEKILAS DESA ========================== --}}
 @if (filled($desa->visi) || filled($desa->sejarah))
-    <section id="profil" data-fade-in class="py-16 px-6 md:px-12 bg-surface">
+    <section id="profil" data-fade-in class="pt-20 md:pt-28 pb-12 md:pb-16 px-6 md:px-12 bg-surface">
         <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             <div>
                 <h2 class="font-headline-lg text-3xl font-bold text-primary mb-4">{{ Teks::ambil('beranda.sekilas.prefix') }} {{ $desa->nama_desa }}</h2>
@@ -162,7 +162,7 @@ function carousel() {
             </div>
 
             @if ($desa->misiSebagaiDaftar())
-                <div class="relative rounded-xl overflow-hidden shadow-[0px_10px_30px_rgba(0,0,0,0.1)] bg-surface-container-lowest p-8 border border-outline-variant/30">
+                <div class="relative rounded-[12px] overflow-hidden shadow-[0px_10px_30px_rgba(0,0,0,0.1)] bg-surface-container-lowest p-8 border border-outline-variant/30">
                     <h3 class="mb-4 text-sm font-semibold tracking-wider text-primary uppercase">{{ Teks::ambil('beranda.sekilas.judul_misi') }}</h3>
                     <ol class="list-decimal space-y-3 pl-5 text-sm text-on-surface-variant leading-relaxed">
                         @foreach (array_slice($desa->misiSebagaiDaftar(), 0, 4) as $misi)
@@ -171,7 +171,7 @@ function carousel() {
                     </ol>
                 </div>
             @else
-                <div class="relative h-96 rounded-xl overflow-hidden shadow-[0px_10px_30px_rgba(0,0,0,0.1)] bg-primary-container/10 flex items-center justify-center border border-outline-variant/30">
+                <div class="relative h-96 rounded-[12px] overflow-hidden shadow-[0px_10px_30px_rgba(0,0,0,0.1)] bg-primary-container/10 flex items-center justify-center border border-outline-variant/30">
                     <span class="material-symbols-outlined text-6xl text-primary/30">landscape</span>
                 </div>
             @endif
@@ -180,7 +180,7 @@ function carousel() {
 @endif
 
 {{-- ============================ STATISTIK ============================ --}}
-<section id="statistik" data-fade-in class="py-16 px-6 md:px-12 bg-surface-container-lowest">
+<section id="statistik" data-fade-in class="py-12 md:py-16 px-6 md:px-12 bg-surface-container-lowest">
     <div class="max-w-7xl mx-auto">
         <div class="mb-10">
             <h2 class="font-headline-lg text-3xl font-bold text-primary mb-2">{{ Teks::ambil('beranda.statistik.label_penduduk') }}</h2>
@@ -197,7 +197,7 @@ function carousel() {
             @endphp
             @foreach ($statData as $stat)
                 @if ($stat['nilai'] !== null)
-                    <div class="snap-start shrink-0 w-[170px] md:w-full {{ $loop->first ? 'bg-primary text-on-primary' : 'bg-surface-container-lowest/80 text-on-surface border border-outline-variant/30' }} backdrop-blur-md shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-6 rounded-xl text-center hover:-translate-y-2 transition-transform duration-300">
+                    <div class="snap-start shrink-0 w-[160px] md:w-full {{ $loop->first ? 'bg-primary text-on-primary' : 'bg-surface-container-lowest/80 text-on-surface border border-outline-variant/30' }} backdrop-blur-md shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-6 rounded-[12px] text-center hover:-translate-y-2 transition-transform duration-300">
                         @if (! $loop->first)
                             <div class="w-12 h-12 mx-auto {{ $stat['color'] }} rounded-full flex items-center justify-center mb-4">
                                 <span class="material-symbols-outlined text-2xl">{{ $stat['icon'] }}</span>
@@ -220,9 +220,9 @@ function carousel() {
 
 {{-- ============================ POTENSI ============================ --}}
 @if ($potensi->isNotEmpty())
-    <section id="potensi" data-fade-in class="py-16 px-6 md:px-12 bg-surface border-t border-outline-variant/30">
+    <section id="potensi" data-fade-in class="py-12 md:py-16 px-6 md:px-12 bg-surface border-t border-outline-variant/30">
         <div class="max-w-7xl mx-auto">
-            <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
+            <div class="mb-8 md:mb-10 flex flex-wrap items-end justify-between gap-4">
                 <div>
                     <h2 class="font-headline-lg text-3xl font-bold text-primary">{{ Teks::ambil('beranda.potensi.judul') }}</h2>
                     <p class="mt-2 text-on-surface-variant">{{ Teks::ambil('beranda.potensi.subjudul') }}</p>
@@ -234,7 +234,7 @@ function carousel() {
             <div class="overflow-x-auto snap-x snap-mandatory scrollbar-hide md:overflow-visible md:grid md:gap-6 md:grid-cols-2 lg:grid-cols-3 flex gap-4">
                 @foreach ($potensi as $item)
                     <a href="{{ route('publik.potensi.show', $item) }}"
-                       class="snap-start shrink-0 w-[240px] md:w-full group overflow-hidden rounded-xl border border-outline-variant/30 bg-surface-container-lowest shadow-[0px_4px_20px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1">
+                       class="snap-start shrink-0 w-[240px] md:w-full group overflow-hidden rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest shadow-[0px_4px_20px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1">
                         <div class="aspect-[4/3] overflow-hidden bg-surface-container-highest">
                             <img src="{{ $item->urlFotoKecil() }}" alt="{{ $item->nama }}" loading="lazy"
                                  class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110">
@@ -255,9 +255,9 @@ function carousel() {
 
 {{-- ============================= BERITA ============================= --}}
 @if ($beritaUtama)
-    <section id="berita" data-fade-in class="py-16 px-6 md:px-12 bg-surface-container-lowest border-t border-outline-variant/30">
+    <section id="berita" data-fade-in class="py-12 md:py-16 px-6 md:px-12 bg-surface-container-lowest border-t border-outline-variant/30">
         <div class="max-w-7xl mx-auto">
-            <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
+            <div class="mb-8 md:mb-10 flex flex-wrap items-end justify-between gap-4">
                 <div>
                     <h2 class="font-headline-lg text-3xl font-bold text-primary">{{ Teks::ambil('beranda.berita.judul') }}</h2>
                     <p class="mt-2 text-on-surface-variant">{{ Teks::ambil('beranda.berita.subjudul') }}</p>
@@ -268,7 +268,7 @@ function carousel() {
 
             <div class="overflow-x-auto snap-x snap-mandatory scrollbar-hide md:overflow-visible md:grid md:gap-8 md:grid-cols-1 lg:grid-cols-2 flex gap-4">
                 <a href="{{ route('publik.berita.show', $beritaUtama) }}"
-                   class="snap-start shrink-0 w-[300px] md:w-full group overflow-hidden rounded-xl bg-surface border border-outline-variant/30 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1">
+                   class="snap-start shrink-0 w-[300px] md:w-full group overflow-hidden rounded-[12px] bg-surface border border-outline-variant/30 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1">
                     <div class="aspect-[16/9] overflow-hidden bg-surface-container-highest">
                         <img src="{{ $beritaUtama->urlSampul() }}" alt="{{ $beritaUtama->judul }}" loading="lazy"
                              class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
@@ -293,7 +293,7 @@ function carousel() {
                 <div class="snap-start shrink-0 w-[300px] md:w-full md:space-y-4 flex flex-col gap-4">
                     @foreach ($berita->where('id', '!=', $beritaUtama->id)->take(Teks::angka('kuota.beranda.berita_samping')) as $item)
                         <a href="{{ route('publik.berita.show', $item) }}"
-                           class="group flex flex-col sm:flex-row gap-4 md:gap-5 rounded-xl border border-outline-variant/30 bg-surface p-4 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)] hover:-translate-x-1">
+                           class="group flex flex-col sm:flex-row gap-4 md:gap-5 rounded-[12px] border border-outline-variant/30 bg-surface p-4 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)] hover:-translate-x-1">
                             <div class="h-32 sm:h-28 w-full sm:w-36 shrink-0 overflow-hidden rounded-lg bg-surface-container-highest">
                                 <img src="{{ $item->urlSampulKecil() }}" alt="" loading="lazy"
                                      class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110">
@@ -317,9 +317,9 @@ function carousel() {
 
 {{-- ============================= GALERI ============================= --}}
 @if ($acara->isNotEmpty())
-    <section id="galeri" data-fade-in class="py-16 px-6 md:px-12 bg-surface border-t border-outline-variant/30">
+    <section id="galeri" data-fade-in class="py-12 md:py-16 px-6 md:px-12 bg-surface border-t border-outline-variant/30">
         <div class="max-w-7xl mx-auto">
-            <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
+            <div class="mb-8 md:mb-10 flex flex-wrap items-end justify-between gap-4">
                 <div>
                     <h2 class="font-headline-lg text-3xl font-bold text-primary">{{ Teks::ambil('beranda.galeri.judul') }}</h2>
                     <p class="mt-2 text-on-surface-variant">{{ Teks::ambil('beranda.galeri.subjudul') }}</p>
@@ -331,7 +331,7 @@ function carousel() {
             <div class="overflow-x-auto snap-x snap-mandatory scrollbar-hide md:overflow-visible md:grid md:gap-6 md:grid-cols-2 lg:grid-cols-3 flex gap-4">
                 @foreach ($acara as $item)
                     <a href="{{ route('publik.galeri.show', $item) }}"
-                       class="snap-start shrink-0 w-[220px] md:w-full group relative aspect-[4/3] overflow-hidden rounded-xl bg-surface-container-highest shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
+                       class="snap-start shrink-0 w-[220px] md:w-full group relative aspect-[4/3] overflow-hidden rounded-[12px] bg-surface-container-highest shadow-[0px_4px_20px_rgba(0,0,0,0.05)]">
                         <img src="{{ $item->urlSampulKecil() }}" alt="{{ $item->judul }}" loading="lazy"
                              class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110">
                         <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-inverse-surface/90 to-transparent pt-12 pb-5 px-5">
@@ -355,12 +355,12 @@ function carousel() {
 
 {{-- ===================== FASILITAS & PRESTASI ===================== --}}
 @if ($fasilitas->isNotEmpty() || $prestasi->isNotEmpty())
-    <section data-fade-in class="py-16 px-6 md:px-12 bg-surface-container-lowest border-t border-outline-variant/30">
+    <section data-fade-in class="py-12 md:py-16 px-6 md:px-12 bg-surface-container-lowest border-t border-outline-variant/30">
         <div class="max-w-7xl mx-auto grid gap-8 md:gap-12 lg:grid-cols-2">
 
             @if ($fasilitas->isNotEmpty())
                 <div x-data="{ buka: false }" class="lg:block">
-                    <button type="button" @click="buka = !buka" class="lg:hidden w-full mb-6 flex items-center justify-between p-4 rounded-xl border border-outline-variant/30 bg-surface shadow-[0px_4px_15px_rgba(0,0,0,0.02)] hover:border-primary/50 transition-colors">
+                    <button type="button" @click="buka = !buka" class="lg:hidden w-full mb-6 flex items-center justify-between p-4 rounded-[12px] border border-outline-variant/30 bg-surface shadow-[0px_4px_15px_rgba(0,0,0,0.02)] hover:border-primary/50 transition-colors">
                         <h2 class="font-headline-lg text-2xl font-bold text-primary text-left">{{ Teks::ambil('beranda.fasilitas.label_toggle') }}</h2>
                         <span class="material-symbols-outlined text-primary transition-transform" :class="{ 'rotate-180': buka }">expand_more</span>
                     </button>
@@ -371,7 +371,7 @@ function carousel() {
                                class="text-sm font-medium text-primary hover:text-primary-container underline">{{ Teks::ambil('beranda.tautan_lihat_semua') }}</a>
                         </div>
                         @foreach ($fasilitas as $item)
-                            <div class="flex items-center gap-5 rounded-xl border border-outline-variant/30 bg-surface p-4 shadow-[0px_4px_15px_rgba(0,0,0,0.02)] transition-colors hover:border-primary/50">
+                            <div class="flex items-center gap-5 rounded-[12px] border border-outline-variant/30 bg-surface p-4 shadow-[0px_4px_15px_rgba(0,0,0,0.02)] transition-colors hover:border-primary/50">
                                 <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-surface-container-highest">
                                     <img src="{{ $item->urlFotoKecil() }}" alt="" loading="lazy"
                                          class="h-full w-full object-cover">
@@ -394,7 +394,7 @@ function carousel() {
 
             @if ($prestasi->isNotEmpty())
                 <div x-data="{ buka: false }" class="lg:block">
-                    <button type="button" @click="buka = !buka" class="lg:hidden w-full mb-6 flex items-center justify-between p-4 rounded-xl border border-outline-variant/30 bg-surface shadow-[0px_4px_15px_rgba(0,0,0,0.02)] hover:border-primary/50 transition-colors">
+                    <button type="button" @click="buka = !buka" class="lg:hidden w-full mb-6 flex items-center justify-between p-4 rounded-[12px] border border-outline-variant/30 bg-surface shadow-[0px_4px_15px_rgba(0,0,0,0.02)] hover:border-primary/50 transition-colors">
                         <h2 class="font-headline-lg text-2xl font-bold text-primary text-left">{{ Teks::ambil('beranda.prestasi.label_toggle') }}</h2>
                         <span class="material-symbols-outlined text-primary transition-transform" :class="{ 'rotate-180': buka }">expand_more</span>
                     </button>
@@ -405,7 +405,7 @@ function carousel() {
                                class="text-sm font-medium text-primary hover:text-primary-container underline">{{ Teks::ambil('beranda.tautan_lihat_semua') }}</a>
                         </div>
                         @foreach ($prestasi as $item)
-                            <div class="rounded-xl border border-outline-variant/30 bg-surface p-5 shadow-[0px_4px_15px_rgba(0,0,0,0.02)] border-l-4 border-l-tertiary transition-colors hover:bg-surface-container-low">
+                            <div class="rounded-[12px] border border-outline-variant/30 bg-surface p-5 shadow-[0px_4px_15px_rgba(0,0,0,0.02)] border-l-4 border-l-tertiary transition-colors hover:bg-surface-container-low">
                                 <div class="flex flex-wrap items-center gap-3">
                                     <span class="font-bold text-tertiary tabular-nums">{{ $item->tahun }}</span>
                                     @if ($item->tingkat)
@@ -430,9 +430,9 @@ function carousel() {
 
 {{-- ============================ PENGURUS ============================ --}}
 @if ($pengurus->isNotEmpty())
-    <section id="pengurus" data-fade-in class="pt-16 pb-0 px-6 md:px-12 bg-surface border-t border-outline-variant/30">
+    <section id="pengurus" data-fade-in class="pt-12 md:pt-16 pb-12 md:pb-16 px-6 md:px-12 bg-surface border-t border-outline-variant/30">
         <div class="max-w-7xl mx-auto">
-            <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
+            <div class="mb-8 md:mb-10 flex flex-wrap items-end justify-between gap-4">
                 <div>
                     <h2 class="font-headline-lg text-3xl font-bold text-primary">{{ Teks::ambil('beranda.pengurus.judul') }}</h2>
                     <p class="mt-2 text-on-surface-variant">{{ Teks::ambil('beranda.pengurus.subjudul') }}</p>
@@ -443,7 +443,7 @@ function carousel() {
 
             <div class="overflow-x-auto snap-x snap-mandatory scrollbar-hide md:overflow-visible md:grid md:gap-6 md:grid-cols-2 lg:grid-cols-4 flex gap-4">
                 @foreach ($pengurus as $orang)
-                    <div class="snap-start shrink-0 w-[180px] md:w-full rounded-xl border border-outline-variant/30 bg-surface-container-lowest p-6 text-center shadow-[0px_4px_20px_rgba(0,0,0,0.03)] hover:-translate-y-1 transition-transform">
+                    <div class="snap-start shrink-0 w-[180px] md:w-full rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest p-6 text-center shadow-[0px_4px_20px_rgba(0,0,0,0.03)] hover:-translate-y-1 transition-transform">
                         <div class="mx-auto h-24 w-24 md:h-28 md:w-28 overflow-hidden rounded-full border-4 border-surface p-1 shadow-sm">
                             <img src="{{ $orang->urlFotoKecil() }}" alt="Foto {{ $orang->nama }}" loading="lazy"
                                  class="h-full w-full rounded-full bg-surface-container-highest object-cover">
