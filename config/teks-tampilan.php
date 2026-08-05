@@ -27,6 +27,7 @@ return [
     'beranda.statistik.label_laki' => ['grup' => 'beranda', 'bagian' => 'Statistik', 'label' => 'Label: laki-laki', 'tipe' => 'teks', 'default' => 'Laki-laki', 'maks' => 40],
     'beranda.statistik.label_perempuan' => ['grup' => 'beranda', 'bagian' => 'Statistik', 'label' => 'Label: perempuan', 'tipe' => 'teks', 'default' => 'Perempuan', 'maks' => 40],
     'beranda.statistik.tautan' => ['grup' => 'beranda', 'bagian' => 'Statistik', 'label' => 'Tautan: lihat statistik lengkap', 'tipe' => 'teks', 'default' => 'Lihat Statistik Lengkap →', 'maks' => 60],
+    'beranda.statistik.hint_geser' => ['grup' => 'beranda', 'bagian' => 'Statistik', 'label' => 'Hint: geser ke kanan (mobile)', 'tipe' => 'teks', 'default' => 'Geser ke kanan untuk lihat selengkapnya', 'maks' => 80],
 
     'beranda.sekilas.prefix' => ['grup' => 'beranda', 'bagian' => 'Sekilas Desa', 'label' => 'Judul (sebelum nama desa)', 'tipe' => 'teks', 'default' => 'Sekilas', 'maks' => 40],
     'beranda.sekilas.cta' => ['grup' => 'beranda', 'bagian' => 'Sekilas Desa', 'label' => 'Tombol: lihat profil lengkap', 'tipe' => 'teks', 'default' => 'Lihat Profil Lengkap', 'maks' => 40],
@@ -46,8 +47,10 @@ return [
     'beranda.galeri.suffix_foto' => ['grup' => 'beranda', 'bagian' => 'Galeri', 'label' => 'Akhiran jumlah foto (mis. "3 foto")', 'tipe' => 'teks', 'default' => 'foto', 'maks' => 20],
 
     'beranda.fasilitas.judul' => ['grup' => 'beranda', 'bagian' => 'Fasilitas & Prestasi', 'label' => 'Judul seksi fasilitas', 'tipe' => 'teks', 'default' => 'Fasilitas Desa', 'maks' => 60],
+    'beranda.fasilitas.label_toggle' => ['grup' => 'beranda', 'bagian' => 'Fasilitas & Prestasi', 'label' => 'Label toggle/expand fasilitas (mobile)', 'tipe' => 'teks', 'default' => 'Fasilitas Umum Desa', 'maks' => 60],
     'beranda.tautan_lihat_semua' => ['grup' => 'beranda', 'bagian' => 'Fasilitas & Prestasi', 'label' => 'Tautan "Lihat Semua" (fasilitas & prestasi)', 'tipe' => 'teks', 'default' => 'Lihat Semua →', 'maks' => 40],
     'beranda.prestasi.judul' => ['grup' => 'beranda', 'bagian' => 'Fasilitas & Prestasi', 'label' => 'Judul seksi prestasi', 'tipe' => 'teks', 'default' => 'Prestasi Desa', 'maks' => 60],
+    'beranda.prestasi.label_toggle' => ['grup' => 'beranda', 'bagian' => 'Fasilitas & Prestasi', 'label' => 'Label toggle/expand prestasi (mobile)', 'tipe' => 'teks', 'default' => 'Penghargaan Desa', 'maks' => 60],
 
     'beranda.pengurus.judul' => ['grup' => 'beranda', 'bagian' => 'Struktur Organisasi', 'label' => 'Judul seksi', 'tipe' => 'teks', 'default' => 'Struktur Organisasi', 'maks' => 60],
     'beranda.pengurus.subjudul' => ['grup' => 'beranda', 'bagian' => 'Struktur Organisasi', 'label' => 'Subjudul', 'tipe' => 'teks', 'default' => 'Aparat desa yang melayani warga.', 'maks' => 150],
@@ -65,7 +68,9 @@ return [
 
     'footer.kolom_kontak' => ['grup' => 'footer', 'label' => 'Judul kolom "Kontak"', 'tipe' => 'teks', 'default' => 'Kontak', 'maks' => 30],
     'footer.kolom_halaman' => ['grup' => 'footer', 'label' => 'Judul kolom "Halaman"', 'tipe' => 'teks', 'default' => 'Halaman', 'maks' => 30],
+    'footer.kolom_tautan_cepat' => ['grup' => 'footer', 'label' => 'Judul kolom "Tautan Cepat" (mobile)', 'tipe' => 'teks', 'default' => 'Tautan Cepat', 'maks' => 30],
     'footer.pengelola' => ['grup' => 'footer', 'label' => 'Baris hak cipta (setelah tahun & nama desa)', 'tipe' => 'teks', 'default' => 'Dikelola oleh Pemerintah Desa.', 'maks' => 80],
+    'footer.buka_maps' => ['grup' => 'footer', 'label' => 'Tombol "Buka di Google Maps"', 'tipe' => 'teks', 'default' => 'Buka di Google Maps', 'maks' => 40],
 
     // ---------------------------------------------------------------
     // MENU — app/Support/MenuPublik.php
