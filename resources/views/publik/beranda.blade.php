@@ -114,7 +114,7 @@ function carousel() {
 
 {{-- ========================== SEKILAS DESA ========================== --}}
 @if (filled($desa->visi) || filled($desa->sejarah))
-    <section id="profil" class="py-16 px-6 md:px-12 bg-surface">
+    <section id="profil" data-fade-in class="py-16 px-6 md:px-12 bg-surface">
         <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
             <div>
                 <h2 class="font-headline-lg text-3xl font-bold text-primary mb-4">{{ Teks::ambil('beranda.sekilas.prefix') }} {{ $desa->nama_desa }}</h2>
@@ -148,7 +148,7 @@ function carousel() {
 @endif
 
 {{-- ============================ STATISTIK ============================ --}}
-<section id="statistik" class="py-16 px-6 md:px-12 bg-surface-container-lowest">
+<section id="statistik" data-fade-in class="py-16 px-6 md:px-12 bg-surface-container-lowest">
     <div class="max-w-7xl mx-auto">
         <div class="text-center mb-12">
             <h2 class="font-headline-lg text-3xl font-bold text-primary mb-4">Data Demografi</h2>
@@ -186,7 +186,7 @@ function carousel() {
 
 {{-- ============================ POTENSI ============================ --}}
 @if ($potensi->isNotEmpty())
-    <section id="potensi" class="py-16 px-6 md:px-12 bg-surface border-t border-outline-variant/30">
+    <section id="potensi" data-fade-in class="py-16 px-6 md:px-12 bg-surface border-t border-outline-variant/30">
         <div class="max-w-7xl mx-auto">
             <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
                 <div>
@@ -221,7 +221,7 @@ function carousel() {
 
 {{-- ============================= BERITA ============================= --}}
 @if ($beritaUtama)
-    <section id="berita" class="py-16 px-6 md:px-12 bg-surface-container-lowest border-t border-outline-variant/30">
+    <section id="berita" data-fade-in class="py-16 px-6 md:px-12 bg-surface-container-lowest border-t border-outline-variant/30">
         <div class="max-w-7xl mx-auto">
             <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
                 <div>
@@ -283,7 +283,7 @@ function carousel() {
 
 {{-- ============================= GALERI ============================= --}}
 @if ($acara->isNotEmpty())
-    <section id="galeri" class="py-16 px-6 md:px-12 bg-surface border-t border-outline-variant/30">
+    <section id="galeri" data-fade-in class="py-16 px-6 md:px-12 bg-surface border-t border-outline-variant/30">
         <div class="max-w-7xl mx-auto">
             <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
                 <div>
@@ -321,7 +321,7 @@ function carousel() {
 
 {{-- ===================== FASILITAS & PRESTASI ===================== --}}
 @if ($fasilitas->isNotEmpty() || $prestasi->isNotEmpty())
-    <section class="py-16 px-6 md:px-12 bg-surface-container-lowest border-t border-outline-variant/30">
+    <section data-fade-in class="py-16 px-6 md:px-12 bg-surface-container-lowest border-t border-outline-variant/30">
         <div class="max-w-7xl mx-auto grid gap-12 lg:grid-cols-2">
 
             @if ($fasilitas->isNotEmpty())
@@ -380,7 +380,7 @@ function carousel() {
 
 {{-- ============================ PENGURUS ============================ --}}
 @if ($pengurus->isNotEmpty())
-    <section id="pengurus" class="py-16 px-6 md:px-12 bg-surface border-t border-outline-variant/30">
+    <section id="pengurus" data-fade-in class="py-16 px-6 md:px-12 bg-surface border-t border-outline-variant/30">
         <div class="max-w-7xl mx-auto">
             <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
                 <div>

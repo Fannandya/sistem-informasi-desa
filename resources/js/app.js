@@ -1,4 +1,5 @@
 import './bootstrap';
+import './scroll-fade';
 
 import Alpine from 'alpinejs';
 
