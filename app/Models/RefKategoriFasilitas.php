@@ -22,4 +22,14 @@ class RefKategoriFasilitas extends Model
     {
         return $query->orderBy('urutan');
     }
+
+    public function warna(): string
+    {
+        return 'bg-secondary/15 text-secondary';
+    }
+
+    public function label(): string
+    {
+        return $this->nama;
+    }
 }

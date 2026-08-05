@@ -22,4 +22,14 @@ class RefKategoriPotensi extends Model
     {
         return $query->orderBy('urutan');
     }
+
+    public function warna(): string
+    {
+        return 'bg-tertiary/15 text-tertiary';
+    }
+
+    public function label(): string
+    {
+        return $this->nama;
+    }
 }
