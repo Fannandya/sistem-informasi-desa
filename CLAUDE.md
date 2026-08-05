@@ -355,6 +355,8 @@ Migrasi di `database/migrations/`, semua bertanggal `2026_08_04_*` kecuali bawaa
 | `..._000007_create_berita_dan_acara_tables` | `kategori_berita`, `berita_desa`, `acara_desa`, `foto_acara` |
 | `..._000008_create_teks_tampilan_table` | `teks_tampilan` |
 | `..._000226_create_carousel_images_table` | `carousel_images` |
+| `2026_08_05_000228_add_is_template_to_ref_pekerjaan` | `ref_pekerjaan` (is_template) |
+| `2026_08_05_000301_add_hero_text_color_to_pengaturan_desa` | `pengaturan_desa` (hero_text_color) |
 
 Tabel `password_reset_tokens` **sengaja tidak dibuat** (tidak ada reset sandi publik).
 
@@ -371,9 +373,16 @@ Tabel `password_reset_tokens` **sengaja tidak dibuat** (tidak ada reset sandi pu
 `peta_embed` menyimpan **hanya URL `src`** hasil `App\Support\EmbedPeta::ekstrakUrl()`,
 bukan HTML iframe mentah dari admin.
 
+**`pengaturan_desa`** (continued) — `hero_text_color` (default `#ffffff`).
+Hex color picker di admin untuk menyesuaikan warna teks hero section dengan foto carousel.
+
 **`wilayah`** — `dusun`, `rw`, `rt`, `urutan`. Unique `(dusun, rw, rt)`.
 Wilayah & pekerjaan dibuat sebagai tabel referensi (bukan teks bebas) supaya
 "Krajan"/"krajan"/"Dusun Krajan" tidak terhitung tiga wilayah berbeda di statistik.
+
+**`ref_pekerjaan`** — `nama`, `is_template` (boolean, default false).
+Default 10 pekerjaan di-mark sebagai template (tidak bisa dihapus). Admin bisa
+tambah custom pekerjaan & delete hanya yang custom.
 
 **`penduduk`** — `nama_lengkap`, `tanggal_lahir` (nullable, untuk data impor;
 form manual mewajibkan), `jenis_kelamin` (L/P), `wilayah_id` (restrictOnDelete),
@@ -510,13 +519,15 @@ Trait pembantu controller untuk simpan/ganti/hapus gambar via `LayananUnggahGamb
 | Entry | Dimuat di |
 |---|---|
 | `resources/css/app.css` | semua halaman |
-| `resources/js/app.js` | semua halaman (Alpine) |
+| `resources/js/app.js` | semua halaman (Alpine + scroll-fade) |
+| `resources/js/scroll-fade.js` | di-import dari app.js (IntersectionObserver) |
 | `resources/js/dialog.js` | layout admin |
 | `resources/js/grafik.js` | halaman bergrafik saja (Chart.js ~64 kB gzip) |
 | `resources/js/editor.js` | halaman tulis berita saja (Trix) |
 
 Layout admin memuat: `app.css`, `app.js`, `dialog.js`. Grafik & editor
-di-`@push('skrip')` dari halaman terkait.
+di-`@push('skrip')` dari halaman terkait. Publik juga memuat `scroll-fade.js`
+untuk animasi fade in/out saat scroll beranda.
 
 ### Design Tokens — `resources/css/app.css` (Tailwind 4 `@theme`)
 **Tema Terra** (fitur 16): Palet hijau/earth-tone, fonts Literata + Nunito Sans, ikon Material Symbols.
@@ -540,6 +551,18 @@ di-`@push('skrip')` dari halaman terkait.
 - Old: `<svg class="h-4 w-4"><path d="M..." /></svg>`
 - New: `<span class="material-symbols-outlined">nama_ikon</span>`
 - Perubahan JS di `dialog.js`: swap `textContent` span daripada path `d` attribute.
+
+**Animasi Scroll** (`resources/css/app.css`):
+- `@keyframes fadeIn` — opacity 0→1, translateY 20px→0 (0.6s ease-out)
+- `@keyframes fadeOut` — opacity 1→0, translateY 0→20px (0.6s ease-out)
+- Elemen dengan `data-fade-in` trigger animasi saat masuk/keluar viewport via IntersectionObserver
+- Dipakai di beranda: 7 sections fade-in saat scroll
+
+**Hero Text Color** (`resources/css/app.css`):
+- CSS Variable: `--hero-text-color` di hero section (dari `pengaturan_desa.hero_text_color`)
+- Applied ke: h1, p, buttons, borders di hero
+- Default: `#ffffff` (putih) jika tidak di-set admin
+- Support opacity variants: `text-on-primary/90`, `text-on-primary/80`, dst.
 
 **Komponen yang memakai tokens:**
 - Admin: `field`, `select`, `textarea`, `gambar`, `simpan`, `kartu-grafik`, `tombol-ekspor`, `notifikasi`, `pusat-dialog`, `dialog-arsip`
@@ -707,11 +730,21 @@ Spesifikasi per fitur ada di `features/01-*.md` … `features/15-*.md`
 | `a4a5ad2` | Tambah CLAUDE.md sebagai peta proyek untuk sesi baru |
 | `72a5d02` | Perkuat mandat CLAUDE.md dan catat perangkap dot-notation di spec CMS |
 | `f66b887` | CMS Teks Tampilan: beranda, footer, menu, dan kuota dari admin panel |
+| `1bf5463` | Fitur 17 (1/3) — Kategori Potensi & Fasilitas: Struktur & Model |
+| `c628449` | Fitur 17 (2/3) — Pekerjaan: Template Locked + Custom Admin |
+| `aeb5a95` | Fitur 17 (3/3) — Session Timeout: 1 Jam Auto Logout + AJAX 401 |
+| `142d116` | Fix: Remove invalid orderBy kategori dari BerandaController |
+| `c82ae63` | Fix: Add warna() dan label() methods ke kategori models |
+| `f7d0bdc` | Add scroll fade in/out animations ke beranda |
+| `2f469c0` | Add hero text color picker untuk admin customization |
 
-Seluruh 15 fitur PRD sudah selesai.
+Seluruh 17 fitur selesai (15 PRD + 2 enhancement).
 
-**Fitur tambahan:**
-| `TBD` | Fitur 16 — Carousel Gambar Hero dengan Alpine.js auto-scroll (4 detik) |
+**Status sekarang:**
+- ✅ Fitur 01-15: PRD lengkap
+- ✅ Fitur 16: Carousel Hero (auto-scroll 4 detik) + Fade animations
+- ✅ Fitur 17: Kategori Potensi/Fasilitas + Pekerjaan Template + Session Timeout (1 jam)
+- ✅ Enhancement: Hero Text Color Picker untuk admin
 
 ---
 
@@ -743,7 +776,7 @@ lengkap belum pernah dirampungkan.
 ## 15. Perintah Cepat
 
 ```powershell
-php artisan test                       # 449 tes
+php artisan test                       # 473 tes (1325+ asersi)
 php artisan test --filter=NamaTest
 php artisan route:list --except-vendor # CATATAN: opsi --columns TIDAK ADA di Laravel 12
 php artisan migrate:fresh --seed
