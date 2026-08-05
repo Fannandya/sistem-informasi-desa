@@ -100,13 +100,13 @@ class Admin extends Authenticatable
     protected static function booted(): void
     {
         static::creating(function (Admin $admin) {
-            if (auth()->check() && auth()->guard() === 'admin') {
+            if (auth('admin')->check()) {
                 $admin->created_by = auth('admin')->id();
             }
         });
 
         static::updating(function (Admin $admin) {
-            if (auth()->check() && auth()->guard() === 'admin') {
+            if (auth('admin')->check()) {
                 $admin->updated_by = auth('admin')->id();
             }
         });
