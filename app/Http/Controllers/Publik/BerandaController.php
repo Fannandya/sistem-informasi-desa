@@ -38,7 +38,7 @@ class BerandaController extends Controller
 
             'acara' => AcaraDesa::query()->terbit()->withCount('foto')->with('foto')->terbaru()->take(Teks::angka('kuota.beranda.acara'))->get(),
 
-            'fasilitas' => FasilitasUmum::query()->tampil()->orderBy('kategori')->take(Teks::angka('kuota.beranda.fasilitas'))->get(),
+            'fasilitas' => FasilitasUmum::query()->tampil()->take(Teks::angka('kuota.beranda.fasilitas'))->get(),
 
             'prestasi' => PrestasiDesa::query()->tampil()->terbaru()->take(Teks::angka('kuota.beranda.prestasi'))->get(),
 

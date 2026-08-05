@@ -6,9 +6,9 @@
 @source '../**/*.js';
 
 @theme {
-    --font-sans: 'Nunito Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'IBM Plex Serif', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
-    --font-serif: 'Literata', ui-serif, Georgia, serif;
+    --font-serif: 'IBM Plex Serif', ui-serif, Georgia, serif;
 
     /* Terra Design Palette (dari DESAIN-FIGMA.md) */
     --color-primary: #4a7c59;
