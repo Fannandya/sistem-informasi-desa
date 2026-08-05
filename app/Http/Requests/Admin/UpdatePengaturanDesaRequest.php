@@ -61,6 +61,7 @@ class UpdatePengaturanDesaRequest extends FormRequest
                 'foto_sampul' => LayananUnggahGambar::aturanValidasi(),
                 'hapus_logo' => ['nullable', 'boolean'],
                 'hapus_foto_sampul' => ['nullable', 'boolean'],
+                'hero_text_color' => ['nullable', 'string', 'regex:/^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/'],
             ],
 
             'profil' => [
@@ -105,6 +106,7 @@ class UpdatePengaturanDesaRequest extends FormRequest
             'alamat_kantor' => 'alamat kantor',
             'telepon_kantor' => 'telepon kantor',
             'meta_description' => 'deskripsi ringkas',
+            'hero_text_color' => 'warna teks hero section',
             'medsos.facebook' => 'tautan Facebook',
             'medsos.instagram' => 'tautan Instagram',
             'medsos.youtube' => 'tautan YouTube',

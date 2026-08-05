@@ -15,6 +15,7 @@
 
 {{-- ============================== HERO ============================== --}}
 <section class="relative w-full h-[600px] md:h-[819px] flex items-center justify-center overflow-hidden bg-on-surface"
+         style="--hero-text-color: {{ $desa->hero_text_color ?? '#ffffff' }};"
          x-data="carousel()" x-init="init()">
     {{-- Carousel images --}}
     <div class="absolute inset-0 overflow-hidden">

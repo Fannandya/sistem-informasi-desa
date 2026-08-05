@@ -8,7 +8,7 @@
     // Bila validasi gagal, buka tab tempat kesalahannya berada agar admin
     // tidak melihat halaman yang seolah tidak bereaksi.
     $petaKesalahan = [
-        'identitas' => ['nama_desa', 'kecamatan', 'kabupaten', 'provinsi', 'kode_pos', 'tahun_berdiri', 'luas_desa', 'logo', 'foto_sampul'],
+        'identitas' => ['nama_desa', 'kecamatan', 'kabupaten', 'provinsi', 'kode_pos', 'tahun_berdiri', 'luas_desa', 'logo', 'foto_sampul', 'hero_text_color'],
         'profil' => ['visi', 'misi', 'nilai_tujuan', 'sejarah'],
         'geografis' => ['letak_geografis', 'peta_embed'],
         'kontak' => ['alamat_kantor', 'telepon_kantor', 'email', 'website', 'medsos'],
@@ -79,6 +79,26 @@
 
             <x-admin.gambar name="foto_sampul" label="Gambar Sampul" :path="$pengaturan->foto_sampul"
                             keterangan="Gambar besar di bagian paling atas halaman muka. Sebaiknya melebar (landscape)." />
+
+            <div>
+                <label for="hero_text_color" class="mb-1.5 block text-sm font-medium text-slate-700">
+                    Warna Teks Hero Section
+                </label>
+                <div class="flex items-center gap-3">
+                    <input type="color" id="hero_text_color" name="hero_text_color"
+                           value="{{ $pengaturan->hero_text_color ?? '#ffffff' }}"
+                           class="h-10 w-20 cursor-pointer rounded-lg border border-slate-300 shadow-sm
+                                  focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none">
+                    <div class="flex-1">
+                        <p class="text-xs text-slate-500">
+                            Pilih warna untuk teks di hero section (judul, deskripsi, tombol).
+                        </p>
+                        <p class="mt-1 text-xs text-slate-500">
+                            Default: putih (#ffffff). Gunakan warna yang kontras dengan foto carousel Anda.
+                        </p>
+                    </div>
+                </div>
+            </div>
 
             <x-admin.simpan />
         </form>
