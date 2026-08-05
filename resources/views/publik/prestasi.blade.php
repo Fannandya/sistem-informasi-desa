@@ -54,12 +54,12 @@
         <ol class="relative space-y-8 border-l-2 border-outline-variant/30 pl-6">
             @foreach ($daftar as $prestasi)
                 <li class="relative">
-                    <span class="absolute top-1.5 -left-[1.9rem] h-3.5 w-3.5 rounded-full border-2 border-white bg-primary-container0"></span>
+                    <span class="absolute top-1.5 -left-[1.9rem] h-3.5 w-3.5 rounded-full border-2 border-white bg-primary-container"></span>
 
-                    <article class="overflow-hidden rounded-[12px] border border-outline-variant/30">
+                    <article class="overflow-hidden rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest shadow-[0px_4px_20px_rgba(0,0,0,0.03)]">
                         <div class="flex flex-col sm:flex-row">
                             @if (filled($prestasi->foto))
-                                <div class="shrink-0 bg-surface-container-lowest sm:w-48">
+                                <div class="shrink-0 bg-surface-container-highest sm:w-48">
                                     <img src="{{ $prestasi->urlFotoKecil() }}" alt="{{ $prestasi->judul }}"
                                          loading="lazy" class="h-full max-h-44 w-full object-cover">
                                 </div>

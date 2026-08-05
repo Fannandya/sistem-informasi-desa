@@ -13,6 +13,10 @@
     <title>@yield('judul', $desa->nama_desa) — {{ $desa->nama_desa }}</title>
     <meta name="description" content="@yield('deskripsi', $desa->deskripsiMeta())">
 
+    @if (filled($desa->logo))
+        <link rel="icon" href="{{ $desa->urlLogo() }}" type="image/webp">
+    @endif
+
     <meta property="og:type" content="website">
     <meta property="og:title" content="@yield('judul', $desa->nama_desa)">
     <meta property="og:description" content="@yield('deskripsi', $desa->deskripsiMeta())">
@@ -29,12 +33,26 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="flex min-h-full flex-col bg-surface-container-lowest text-slate-800">
+<body class="flex min-h-full flex-col bg-surface text-slate-800">
 
-    {{-- ------------------------------ Kop ------------------------------ --}}
-    <header x-data="{ menu: false }" class="bg-surface-container-lowest shadow-sm z-50 top-0 sticky">
+    {{--
+        ------------------------------ Kop ------------------------------
+        Transparan-di-atas-hero hanya berlaku di beranda, satu-satunya
+        halaman dengan gambar hero di baliknya. Halaman lain tetap solid
+        dari awal seperti sebelumnya. Alpine hanya menyalakan/mematikan satu
+        kelas penanda (`kop-transparan`) — seluruh perubahan warna diatur CSS
+        murni di app.css (pola yang sama dengan `--hero-text-color`), supaya
+        tidak perlu menukar banyak kelas warna Tailwind lewat `:class` pada
+        tiap elemen sekaligus.
+    --}}
+    @php($diBeranda = request()->routeIs('beranda'))
+    <header
+        x-data="{ menu: false, diBeranda: @js($diBeranda), scrolled: false }"
+        x-init="if (diBeranda) { scrolled = window.scrollY > 40; window.addEventListener('scroll', () => scrolled = window.scrollY > 40); }"
+        :class="{ 'kop-transparan': diBeranda && !scrolled }"
+        class="bg-surface-container-lowest shadow-sm z-50 top-0 sticky transition-colors duration-300">
         <div class="flex justify-between items-center w-full px-6 max-w-7xl mx-auto h-16">
-            <a href="{{ route('beranda') }}" class="flex items-center gap-3">
+            <a href="{{ route('beranda') }}" class="flex min-w-0 items-center gap-3">
                 @if (filled($desa->logo))
                     <img src="{{ $desa->urlLogo() }}" alt="Logo {{ $desa->nama_desa }}"
                          class="h-10 w-10 shrink-0 rounded-lg object-cover">
@@ -43,20 +61,20 @@
                         {{ mb_strtoupper(mb_substr($desa->nama_desa, 0, 1)) }}
                     </div>
                 @endif
-                <div class="font-headline-md text-xl font-bold text-primary hidden sm:block">{{ $desa->nama_desa }}</div>
+                <div class="kop-nama min-w-0 truncate font-headline-md text-base sm:text-xl font-bold text-primary transition-colors duration-300">{{ $desa->nama_desa }}</div>
             </a>
-            
+
             <nav class="hidden md:flex space-x-8">
                 @foreach (\App\Support\MenuPublik::tautan() as $tautan)
                     <a href="{{ $tautan['url'] }}"
-                       class="font-label-md text-sm transition-colors {{ $tautan['aktif'] ? 'text-primary border-b-2 border-primary pb-1' : 'text-on-surface-variant hover:text-primary' }}">
+                       class="kop-tautan font-label-md text-sm transition-colors duration-300 {{ $tautan['aktif'] ? 'kop-tautan-aktif text-primary border-b-2 border-primary pb-1' : 'text-on-surface-variant hover:text-primary' }}">
                         {{ $tautan['label'] }}
                     </a>
                 @endforeach
             </nav>
-            
-            
-            <button type="button" @click="menu = !menu" class="md:hidden text-on-surface">
+
+
+            <button type="button" @click="menu = !menu" class="kop-menu-tombol md:hidden text-on-surface transition-colors duration-300">
                 <span class="material-symbols-outlined" x-show="!menu">menu</span>
                 <span class="material-symbols-outlined" x-show="menu" x-cloak>close</span>
             </button>
@@ -80,8 +98,8 @@
     </main>
 
     {{-- ----------------------------- Footer ----------------------------- --}}
-    <footer class="@yield('footer_margin', 'mt-16') bg-primary dark:bg-primary-container w-full">
-        <div class="py-12 md:py-16 px-6 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 max-w-7xl mx-auto">
+    <footer class="@yield('footer_margin', 'mt-16') bg-[#3B6648] w-full">
+        <div class="py-12 md:py-16 px-6 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 max-w-7xl mx-auto">
             {{-- Identitas Desa --}}
             <div>
                 <div class="font-headline-md text-2xl font-bold text-on-primary mb-4">{{ $desa->nama_desa }}</div>
@@ -89,10 +107,12 @@
                     <p class="font-body-md text-sm md:text-base text-on-primary/80 mb-2">{{ $desa->wilayahLengkap() }}</p>
                 @endif
                 @if (filled($desa->alamat_kantor))
-                    <p class="font-body-md text-sm md:text-base text-on-primary/80 mb-4">{{ $desa->alamat_kantor }}</p>
+                    <p class="font-body-md text-sm md:text-base text-on-primary/80 mb-4 flex items-start gap-2">
+                        <span class="material-symbols-outlined text-base shrink-0">location_on</span>
+                        <span>{{ $desa->alamat_kantor }}</span>
+                    </p>
                 @endif
-                <p class="font-body-md text-sm md:text-base text-on-primary/80 mb-4">{{ \App\Support\Teks::ambil('footer.pengelola') }}</p>
-                <p class="font-label-sm text-xs text-on-primary/80">&copy; {{ now()->year }} {{ $desa->nama_desa }}. Hak Cipta Dilindungi.</p>
+                <p class="font-body-md text-sm md:text-base text-on-primary/80">{{ \App\Support\Teks::ambil('footer.pengelola') }}</p>
             </div>
 
             {{-- Kontak & Menu --}}
@@ -102,10 +122,16 @@
                     <h3 class="font-headline-md text-lg md:text-xl text-on-primary mb-3 md:mb-4">{{ \App\Support\Teks::ambil('footer.kolom_kontak') }}</h3>
                     <div class="space-y-2">
                         @if (filled($desa->telepon_kantor))
-                            <a href="tel:{{ preg_replace('/\D/', '', $desa->telepon_kantor) }}" class="font-label-sm text-sm text-on-primary/90 hover:text-white transition-colors block">{{ $desa->telepon_kantor }}</a>
+                            <a href="tel:{{ preg_replace('/\D/', '', $desa->telepon_kantor) }}" class="font-label-sm text-sm text-on-primary/90 hover:text-white transition-colors flex items-center gap-2">
+                                <span class="material-symbols-outlined text-base">call</span>
+                                {{ $desa->telepon_kantor }}
+                            </a>
                         @endif
                         @if (filled($desa->email))
-                            <a href="mailto:{{ $desa->email }}" class="font-label-sm text-sm text-on-primary/90 hover:text-white transition-colors block">{{ $desa->email }}</a>
+                            <a href="mailto:{{ $desa->email }}" class="font-label-sm text-sm text-on-primary/90 hover:text-white transition-colors flex items-center gap-2">
+                                <span class="material-symbols-outlined text-base">mail</span>
+                                {{ $desa->email }}
+                            </a>
                         @endif
                     </div>
                 </div>
@@ -170,21 +196,59 @@
                 @endif
             </div>
 
-            {{-- Peta / Google Maps --}}
-            <div>
-                @if (filled($desa->peta_embed))
-                    <div class="h-48 bg-surface-container-highest rounded-lg overflow-hidden relative">
-                        <iframe src="{{ $desa->peta_embed }}" class="absolute inset-0 w-full h-full" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+
+        {{-- Peta / Google Maps — section sendiri, dipisah dari kolom identitas &
+             kontak di atas karena letak kantor desa perlu tampil menonjol,
+             bukan terselip sebagai satu dari beberapa kolom. Bila peta sudah
+             diatur, iframe-nya memenuhi seluruh section dan identitas desa
+             mengambang di atasnya lewat scrim gelap — supaya tetap terbaca
+             di atas warna-warni peta apa pun. --}}
+        @if (filled($desa->peta_embed))
+            <div class="relative h-64 w-full overflow-hidden md:h-96">
+                <iframe src="{{ $desa->peta_embed }}" class="absolute inset-0 h-full w-full" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+
+                <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-inverse-surface/90 via-inverse-surface/30 to-transparent"></div>
+
+                <div class="absolute inset-x-0 bottom-0 flex flex-col items-center gap-3 px-6 pt-16 pb-8 text-center">
+                    <div>
+                        <p class="font-label-md text-base font-semibold text-inverse-on-surface">{{ $desa->nama_desa }}</p>
+                        @if ($desa->wilayahLengkap())
+                            <p class="font-label-sm text-sm text-inverse-on-surface/80 mt-0.5">{{ $desa->wilayahLengkap() }}</p>
+                        @endif
                     </div>
-                @else
-                    <div class="h-48 bg-surface-container-highest rounded-lg flex items-center justify-center text-on-surface-variant">
-                        <div class="text-center">
-                            <span class="material-symbols-outlined text-4xl block mb-2 opacity-50">location_on</span>
-                            <p class="font-label-md text-xs">Lokasi belum diatur</p>
-                        </div>
-                    </div>
-                @endif
+
+                    @if ($desa->tautanGoogleMaps())
+                        <a href="{{ $desa->tautanGoogleMaps() }}" target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 rounded-lg bg-inverse-on-surface/15 px-4 py-2 text-xs font-medium text-inverse-on-surface backdrop-blur-sm transition-colors hover:bg-inverse-on-surface/25">
+                            <span class="material-symbols-outlined text-base">map</span>
+                            Buka di Google Maps
+                        </a>
+                    @endif
+                </div>
             </div>
+        @elseif ($desa->tautanGoogleMaps())
+            <div class="bg-on-primary-fixed-variant py-10 px-6">
+                <div class="mx-auto flex max-w-2xl flex-col items-center gap-4 text-center">
+                    <div>
+                        <p class="font-label-md text-base font-semibold text-on-primary">{{ $desa->nama_desa }}</p>
+                        @if ($desa->wilayahLengkap())
+                            <p class="font-label-sm text-sm text-on-primary/80 mt-0.5">{{ $desa->wilayahLengkap() }}</p>
+                        @endif
+                    </div>
+
+                    <a href="{{ $desa->tautanGoogleMaps() }}" target="_blank" rel="noopener noreferrer"
+                       class="inline-flex items-center gap-2 rounded-lg bg-on-primary/15 px-4 py-2 text-xs font-medium text-on-primary transition-colors hover:bg-on-primary/25">
+                        <span class="material-symbols-outlined text-base">map</span>
+                        Buka di Google Maps
+                    </a>
+                </div>
+            </div>
+        @endif
+
+        {{-- Hak cipta — baris paling bawah, terpisah dari kolom identitas. --}}
+        <div class="bg-inverse-surface py-4 px-6">
+            <p class="text-center font-label-sm text-xs text-inverse-on-surface/70">&copy; {{ now()->year }} {{ $desa->nama_desa }}. Hak Cipta Dilindungi.</p>
         </div>
     </footer>
 

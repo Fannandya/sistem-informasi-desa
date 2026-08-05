@@ -4,7 +4,7 @@
 @section('deskripsi', $desa->deskripsiMeta())
 
 @section('konten')
-<div class="bg-surface-container-lowest">
+<div class="bg-surface">
     {{-- Breadcrumb --}}
     <nav class="max-w-7xl mx-auto px-6 py-4 text-sm">
         <a href="{{ route('beranda') }}" class="text-on-surface-variant hover:text-primary transition-colors">Beranda</a>

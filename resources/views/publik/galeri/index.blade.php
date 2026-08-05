@@ -30,8 +30,8 @@
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ($daftar as $acara)
                 <a href="{{ route('publik.galeri.show', $acara) }}"
-                   class="group overflow-hidden rounded-[12px] border border-outline-variant/30 transition hover:border-outline-variant/50 hover:shadow-md">
-                    <div class="relative aspect-[4/3] overflow-hidden bg-surface-container-lowest">
+                   class="group overflow-hidden rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest shadow-[0px_4px_20px_rgba(0,0,0,0.03)] transition hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)]">
+                    <div class="relative aspect-[4/3] overflow-hidden bg-surface-container-highest">
                         <img src="{{ $acara->urlSampulKecil() }}" alt="{{ $acara->judul }}" loading="lazy"
                              class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
                         @if ($acara->foto_count > 1)

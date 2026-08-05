@@ -21,7 +21,7 @@
 
     {{-- ------------------------- Ringkasan ------------------------- --}}
     <div class="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="rounded-[12px] border border-outline-variant/30 p-5">
+        <div class="rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest p-5 shadow-[0px_4px_20px_rgba(0,0,0,0.03)]">
             <p class="text-sm text-on-surface-variant">Jumlah Penduduk</p>
             <p class="mt-1 text-3xl font-semibold text-on-surface">
                 {{ number_format($ringkasan['jumlah_penduduk'], 0, ',', '.') }}
@@ -30,7 +30,7 @@
         </div>
 
         @if ($ringkasan['jumlah_kk'] !== null)
-            <div class="rounded-[12px] border border-outline-variant/30 p-5">
+            <div class="rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest p-5 shadow-[0px_4px_20px_rgba(0,0,0,0.03)]">
                 <p class="text-sm text-on-surface-variant">Kepala Keluarga</p>
                 <p class="mt-1 text-3xl font-semibold text-on-surface">
                     {{ number_format($ringkasan['jumlah_kk'], 0, ',', '.') }}
@@ -39,7 +39,7 @@
             </div>
         @endif
 
-        <div class="rounded-[12px] border border-outline-variant/30 p-5">
+        <div class="rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest p-5 shadow-[0px_4px_20px_rgba(0,0,0,0.03)]">
             <p class="text-sm text-on-surface-variant">Laki-laki</p>
             <p class="mt-1 text-3xl font-semibold text-on-surface">
                 {{ number_format($ringkasan['laki'], 0, ',', '.') }}
@@ -47,7 +47,7 @@
             <p class="mt-1 text-xs text-on-surface-variant">jiwa</p>
         </div>
 
-        <div class="rounded-[12px] border border-outline-variant/30 p-5">
+        <div class="rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest p-5 shadow-[0px_4px_20px_rgba(0,0,0,0.03)]">
             <p class="text-sm text-on-surface-variant">Perempuan</p>
             <p class="mt-1 text-3xl font-semibold text-on-surface">
                 {{ number_format($ringkasan['perempuan'], 0, ',', '.') }}
@@ -66,7 +66,7 @@
     {{-- ------------------------- Grafik ------------------------- --}}
     <div class="grid gap-6 lg:grid-cols-2">
 
-        <section class="rounded-[12px] border border-outline-variant/30 p-5" data-grafik>
+        <section class="rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest p-5 shadow-[0px_4px_20px_rgba(0,0,0,0.03)]" data-grafik>
             <h2 class="mb-4 text-sm font-semibold text-on-surface">Sebaran Kelompok Umur</h2>
             <div class="relative h-72">
                 <canvas id="grafikUmurPublik" class="hidden"></canvas>
@@ -95,7 +95,7 @@
             </details>
         </section>
 
-        <section class="rounded-[12px] border border-outline-variant/30 p-5" data-grafik>
+        <section class="rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest p-5 shadow-[0px_4px_20px_rgba(0,0,0,0.03)]" data-grafik>
             <h2 class="mb-4 text-sm font-semibold text-on-surface">Tingkat Pendidikan</h2>
             <div class="relative h-72">
                 <canvas id="grafikPendidikanPublik" class="hidden"></canvas>
@@ -125,13 +125,13 @@
     </div>
 
     {{-- ------------------------- Sebaran dusun ------------------------- --}}
-    <section class="mt-6 overflow-hidden rounded-[12px] border border-outline-variant/30">
+    <section class="mt-6 overflow-hidden rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest shadow-[0px_4px_20px_rgba(0,0,0,0.03)]">
         <div class="border-b border-outline-variant/30 px-5 py-4">
             <h2 class="text-sm font-semibold text-on-surface">Sebaran Penduduk per Dusun</h2>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-slate-50 text-left text-xs tracking-wider text-on-surface-variant uppercase">
+                <thead class="bg-surface-container-low text-left text-xs tracking-wider text-on-surface-variant uppercase">
                     <tr>
                         <th class="px-5 py-3 font-semibold">Dusun</th>
                         <th class="px-5 py-3 text-right font-semibold">Penduduk</th>
@@ -157,7 +157,7 @@
         </div>
     </section>
 
-    <div class="mt-8 rounded-[12px] bg-slate-50 px-5 py-4 text-xs leading-relaxed text-on-surface-variant">
+    <div class="mt-8 rounded-[12px] bg-surface-container-low px-5 py-4 text-xs leading-relaxed text-on-surface-variant">
         <p>
             Data bersumber dari pendataan penduduk yang dikelola aparat {{ $desa->nama_desa }}.
             @if ($tanggalPembaruan)

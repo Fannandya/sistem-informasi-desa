@@ -48,16 +48,16 @@
     {{-- Berita utama --}}
     @if ($utama)
         <a href="{{ route('publik.berita.show', $utama) }}"
-           class="group mb-10 grid overflow-hidden rounded-[12px] border border-outline-variant/30 transition hover:border-outline-variant/50 hover:shadow-md md:grid-cols-2">
-            <div class="aspect-[16/10] overflow-hidden bg-surface-container-lowest md:aspect-auto">
+           class="group mb-10 grid overflow-hidden rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest shadow-[0px_4px_20px_rgba(0,0,0,0.03)] transition hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)] md:grid-cols-2">
+            <div class="aspect-[16/10] overflow-hidden bg-surface-container-highest md:aspect-auto">
                 <img src="{{ $utama->urlSampul() }}" alt="{{ $utama->judul }}"
                      class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
             </div>
             <div class="flex flex-col justify-center p-6 sm:p-8">
                 <div class="flex flex-wrap items-center gap-2 text-xs">
-                    <span class="rounded-full bg-emerald-600 px-2.5 py-1 font-medium text-white">Berita Utama</span>
+                    <span class="rounded-full bg-primary text-on-primary px-2.5 py-1 font-medium">Berita Utama</span>
                     @if ($utama->kategori)
-                        <span class="rounded-full bg-surface-container-lowest px-2.5 py-1 text-on-surface">{{ $utama->kategori->nama }}</span>
+                        <span class="rounded-full bg-primary-container text-on-primary-container px-2.5 py-1">{{ $utama->kategori->nama }}</span>
                     @endif
                 </div>
                 <h2 class="mt-3 text-2xl font-semibold text-on-surface group-hover:text-primary transition-colors">
@@ -84,14 +84,14 @@
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ($daftar as $berita)
                 <a href="{{ route('publik.berita.show', $berita) }}"
-                   class="group flex flex-col overflow-hidden rounded-[12px] border border-outline-variant/30 transition hover:border-outline-variant/50 hover:shadow-md">
-                    <div class="aspect-[16/10] overflow-hidden bg-surface-container-lowest">
+                   class="group flex flex-col overflow-hidden rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest shadow-[0px_4px_20px_rgba(0,0,0,0.03)] transition hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)]">
+                    <div class="aspect-[16/10] overflow-hidden bg-surface-container-highest">
                         <img src="{{ $berita->urlSampulKecil() }}" alt="{{ $berita->judul }}" loading="lazy"
                              class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
                     </div>
                     <div class="flex flex-1 flex-col p-5">
                         @if ($berita->kategori)
-                            <span class="mb-2 self-start rounded-full bg-surface-container-lowest px-2.5 py-1 text-xs text-on-surface">
+                            <span class="mb-2 self-start rounded-full bg-primary-container px-2.5 py-1 text-xs text-on-primary-container">
                                 {{ $berita->kategori->nama }}
                             </span>
                         @endif

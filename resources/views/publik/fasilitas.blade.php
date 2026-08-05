@@ -48,7 +48,7 @@
 
             <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($items as $fasilitas)
-                    <article class="overflow-hidden rounded-[12px] border border-outline-variant/30">
+                    <article class="overflow-hidden rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest shadow-[0px_4px_20px_rgba(0,0,0,0.03)] transition hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)]">
                         <div class="aspect-[16/10] overflow-hidden bg-surface-container-highest">
                             <img src="{{ $fasilitas->urlFotoKecil() }}" alt="{{ $fasilitas->nama }}"
                                  loading="lazy" class="h-full w-full object-cover">

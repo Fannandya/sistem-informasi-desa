@@ -29,11 +29,11 @@
 
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($daftarPengurus as $pengurus)
-                    <article class="flex gap-4 rounded-[12px] border border-outline-variant/30 p-4 transition hover:border-primary/50 hover:shadow-md">
+                    <article class="flex gap-4 rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest p-4 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] transition hover:border-primary/50 hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)]">
                         <img src="{{ $pengurus->urlFotoKecil() }}"
                              alt="Foto {{ $pengurus->nama }}"
                              loading="lazy"
-                             class="h-20 w-20 shrink-0 rounded-[12px] bg-surface-container-lowest object-cover">
+                             class="h-20 w-20 shrink-0 rounded-[12px] bg-surface-container-highest object-cover">
 
                         <div class="min-w-0 flex-1">
                             <p class="truncate font-semibold text-on-surface">{{ $pengurus->nama }}</p>
@@ -46,7 +46,7 @@
                             @if (filled($pengurus->nomor_hp))
                                 <div class="mt-2.5 flex flex-wrap gap-2">
                                     <a href="tel:{{ preg_replace('/\D/', '', $pengurus->nomor_hp) }}"
-                                       class="rounded-[12px] bg-surface-container-lowest px-2.5 py-1 text-xs font-medium text-on-surface transition hover:bg-surface-container-low">
+                                       class="rounded-[12px] bg-surface-container-high px-2.5 py-1 text-xs font-medium text-on-surface transition hover:bg-surface-container-highest">
                                         {{ $pengurus->nomor_hp }}
                                     </a>
                                     @if ($pengurus->nomorWhatsapp())

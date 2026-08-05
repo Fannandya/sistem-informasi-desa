@@ -231,4 +231,49 @@ section[style*="--hero-text-color"] .border-on-primary\/50 {
 section[style*="--hero-text-color"] button.border-on-primary\/50:hover {
     background-color: color-mix(in srgb, var(--hero-text-color) 10%, transparent);
 }
+
+/*
+ * Kop transparan di beranda (lihat resources/views/publik/layouts/app.blade.php).
+ * Alpine hanya menyalakan kelas `kop-transparan` pada <header>; sisanya
+ * murni CSS supaya tidak perlu menukar banyak kelas warna Tailwind lewat
+ * `:class` pada setiap elemen anak sekaligus.
+ */
+header.kop-transparan {
+    background-color: transparent;
+    box-shadow: none;
+}
+
+header.kop-transparan .kop-nama {
+    color: var(--color-on-primary);
+}
+
+header.kop-transparan .kop-tautan {
+    color: color-mix(in srgb, var(--color-on-primary) 90%, transparent);
+}
+header.kop-transparan .kop-tautan:hover {
+    color: var(--color-on-primary);
+}
+header.kop-transparan .kop-tautan-aktif {
+    color: var(--color-on-primary);
+    border-color: var(--color-on-primary);
+}
+
+header.kop-transparan .kop-menu-tombol {
+    color: var(--color-on-primary);
+}
+
+/*
+ * Carousel hero beranda — fade silang antar-slide. Alpine hanya menyalakan
+ * kelas `slide-aktif`; opacity & transisinya murni CSS (pola yang sama
+ * dengan kop-transparan) karena menukar kelas `opacity-*` Tailwind langsung
+ * lewat `:class` ternary tidak konsisten diterapkan browser di sini.
+ */
+.slide-carousel {
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+.slide-carousel.slide-aktif {
+    opacity: 1;
+}
+
 trix-toolbar .trix-button-group { border-color: var(--color-outline-variant); }
