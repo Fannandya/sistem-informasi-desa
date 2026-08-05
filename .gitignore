@@ -29,5 +29,10 @@ Thumbs.db
 # Pengaturan lokal Claude Code, spesifik per mesin
 /.claude/settings.local.json
 
-ANALISIS-CMS.md
+# Temporary documentation & working files (development only)
+/docs
 /stitch_sistem_informasi_desa_modern
+ANALISIS-CMS.md
+DESAIN-FIGMA.md
+PROMPT-SESSION-BERIKUTNYA.md
+PROMPT-TAHAP-2-DAN-3.md
