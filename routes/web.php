@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\Auth\LoginController;
 use App\Http\Controllers\Admin\Auth\PasswordController;
 use App\Http\Controllers\Admin\ArsipPendudukController;
@@ -247,5 +248,18 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::put('kata-sandi', [PasswordController::class, 'perbarui'])->name('kata-sandi.perbarui');
 
         Route::post('logout', [LoginController::class, 'keluar'])->name('logout');
+
+        // --- Admin Management (Superuser only) ---
+        Route::middleware('admin.super')->group(function () {
+            Route::get('admin', [AdminController::class, 'index'])->name('admin.index');
+            Route::get('admin/tambah', [AdminController::class, 'create'])->name('admin.create');
+            Route::post('admin', [AdminController::class, 'store'])->name('admin.store');
+            Route::get('admin/{admin}/ubah', [AdminController::class, 'edit'])->name('admin.edit');
+            Route::put('admin/{admin}', [AdminController::class, 'update'])->name('admin.update');
+            Route::delete('admin/{admin}', [AdminController::class, 'destroy'])->name('admin.destroy');
+            Route::post('admin/{admin}/aktifkan', [AdminController::class, 'aktifkan'])->name('admin.aktifkan');
+            Route::post('admin/{admin}/nonaktifkan', [AdminController::class, 'nonaktifkan'])->name('admin.nonaktifkan');
+            Route::post('admin/{admin}/reset-sandi', [AdminController::class, 'resetSandi'])->name('admin.reset-sandi');
+        });
     });
 });
