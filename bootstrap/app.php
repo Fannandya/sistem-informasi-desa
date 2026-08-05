@@ -4,6 +4,7 @@ use App\Http\Middleware\EnsureAdminSessionIsFresh;
 use App\Http\Middleware\EnsureAdminSessionNotExpired;
 use App\Http\Middleware\PreventBackHistory;
 use App\Http\Middleware\RedirectIfAdminAuthenticated;
+use App\Http\Middleware\VerifyAdminIsSuper;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -19,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'tamu.admin' => RedirectIfAdminAuthenticated::class,
             'sesi.segar' => EnsureAdminSessionIsFresh::class,
             'tanpa.cache' => PreventBackHistory::class,
+            'admin.super' => VerifyAdminIsSuper::class,
         ]);
 
         // Tamu yang membuka halaman admin diarahkan ke login admin,
