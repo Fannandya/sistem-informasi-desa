@@ -24,7 +24,13 @@ class RekapKkTest extends TestCase
     {
         parent::setUp();
 
-        $this->admin = Admin::create(['nama' => 'A', 'email' => 'a@desa.test', 'password' => 'rahasia123']);
+        $this->admin = Admin::create([
+            'nama' => 'A',
+            'email' => 'a@desa.test',
+            'password' => 'rahasia123',
+            'is_super_admin' => true,
+            'is_active' => true,
+        ]);
 
         $this->rt = [
             Wilayah::create(['dusun' => 'Krajan', 'rw' => '001', 'rt' => '001', 'urutan' => 1]),
@@ -55,6 +61,7 @@ class RekapKkTest extends TestCase
             'wilayah_id' => $this->rt[$index]->id,
             'tahun' => $tahun,
             'jumlah_kk' => $jumlah,
+            'admin_id' => $this->admin->id,
         ]);
     }
 

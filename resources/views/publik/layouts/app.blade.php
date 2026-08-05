@@ -54,9 +54,6 @@
                 @endforeach
             </nav>
             
-            <a href="{{ url('/admin') }}" class="bg-primary-container text-on-primary-container px-4 py-2 rounded-lg font-label-md text-sm hover:bg-surface-tint hover:text-on-primary transition-colors hidden md:block">
-                Masuk Portal
-            </a>
             
             <button type="button" @click="menu = !menu" class="md:hidden text-on-surface">
                 <span class="material-symbols-outlined" x-show="!menu">menu</span>
@@ -72,9 +69,7 @@
                         {{ $tautan['label'] }}
                     </a>
                 @endforeach
-                <a href="{{ url('/admin') }}" class="block mt-2 rounded-lg px-3 py-2.5 text-sm font-medium text-on-primary-container bg-primary-container text-center">
-                    Masuk Portal
-                </a>
+
             </div>
         </nav>
     </header>
@@ -84,7 +79,7 @@
     </main>
 
     {{-- ----------------------------- Footer ----------------------------- --}}
-    <footer class="mt-16 bg-primary dark:bg-primary-container w-full">
+    <footer class="@yield('footer_margin', 'mt-16') bg-primary dark:bg-primary-container w-full">
         <div class="py-16 px-6 grid grid-cols-1 md:grid-cols-3 gap-10 max-w-7xl mx-auto">
             <div>
                 <div class="font-headline-md text-2xl font-bold text-on-primary mb-6">{{ $desa->nama_desa }}</div>

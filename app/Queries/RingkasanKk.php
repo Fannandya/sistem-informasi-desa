@@ -39,7 +39,9 @@ class RingkasanKk
     public function tahunAcuan(): ?int
     {
         if (! $this->tahunDicari) {
-            $this->tahun = RekapKk::max('tahun');
+            // Use latest()->first() instead of max() for better SQLite transaction handling
+            $latest = RekapKk::latest('tahun')->first();
+            $this->tahun = $latest?->tahun;
             $this->tahunDicari = true;
         }
 

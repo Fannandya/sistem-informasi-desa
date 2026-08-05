@@ -2,6 +2,7 @@
 
 @section('judul', 'Beranda')
 @section('deskripsi', $desa->deskripsiMeta())
+@section('footer_margin', 'mt-0')
 
 @php
     use App\Support\Teks;
@@ -381,7 +382,7 @@ function carousel() {
 
 {{-- ============================ PENGURUS ============================ --}}
 @if ($pengurus->isNotEmpty())
-    <section id="pengurus" data-fade-in class="py-16 px-6 md:px-12 bg-surface border-t border-outline-variant/30">
+    <section id="pengurus" data-fade-in class="pt-16 pb-0 px-6 md:px-12 bg-surface border-t border-outline-variant/30">
         <div class="max-w-7xl mx-auto">
             <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
                 <div>
