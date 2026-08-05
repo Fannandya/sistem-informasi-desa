@@ -11,7 +11,7 @@
 > menyinkronkannya adalah bagian dari definisi "selesai", bukan pekerjaan
 > tambahan.
 >
-> Status terakhir diverifikasi: 115 rute, 23 commit, 473 tes lulus (1315+ asersi).
+> Status terakhir diverifikasi: 123 rute, 33 commit, 495 tes (1374+ asersi).
 
 ---
 
@@ -230,6 +230,20 @@ itu ikut berkurang.
 | GET | `admin/teks-tampilan` | `admin.teks-tampilan.index` | `TeksTampilanController::tampilkan` |
 | PUT | `admin/teks-tampilan/{grup}` | `admin.teks-tampilan.perbarui` | `TeksTampilanController::perbarui` |
 
+**Kelola Admin** (hanya super admin, middleware `admin.super`)
+
+| Method | URI | Nama | Aksi |
+|---|---|---|---|
+| GET | `admin/admin` | `admin.admin.index` | `Admin\AdminController::index` |
+| GET | `admin/admin/tambah` | `admin.admin.create` | `Admin\AdminController::create` |
+| POST | `admin/admin` | `admin.admin.store` | `Admin\AdminController::store` |
+| GET | `admin/admin/{admin}/ubah` | `admin.admin.edit` | `Admin\AdminController::edit` |
+| PUT | `admin/admin/{admin}` | `admin.admin.update` | `Admin\AdminController::update` |
+| DELETE | `admin/admin/{admin}` | `admin.admin.destroy` | `Admin\AdminController::destroy` |
+| POST | `admin/admin/{admin}/aktifkan` | `admin.admin.aktifkan` | `Admin\AdminController::aktifkan` |
+| POST | `admin/admin/{admin}/nonaktifkan` | `admin.admin.nonaktifkan` | `Admin\AdminController::nonaktifkan` |
+| POST | `admin/admin/{admin}/reset-sandi` | `admin.admin.reset-sandi` | `Admin\AdminController::resetSandi` |
+
 **Struktur organisasi**
 
 | Method | URI | Nama | Aksi |
@@ -325,6 +339,7 @@ Rute health check bawaan: `GET /up`.
 | `tamu.admin` | `RedirectIfAdminAuthenticated` | admin yang sudah login tidak melihat halaman login |
 | `sesi.segar` | `EnsureAdminSessionIsFresh` | memaksa login ulang setelah sesi idle |
 | `tanpa.cache` | `PreventBackHistory` | mencegah halaman admin tersimpan di riwayat peramban |
+| `admin.super` | `VerifyAdminIsSuper` | hanya super admin yang bisa akses route kelola admin |
 | — | `EnsureAdminSessionNotExpired` | check session timeout (1 jam inaktif), auto logout, return 401 untuk AJAX |
 
 `PreventBackHistory` **wajib** memakai `$response->headers->set(...)`, bukan
@@ -357,12 +372,15 @@ Migrasi di `database/migrations/`, semua bertanggal `2026_08_04_*` kecuali bawaa
 | `..._000226_create_carousel_images_table` | `carousel_images` |
 | `2026_08_05_000228_add_is_template_to_ref_pekerjaan` | `ref_pekerjaan` (is_template) |
 | `2026_08_05_000301_add_hero_text_color_to_pengaturan_desa` | `pengaturan_desa` (hero_text_color) |
+| `2026_08_05_000302_add_admin_management_columns_to_admins_table` | `admins` (is_super_admin, is_active, created_by, updated_by) |
 
 Tabel `password_reset_tokens` **sengaja tidak dibuat** (tidak ada reset sandi publik).
 
 ### Kolom penting
 
 **`admins`** — `nama`, `email` (unique), `password`, `last_login_at`, `remember_token`.
+
+**`admins`** (continued) — `is_super_admin` (boolean, default false, untuk membedakan super admin), `is_active` (boolean, default true, status akun), `created_by` (FK admins.id nullable), `updated_by` (FK admins.id nullable).
 
 **`pengaturan_desa`** — singleton `id = 1`, di-cache. Kelompok kolom: identitas
 (`nama_desa`, `logo`, `foto_sampul`, `kecamatan`, `kabupaten`, `provinsi`,
@@ -661,7 +679,7 @@ di fase berikutnya cukup menambah entri di sini, tanpa migrasi baru.
 
 ## 11. Pengujian
 
-`phpunit.xml` → SQLite `:memory:`. **449 tes, 1243 asersi, semua lulus.**
+`phpunit.xml` → SQLite `:memory:`. **495 tes, 1374 asersi.**
 
 ```
 tests/Feature/BahasaTest.php                       lang/id lengkap
@@ -737,14 +755,15 @@ Spesifikasi per fitur ada di `features/01-*.md` … `features/15-*.md`
 | `c82ae63` | Fix: Add warna() dan label() methods ke kategori models |
 | `f7d0bdc` | Add scroll fade in/out animations ke beranda |
 | `2f469c0` | Add hero text color picker untuk admin customization |
+| `52002cb` | Fitur 18 — Super Admin & Multi-Level Account Management |
 
-Seluruh 17 fitur selesai (15 PRD + 2 enhancement).
+Seluruh 18 fitur selesai (15 PRD + 3 enhancement).
 
 **Status sekarang:**
 - ✅ Fitur 01-15: PRD lengkap
 - ✅ Fitur 16: Carousel Hero (auto-scroll 4 detik) + Fade animations
 - ✅ Fitur 17: Kategori Potensi/Fasilitas + Pekerjaan Template + Session Timeout (1 jam)
-- ✅ Enhancement: Hero Text Color Picker untuk admin
+- ✅ Fitur 18: Super Admin account management (create, edit, delete, reset password, toggle active, audit trail) + 22 tests
 
 ---
 
@@ -776,7 +795,7 @@ lengkap belum pernah dirampungkan.
 ## 15. Perintah Cepat
 
 ```powershell
-php artisan test                       # 473 tes (1325+ asersi)
+php artisan test                       # 495 tes (1374+ asersi)
 php artisan test --filter=NamaTest
 php artisan route:list --except-vendor # CATATAN: opsi --columns TIDAK ADA di Laravel 12
 php artisan migrate:fresh --seed
