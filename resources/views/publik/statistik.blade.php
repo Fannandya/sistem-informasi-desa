@@ -4,61 +4,61 @@
 @section('deskripsi', 'Data kependudukan ' . $desa->nama_desa . ': jumlah penduduk, kepala keluarga, sebaran umur, dan pendidikan.')
 
 @section('konten')
-<div class="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+<div class="mx-auto max-w-5xl px-6 md:px-12 py-12 md:py-16">
 
-    <nav class="mb-6 text-sm text-slate-500">
-        <a href="{{ route('beranda') }}" class="hover:text-emerald-700">Beranda</a>
+    <nav class="mb-6 text-sm text-on-surface-variant">
+        <a href="{{ route('beranda') }}" class="hover:text-primary transition-colors">Beranda</a>
         <span class="mx-1.5">/</span>
-        <span class="text-slate-700">Statistik</span>
+        <span class="text-on-surface">Statistik</span>
     </nav>
 
     <header class="mb-8 max-w-2xl">
-        <h1 class="text-3xl font-semibold text-slate-900">Statistik Penduduk</h1>
-        <p class="mt-2 text-slate-600">
+        <h1 class="text-3xl font-semibold text-on-surface">Statistik Penduduk</h1>
+        <p class="mt-2 text-on-surface-variant">
             Gambaran kependudukan {{ $desa->nama_desa }} sebagai bentuk keterbukaan informasi desa.
         </p>
     </header>
 
     {{-- ------------------------- Ringkasan ------------------------- --}}
     <div class="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="rounded-2xl border border-slate-200 p-5">
-            <p class="text-sm text-slate-500">Jumlah Penduduk</p>
-            <p class="mt-1 text-3xl font-semibold text-slate-900">
+        <div class="rounded-[12px] border border-outline-variant/30 p-5">
+            <p class="text-sm text-on-surface-variant">Jumlah Penduduk</p>
+            <p class="mt-1 text-3xl font-semibold text-on-surface">
                 {{ number_format($ringkasan['jumlah_penduduk'], 0, ',', '.') }}
             </p>
-            <p class="mt-1 text-xs text-slate-400">jiwa</p>
+            <p class="mt-1 text-xs text-on-surface-variant">jiwa</p>
         </div>
 
         @if ($ringkasan['jumlah_kk'] !== null)
-            <div class="rounded-2xl border border-slate-200 p-5">
-                <p class="text-sm text-slate-500">Kepala Keluarga</p>
-                <p class="mt-1 text-3xl font-semibold text-slate-900">
+            <div class="rounded-[12px] border border-outline-variant/30 p-5">
+                <p class="text-sm text-on-surface-variant">Kepala Keluarga</p>
+                <p class="mt-1 text-3xl font-semibold text-on-surface">
                     {{ number_format($ringkasan['jumlah_kk'], 0, ',', '.') }}
                 </p>
-                <p class="mt-1 text-xs text-slate-400">data tahun {{ $ringkasan['tahun_kk'] }}</p>
+                <p class="mt-1 text-xs text-on-surface-variant">data tahun {{ $ringkasan['tahun_kk'] }}</p>
             </div>
         @endif
 
-        <div class="rounded-2xl border border-slate-200 p-5">
-            <p class="text-sm text-slate-500">Laki-laki</p>
-            <p class="mt-1 text-3xl font-semibold text-slate-900">
+        <div class="rounded-[12px] border border-outline-variant/30 p-5">
+            <p class="text-sm text-on-surface-variant">Laki-laki</p>
+            <p class="mt-1 text-3xl font-semibold text-on-surface">
                 {{ number_format($ringkasan['laki'], 0, ',', '.') }}
             </p>
-            <p class="mt-1 text-xs text-slate-400">jiwa</p>
+            <p class="mt-1 text-xs text-on-surface-variant">jiwa</p>
         </div>
 
-        <div class="rounded-2xl border border-slate-200 p-5">
-            <p class="text-sm text-slate-500">Perempuan</p>
-            <p class="mt-1 text-3xl font-semibold text-slate-900">
+        <div class="rounded-[12px] border border-outline-variant/30 p-5">
+            <p class="text-sm text-on-surface-variant">Perempuan</p>
+            <p class="mt-1 text-3xl font-semibold text-on-surface">
                 {{ number_format($ringkasan['perempuan'], 0, ',', '.') }}
             </p>
-            <p class="mt-1 text-xs text-slate-400">jiwa</p>
+            <p class="mt-1 text-xs text-on-surface-variant">jiwa</p>
         </div>
     </div>
 
     @if ($ringkasan['jiwa_per_kk'] !== null)
-        <p class="mb-10 text-sm text-slate-600">
-            Rata-rata <span class="font-semibold text-slate-900">{{ number_format($ringkasan['jiwa_per_kk'], 2, ',', '.') }}</span>
+        <p class="mb-10 text-sm text-on-surface-variant">
+            Rata-rata <span class="font-semibold text-on-surface">{{ number_format($ringkasan['jiwa_per_kk'], 2, ',', '.') }}</span>
             jiwa per keluarga, tersebar di {{ $jumlahDusun }} dusun.
         </p>
     @endif
@@ -66,28 +66,28 @@
     {{-- ------------------------- Grafik ------------------------- --}}
     <div class="grid gap-6 lg:grid-cols-2">
 
-        <section class="rounded-2xl border border-slate-200 p-5" data-grafik>
-            <h2 class="mb-4 text-sm font-semibold text-slate-900">Sebaran Kelompok Umur</h2>
+        <section class="rounded-[12px] border border-outline-variant/30 p-5" data-grafik>
+            <h2 class="mb-4 text-sm font-semibold text-on-surface">Sebaran Kelompok Umur</h2>
             <div class="relative h-72">
                 <canvas id="grafikUmurPublik" class="hidden"></canvas>
-                <div data-status="muat" class="absolute inset-0 flex items-center justify-center text-sm text-slate-400">Memuat…</div>
-                <div data-status="kosong" class="absolute inset-0 hidden flex-col items-center justify-center text-sm text-slate-500">Belum ada data</div>
+                <div data-status="muat" class="absolute inset-0 flex items-center justify-center text-sm text-on-surface-variant">Memuat…</div>
+                <div data-status="kosong" class="absolute inset-0 hidden flex-col items-center justify-center text-sm text-on-surface-variant">Belum ada data</div>
                 <div data-status="gagal" class="absolute inset-0 hidden flex-col items-center justify-center text-sm text-amber-700">Gagal memuat grafik</div>
             </div>
 
             {{-- Padanan tabel: grafik saja tidak terbaca pembaca layar. --}}
             <details class="mt-4">
-                <summary class="cursor-pointer text-xs text-slate-500">Lihat dalam bentuk tabel</summary>
+                <summary class="cursor-pointer text-xs text-on-surface-variant">Lihat dalam bentuk tabel</summary>
                 <table class="mt-3 w-full text-sm">
-                    <thead class="text-left text-xs text-slate-500">
+                    <thead class="text-left text-xs text-on-surface-variant">
                         <tr><th class="py-1.5">Kelompok</th><th class="py-1.5 text-right">Jumlah</th><th class="py-1.5 text-right">Persen</th></tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         @foreach ($sebaranUmur as $baris)
                             <tr>
-                                <td class="py-1.5 text-slate-700">{{ $baris['label'] }}</td>
-                                <td class="py-1.5 text-right tabular-nums text-slate-700">{{ $baris['tampilan'] }}</td>
-                                <td class="py-1.5 text-right tabular-nums text-slate-500">{{ $baris['persen'] }}%</td>
+                                <td class="py-1.5 text-on-surface">{{ $baris['label'] }}</td>
+                                <td class="py-1.5 text-right tabular-nums text-on-surface">{{ $baris['tampilan'] }}</td>
+                                <td class="py-1.5 text-right tabular-nums text-on-surface-variant">{{ $baris['persen'] }}%</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -95,27 +95,27 @@
             </details>
         </section>
 
-        <section class="rounded-2xl border border-slate-200 p-5" data-grafik>
-            <h2 class="mb-4 text-sm font-semibold text-slate-900">Tingkat Pendidikan</h2>
+        <section class="rounded-[12px] border border-outline-variant/30 p-5" data-grafik>
+            <h2 class="mb-4 text-sm font-semibold text-on-surface">Tingkat Pendidikan</h2>
             <div class="relative h-72">
                 <canvas id="grafikPendidikanPublik" class="hidden"></canvas>
-                <div data-status="muat" class="absolute inset-0 flex items-center justify-center text-sm text-slate-400">Memuat…</div>
-                <div data-status="kosong" class="absolute inset-0 hidden flex-col items-center justify-center text-sm text-slate-500">Belum ada data</div>
+                <div data-status="muat" class="absolute inset-0 flex items-center justify-center text-sm text-on-surface-variant">Memuat…</div>
+                <div data-status="kosong" class="absolute inset-0 hidden flex-col items-center justify-center text-sm text-on-surface-variant">Belum ada data</div>
                 <div data-status="gagal" class="absolute inset-0 hidden flex-col items-center justify-center text-sm text-amber-700">Gagal memuat grafik</div>
             </div>
 
             <details class="mt-4">
-                <summary class="cursor-pointer text-xs text-slate-500">Lihat dalam bentuk tabel</summary>
+                <summary class="cursor-pointer text-xs text-on-surface-variant">Lihat dalam bentuk tabel</summary>
                 <table class="mt-3 w-full text-sm">
-                    <thead class="text-left text-xs text-slate-500">
+                    <thead class="text-left text-xs text-on-surface-variant">
                         <tr><th class="py-1.5">Jenjang</th><th class="py-1.5 text-right">Jumlah</th><th class="py-1.5 text-right">Persen</th></tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         @foreach ($pendidikan as $baris)
                             <tr>
-                                <td class="py-1.5 text-slate-700">{{ $baris['label'] }}</td>
-                                <td class="py-1.5 text-right tabular-nums text-slate-700">{{ $baris['tampilan'] }}</td>
-                                <td class="py-1.5 text-right tabular-nums text-slate-500">{{ $baris['persen'] }}%</td>
+                                <td class="py-1.5 text-on-surface">{{ $baris['label'] }}</td>
+                                <td class="py-1.5 text-right tabular-nums text-on-surface">{{ $baris['tampilan'] }}</td>
+                                <td class="py-1.5 text-right tabular-nums text-on-surface-variant">{{ $baris['persen'] }}%</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -125,13 +125,13 @@
     </div>
 
     {{-- ------------------------- Sebaran dusun ------------------------- --}}
-    <section class="mt-6 overflow-hidden rounded-2xl border border-slate-200">
-        <div class="border-b border-slate-200 px-5 py-4">
-            <h2 class="text-sm font-semibold text-slate-900">Sebaran Penduduk per Dusun</h2>
+    <section class="mt-6 overflow-hidden rounded-[12px] border border-outline-variant/30">
+        <div class="border-b border-outline-variant/30 px-5 py-4">
+            <h2 class="text-sm font-semibold text-on-surface">Sebaran Penduduk per Dusun</h2>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-slate-50 text-left text-xs tracking-wider text-slate-500 uppercase">
+                <thead class="bg-slate-50 text-left text-xs tracking-wider text-on-surface-variant uppercase">
                     <tr>
                         <th class="px-5 py-3 font-semibold">Dusun</th>
                         <th class="px-5 py-3 text-right font-semibold">Penduduk</th>
@@ -142,22 +142,22 @@
                 <tbody class="divide-y divide-slate-100">
                     @forelse ($sebaranDusun as $baris)
                         <tr>
-                            <td class="px-5 py-3 font-medium text-slate-900">{{ $baris['label'] }}</td>
-                            <td class="px-5 py-3 text-right tabular-nums text-slate-700">{{ $baris['tampilan'] }}</td>
-                            <td class="px-5 py-3 text-right tabular-nums {{ $baris['jumlah_kk'] ? 'text-slate-700' : 'text-slate-300' }}">
+                            <td class="px-5 py-3 font-medium text-on-surface">{{ $baris['label'] }}</td>
+                            <td class="px-5 py-3 text-right tabular-nums text-on-surface">{{ $baris['tampilan'] }}</td>
+                            <td class="px-5 py-3 text-right tabular-nums {{ $baris['jumlah_kk'] ? 'text-on-surface' : 'text-slate-300' }}">
                                 {{ $baris['jumlah_kk'] ? number_format($baris['jumlah_kk'], 0, ',', '.') : '—' }}
                             </td>
-                            <td class="px-5 py-3 text-right tabular-nums text-slate-500">{{ $baris['persen'] }}%</td>
+                            <td class="px-5 py-3 text-right tabular-nums text-on-surface-variant">{{ $baris['persen'] }}%</td>
                         </tr>
                     @empty
-                        <tr><td colspan="4" class="px-5 py-10 text-center text-slate-500">Belum ada data wilayah.</td></tr>
+                        <tr><td colspan="4" class="px-5 py-10 text-center text-on-surface-variant">Belum ada data wilayah.</td></tr>
                     @endforelse
                 </tbody>
             </table>
         </div>
     </section>
 
-    <div class="mt-8 rounded-2xl bg-slate-50 px-5 py-4 text-xs leading-relaxed text-slate-500">
+    <div class="mt-8 rounded-[12px] bg-slate-50 px-5 py-4 text-xs leading-relaxed text-on-surface-variant">
         <p>
             Data bersumber dari pendataan penduduk yang dikelola aparat {{ $desa->nama_desa }}.
             @if ($tanggalPembaruan)

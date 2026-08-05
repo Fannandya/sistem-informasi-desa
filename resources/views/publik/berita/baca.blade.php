@@ -8,27 +8,27 @@
 @endpush
 
 @section('konten')
-<article class="mx-auto max-w-3xl px-4 py-12 sm:px-6">
+<article class="mx-auto max-w-3xl px-6 md:px-12 py-12 md:py-16">
 
-    <nav class="mb-6 text-sm text-slate-500">
-        <a href="{{ route('beranda') }}" class="hover:text-emerald-700">Beranda</a>
+    <nav class="mb-6 text-sm text-on-surface-variant">
+        <a href="{{ route('beranda') }}" class="hover:text-primary transition-colors">Beranda</a>
         <span class="mx-1.5">/</span>
-        <a href="{{ route('publik.berita.index') }}" class="hover:text-emerald-700">Berita</a>
+        <a href="{{ route('publik.berita.index') }}" class="hover:text-primary transition-colors">Berita</a>
         <span class="mx-1.5">/</span>
-        <span class="text-slate-700">{{ Str::limit($berita->judul, 40) }}</span>
+        <span class="text-on-surface">{{ Str::limit($berita->judul, 40) }}</span>
     </nav>
 
     <header class="mb-6">
         @if ($berita->kategori)
             <a href="{{ route('publik.berita.kategori', $berita->kategori) }}"
-               class="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 hover:bg-emerald-100">
+               class="rounded-full bg-primary-container px-2.5 py-1 text-xs font-medium text-primary hover:bg-primary-container">
                 {{ $berita->kategori->nama }}
             </a>
         @endif
 
-        <h1 class="mt-3 text-3xl leading-tight font-semibold text-slate-900">{{ $berita->judul }}</h1>
+        <h1 class="mt-3 text-3xl leading-tight font-semibold text-on-surface">{{ $berita->judul }}</h1>
 
-        <p class="mt-3 text-sm text-slate-500">
+        <p class="mt-3 text-sm text-on-surface-variant">
             {{ $berita->tanggal_terbit?->translatedFormat('l, d F Y') }}
             · {{ $berita->waktuBaca() }} menit baca
             @if ($berita->admin)
@@ -38,7 +38,7 @@
     </header>
 
     @if (filled($berita->gambar_sampul))
-        <div class="mb-8 overflow-hidden rounded-2xl bg-slate-100">
+        <div class="mb-8 overflow-hidden rounded-[12px] bg-surface-container-lowest">
             <img src="{{ $berita->urlSampul() }}" alt="{{ $berita->judul }}" class="w-full object-cover">
         </div>
     @endif
@@ -50,21 +50,21 @@
     <div class="prose-desa">{!! $berita->isi !!}</div>
 
     @if ($lainnya->isNotEmpty())
-        <section class="mt-14 border-t border-slate-200 pt-10">
-            <h2 class="mb-5 text-lg font-semibold text-slate-900">Berita lainnya</h2>
+        <section class="mt-14 border-t border-outline-variant/30 pt-10">
+            <h2 class="mb-5 text-lg font-semibold text-on-surface">Berita lainnya</h2>
             <div class="grid gap-5 sm:grid-cols-3">
                 @foreach ($lainnya as $lain)
                     <a href="{{ route('publik.berita.show', $lain) }}"
-                       class="group overflow-hidden rounded-xl border border-slate-200 transition hover:border-slate-300">
-                        <div class="aspect-[16/10] overflow-hidden bg-slate-100">
+                       class="group overflow-hidden rounded-[12px] border border-outline-variant/30 transition hover:border-outline-variant/50">
+                        <div class="aspect-[16/10] overflow-hidden bg-surface-container-lowest">
                             <img src="{{ $lain->urlSampulKecil() }}" alt="{{ $lain->judul }}" loading="lazy"
                                  class="h-full w-full object-cover transition group-hover:scale-105">
                         </div>
                         <div class="p-3">
-                            <p class="line-clamp-2 text-sm font-medium text-slate-900 group-hover:text-emerald-700">
+                            <p class="line-clamp-2 text-sm font-medium text-on-surface group-hover:text-primary transition-colors">
                                 {{ $lain->judul }}
                             </p>
-                            <p class="mt-1 text-xs text-slate-400">
+                            <p class="mt-1 text-xs text-on-surface-variant">
                                 {{ $lain->tanggal_terbit?->translatedFormat('d M Y') }}
                             </p>
                         </div>
@@ -75,7 +75,7 @@
     @endif
 
     <div class="mt-10">
-        <a href="{{ route('publik.berita.index') }}" class="text-sm text-slate-500 hover:text-emerald-700">
+        <a href="{{ route('publik.berita.index') }}" class="text-sm text-on-surface-variant hover:text-primary transition-colors">
             &larr; Kembali ke daftar berita
         </a>
     </div>
