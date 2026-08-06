@@ -16,6 +16,9 @@
 
 {{-- ============================== HERO ============================== --}}
 <section class="-mt-16 relative w-full h-[600px] md:h-[819px] flex items-center justify-center overflow-hidden bg-on-surface"
+{{-- -mt-16 menarik hero naik ke belakang header (h-16) yang transparan di
+     beranda, supaya gambar hero benar-benar terlihat di balik navbar. --}}
+<section class="relative -mt-16 w-full h-[600px] md:h-[819px] flex items-center justify-center overflow-hidden bg-on-surface"
          style="--hero-text-color: {{ $desa->hero_text_color ?? '#ffffff' }};"
          x-data="carousel()" x-init="init()">
     {{-- Carousel images --}}
@@ -24,6 +27,8 @@
         @forelse ($carousel as $item)
             <img src="{{ $layanan->url($item->path) }}"
                  alt="{{ $item->judul }}"
+                 :class="{ 'slide-aktif': currentIndex === {{ $loop->index }} }"
+                 class="slide-carousel absolute inset-0 h-full w-full object-cover">
                  :class="{ 'slide-aktif': currentIndex === {{ $loop->index }} }"
                  class="slide-carousel absolute inset-0 h-full w-full object-cover">
         @empty
@@ -103,6 +108,7 @@ function carousel() {
             this.autoplayInterval = setInterval(() => {
                 this.currentIndex = (this.currentIndex + 1) % this.totalSlides;
             }, 5000);
+            }, 5000); // 5 seconds
         },
 
         goToSlide(index) {
@@ -116,36 +122,63 @@ function carousel() {
 @endpush
 
 {{-- ========================== SEKILAS DESA ========================== --}}
-@if (filled($desa->visi) || filled($desa->sejarah))
+@if (filled($desa->visi) || filled($desa->sejarah) || filled($desa->foto_sampul))
     <section id="profil" data-fade-in class="pt-20 md:pt-28 pb-12 md:pb-16 px-6 md:px-12 bg-surface">
-        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-            <div>
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-10">
                 <h2 class="font-headline-lg text-3xl font-bold text-primary mb-4">{{ Teks::ambil('beranda.sekilas.prefix') }} {{ $desa->nama_desa }}</h2>
-                <div class="w-16 h-1 bg-secondary rounded-full mb-6"></div>
-                <p class="font-body-md text-base text-on-surface-variant mb-8 leading-relaxed">
-                    {{ Str::limit(strip_tags($desa->sejarah ?: $desa->visi), Teks::angka('kuota.beranda.limit_sekilas')) }}
-                </p>
+                <div class="w-16 h-1 bg-secondary rounded-full mx-auto mb-6"></div>
+                @if (filled($desa->sejarah))
+                    <p class="font-body-md text-base text-on-surface-variant leading-relaxed max-w-3xl mx-auto">
+                        {{ Str::limit(strip_tags($desa->sejarah), Teks::angka('kuota.beranda.limit_sekilas')) }}
+                    </p>
+                @endif
+            </div>
+
+            @if (filled($desa->foto_sampul))
+                <div class="rounded-[12px] overflow-hidden shadow-[0px_10px_30px_rgba(0,0,0,0.1)] border border-outline-variant/30 mb-6">
+                    <img src="{{ $desa->urlSampul() }}" alt="{{ $desa->nama_desa }}" loading="lazy"
+                         class="w-full h-64 md:h-96 object-cover">
+                </div>
+            @endif
+
+            @if (filled($desa->visi))
+                <div class="rounded-[12px] bg-primary-container/20 border border-primary/20 p-6 md:p-8 mb-8">
+                    <h3 class="mb-3 text-xs font-semibold tracking-wider text-primary uppercase">{{ Teks::ambil('beranda.sekilas.judul_visi') }}</h3>
+                    <p class="font-body-md text-base md:text-lg text-on-surface italic leading-relaxed">&ldquo;{{ $desa->visi }}&rdquo;</p>
+                </div>
+            @endif
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                @if (filled($desa->tahun_berdiri))
+                    <div class="text-center rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest p-5">
+                        <div class="text-2xl font-bold text-primary">{{ $desa->tahun_berdiri }}</div>
+                        <div class="mt-1 text-xs font-medium text-on-surface-variant">{{ Teks::ambil('beranda.sekilas.label_tahun_berdiri') }}</div>
+                    </div>
+                @endif
+                <div class="text-center rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest p-5">
+                    <div class="text-2xl font-bold text-primary">{{ $statistik['jumlah_dusun'] }} {{ Teks::ambil('beranda.sekilas.satuan_dusun') }}</div>
+                    <div class="mt-1 text-xs font-medium text-on-surface-variant">{{ Teks::ambil('beranda.sekilas.label_jumlah_dusun') }}</div>
+                </div>
+                <div class="text-center rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest p-5">
+                    <div class="text-2xl font-bold text-primary">{{ $desa->kecamatan ?? '—' }}</div>
+                    <div class="mt-1 text-xs font-medium text-on-surface-variant">{{ Teks::ambil('beranda.sekilas.label_kecamatan') }}</div>
+                </div>
+                @if (filled($desa->kode_pos))
+                    <div class="text-center rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest p-5">
+                        <div class="text-2xl font-bold text-primary">{{ $desa->kode_pos }}</div>
+                        <div class="mt-1 text-xs font-medium text-on-surface-variant">{{ Teks::ambil('beranda.sekilas.label_kode_pos') }}</div>
+                    </div>
+                @endif
+            </div>
+
+            <div class="text-center mt-10">
                 <a href="{{ route('publik.profil') }}"
                    class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
                     {{ Teks::ambil('beranda.sekilas.cta') }}
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
             </div>
-
-            @if ($desa->misiSebagaiDaftar())
-                <div class="relative rounded-[12px] overflow-hidden shadow-[0px_10px_30px_rgba(0,0,0,0.1)] bg-surface-container-lowest p-8 border border-outline-variant/30">
-                    <h3 class="mb-4 text-sm font-semibold tracking-wider text-primary uppercase">{{ Teks::ambil('beranda.sekilas.judul_misi') }}</h3>
-                    <ol class="list-decimal space-y-3 pl-5 text-sm text-on-surface-variant leading-relaxed">
-                        @foreach (array_slice($desa->misiSebagaiDaftar(), 0, 4) as $misi)
-                            <li>{{ $misi }}</li>
-                        @endforeach
-                    </ol>
-                </div>
-            @else
-                <div class="relative h-96 rounded-[12px] overflow-hidden shadow-[0px_10px_30px_rgba(0,0,0,0.1)] bg-primary-container/10 flex items-center justify-center border border-outline-variant/30">
-                    <span class="material-symbols-outlined text-6xl text-primary/30">landscape</span>
-                </div>
-            @endif
         </div>
     </section>
 @endif
@@ -172,6 +205,10 @@ function carousel() {
                         <div class="w-12 h-12 mx-auto {{ $stat['color'] }} rounded-full flex items-center justify-center mb-4">
                             <span class="material-symbols-outlined text-2xl">{{ $stat['icon'] }}</span>
                         </div>
+                    <div class="snap-start shrink-0 w-[160px] md:w-full bg-surface-container-lowest/80 text-on-surface border border-outline-variant/30 backdrop-blur-md shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-6 rounded-[12px] text-center hover:-translate-y-2 transition-transform duration-300">
+                        <div class="w-12 h-12 mx-auto {{ $stat['color'] }} rounded-full flex items-center justify-center mb-4">
+                            <span class="material-symbols-outlined text-2xl">{{ $stat['icon'] }}</span>
+                        </div>
                         <div class="font-display-lg text-3xl font-bold mb-1">{{ $stat['nilai'] }}</div>
                         <div class="font-label-md text-xs">{{ $stat['label'] }}</div>
                     </div>
@@ -182,6 +219,9 @@ function carousel() {
             <a href="{{ route('publik.statistik') }}"
                class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
                 {{ Teks::ambil('beranda.statistik.tautan') }}
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+               class="inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-2 font-label-md text-sm text-primary transition-colors hover:bg-primary hover:text-on-primary">
+                {{ trim(str_replace('→', '', Teks::ambil('beranda.statistik.tautan'))) }}
                 <span class="material-symbols-outlined text-sm">arrow_forward</span>
             </a>
         </div>
@@ -200,6 +240,10 @@ function carousel() {
                 <a href="{{ route('publik.potensi.index') }}"
                    class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
                     {{ Teks::ambil('beranda.potensi.tautan') }}
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </a>
+                   class="shrink-0 inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-2 font-label-md text-sm text-primary transition-colors hover:bg-primary hover:text-on-primary">
+                    {{ trim(str_replace('→', '', Teks::ambil('beranda.potensi.tautan'))) }}
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
             </div>
@@ -238,6 +282,10 @@ function carousel() {
                 <a href="{{ route('publik.berita.index') }}"
                    class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
                     {{ Teks::ambil('beranda.berita.tautan') }}
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </a>
+                   class="shrink-0 inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-2 font-label-md text-sm text-primary transition-colors hover:bg-primary hover:text-on-primary">
+                    {{ trim(str_replace('→', '', Teks::ambil('beranda.berita.tautan'))) }}
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
             </div>
@@ -305,6 +353,10 @@ function carousel() {
                     {{ Teks::ambil('beranda.galeri.tautan') }}
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
+                   class="shrink-0 inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-2 font-label-md text-sm text-primary transition-colors hover:bg-primary hover:text-on-primary">
+                    {{ trim(str_replace('→', '', Teks::ambil('beranda.galeri.tautan'))) }}
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </a>
             </div>
 
             <div class="overflow-x-auto snap-x snap-mandatory scrollbar-hide md:overflow-visible md:grid md:gap-6 md:grid-cols-2 lg:grid-cols-3 flex gap-4">
@@ -351,6 +403,10 @@ function carousel() {
                                    {{ Teks::ambil('beranda.tautan_lihat_semua') }}
                                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
                                </a>
+                               class="inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-2 font-label-md text-sm text-primary transition-colors hover:bg-primary hover:text-on-primary">
+                                {{ trim(str_replace('→', '', Teks::ambil('beranda.tautan_lihat_semua'))) }}
+                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </a>
                         </div>
                         @foreach ($fasilitas as $item)
                             <div class="flex items-center gap-5 rounded-[12px] border border-outline-variant/30 bg-surface p-4 shadow-[0px_4px_15px_rgba(0,0,0,0.02)] transition-colors hover:border-primary/50">
@@ -372,6 +428,10 @@ function carousel() {
                                    {{ Teks::ambil('beranda.tautan_lihat_semua') }}
                                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
                                </a>
+                               class="inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-2 font-label-md text-sm text-primary transition-colors hover:bg-primary hover:text-on-primary">
+                                {{ trim(str_replace('→', '', Teks::ambil('beranda.tautan_lihat_semua'))) }}
+                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -391,6 +451,10 @@ function carousel() {
                                    {{ Teks::ambil('beranda.tautan_lihat_semua') }}
                                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
                                </a>
+                               class="inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-2 font-label-md text-sm text-primary transition-colors hover:bg-primary hover:text-on-primary">
+                                {{ trim(str_replace('→', '', Teks::ambil('beranda.tautan_lihat_semua'))) }}
+                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </a>
                         </div>
                         @foreach ($prestasi as $item)
                             <div class="rounded-[12px] border border-outline-variant/30 bg-surface p-5 shadow-[0px_4px_15px_rgba(0,0,0,0.02)] transition-colors hover:bg-surface-container-low">
@@ -411,6 +475,10 @@ function carousel() {
                                    {{ Teks::ambil('beranda.tautan_lihat_semua') }}
                                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
                                </a>
+                               class="inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-2 font-label-md text-sm text-primary transition-colors hover:bg-primary hover:text-on-primary">
+                                {{ trim(str_replace('→', '', Teks::ambil('beranda.tautan_lihat_semua'))) }}
+                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -431,6 +499,10 @@ function carousel() {
                 <a href="{{ route('publik.struktur') }}"
                    class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
                     {{ Teks::ambil('beranda.pengurus.tautan') }}
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </a>
+                   class="shrink-0 inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-2 font-label-md text-sm text-primary transition-colors hover:bg-primary hover:text-on-primary">
+                    {{ trim(str_replace('→', '', Teks::ambil('beranda.pengurus.tautan'))) }}
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
             </div>

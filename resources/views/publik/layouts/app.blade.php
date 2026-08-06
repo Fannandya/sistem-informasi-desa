@@ -13,6 +13,10 @@
     <title>@yield('judul', $desa->nama_desa) — {{ $desa->nama_desa }}</title>
     <meta name="description" content="@yield('deskripsi', $desa->deskripsiMeta())">
 
+    @if (filled($desa->logo))
+        <link rel="icon" href="{{ $desa->urlLogo() }}" type="image/webp">
+    @endif
+
     <meta property="og:type" content="website">
     <meta property="og:title" content="@yield('judul', $desa->nama_desa)">
     <meta property="og:description" content="@yield('deskripsi', $desa->deskripsiMeta())">
@@ -29,7 +33,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="flex min-h-full flex-col bg-surface-container-lowest text-slate-800">
+<body class="flex min-h-full flex-col bg-surface text-slate-800">
 
     {{-- ------------------------------ Kop ------------------------------ --}}
     <header
@@ -49,7 +53,7 @@
         class="z-50 top-0 left-0 right-0 fixed w-full transition-[background-color,box-shadow] duration-300 ease-out">
 
         <div class="flex justify-between items-center w-full px-6 max-w-7xl mx-auto h-16">
-            <a href="{{ route('beranda') }}" class="flex items-center gap-3">
+            <a href="{{ route('beranda') }}" class="flex min-w-0 items-center gap-3">
                 @if (filled($desa->logo))
                     <img src="{{ $desa->urlLogo() }}" alt="Logo {{ $desa->nama_desa }}"
                          class="h-10 w-10 shrink-0 rounded-lg object-cover">
@@ -64,6 +68,7 @@
                     {{ $desa->nama_desa }}
                 </div>
             </a>
+
 
             <nav class="hidden md:flex space-x-8">
                 @foreach (\App\Support\MenuPublik::tautan() as $tautan)
@@ -112,8 +117,12 @@
                     <p class="font-body-md text-sm md:text-base text-on-primary/80 mb-2">{{ $desa->wilayahLengkap() }}</p>
                 @endif
                 @if (filled($desa->alamat_kantor))
-                    <p class="font-body-md text-sm md:text-base text-on-primary/80 mb-4">{{ $desa->alamat_kantor }}</p>
+                    <p class="font-body-md text-sm md:text-base text-on-primary/80 mb-4 flex items-start gap-2">
+                        <span class="material-symbols-outlined text-base shrink-0">location_on</span>
+                        <span>{{ $desa->alamat_kantor }}</span>
+                    </p>
                 @endif
+                <p class="font-body-md text-sm md:text-base text-on-primary/80">{{ \App\Support\Teks::ambil('footer.pengelola') }}</p>
                 <p class="font-body-md text-sm md:text-base text-on-primary/80">{{ \App\Support\Teks::ambil('footer.pengelola') }}</p>
             </div>
 
@@ -124,10 +133,16 @@
                     <h3 class="font-headline-md text-lg md:text-xl text-on-primary mb-3 md:mb-4">{{ \App\Support\Teks::ambil('footer.kolom_kontak') }}</h3>
                     <div class="space-y-2">
                         @if (filled($desa->telepon_kantor))
-                            <a href="tel:{{ preg_replace('/\D/', '', $desa->telepon_kantor) }}" class="font-label-sm text-sm text-on-primary/90 hover:text-white transition-colors block">{{ $desa->telepon_kantor }}</a>
+                            <a href="tel:{{ preg_replace('/\D/', '', $desa->telepon_kantor) }}" class="font-label-sm text-sm text-on-primary/90 hover:text-white transition-colors flex items-center gap-2">
+                                <span class="material-symbols-outlined text-base">call</span>
+                                {{ $desa->telepon_kantor }}
+                            </a>
                         @endif
                         @if (filled($desa->email))
-                            <a href="mailto:{{ $desa->email }}" class="font-label-sm text-sm text-on-primary/90 hover:text-white transition-colors block">{{ $desa->email }}</a>
+                            <a href="mailto:{{ $desa->email }}" class="font-label-sm text-sm text-on-primary/90 hover:text-white transition-colors flex items-center gap-2">
+                                <span class="material-symbols-outlined text-base">mail</span>
+                                {{ $desa->email }}
+                            </a>
                         @endif
                     </div>
                 </div>

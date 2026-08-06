@@ -54,7 +54,7 @@
         <ol class="relative space-y-8 border-l-2 border-outline-variant/30 pl-6">
             @foreach ($daftar as $prestasi)
                 <li class="relative">
-                    <span class="absolute top-1.5 -left-[1.9rem] h-3.5 w-3.5 rounded-full border-2 border-white bg-primary-container0"></span>
+                    <span class="absolute top-1.5 -left-[1.9rem] h-3.5 w-3.5 rounded-full border-2 border-white bg-primary-container"></span>
 
                     <article class="overflow-hidden rounded-[12px] bg-white border border-outline-variant shadow-sm transition-[box-shadow] duration-200 ease-out hover:shadow-md">
                         <div class="flex flex-col sm:flex-row">

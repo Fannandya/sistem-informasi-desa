@@ -38,7 +38,7 @@
     </header>
 
     @if (filled($berita->gambar_sampul))
-        <div class="mb-8 overflow-hidden rounded-[12px] bg-surface-container-lowest">
+        <div class="mb-8 overflow-hidden rounded-[12px] bg-surface-container-highest shadow-[0px_10px_30px_rgba(0,0,0,0.08)]">
             <img src="{{ $berita->urlSampul() }}" alt="{{ $berita->judul }}" class="w-full object-cover">
         </div>
     @endif
@@ -55,8 +55,8 @@
             <div class="grid gap-5 sm:grid-cols-3">
                 @foreach ($lainnya as $lain)
                     <a href="{{ route('publik.berita.show', $lain) }}"
-                       class="group overflow-hidden rounded-[12px] border border-outline-variant/30 transition hover:border-outline-variant/50">
-                        <div class="aspect-[16/10] overflow-hidden bg-surface-container-lowest">
+                       class="group overflow-hidden rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest shadow-[0px_4px_20px_rgba(0,0,0,0.03)] transition hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)]">
+                        <div class="aspect-[16/10] overflow-hidden bg-surface-container-highest">
                             <img src="{{ $lain->urlSampulKecil() }}" alt="{{ $lain->judul }}" loading="lazy"
                                  class="h-full w-full object-cover transition group-hover:scale-105">
                         </div>

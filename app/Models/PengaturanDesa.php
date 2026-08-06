@@ -113,6 +113,23 @@ class PengaturanDesa extends Model
             || $this->medsosTerisi() !== [];
     }
 
+    /**
+     * Tautan "buka di Google Maps" untuk footer. `peta_embed` hanya berisi
+     * URL /maps/embed yang dibuat untuk iframe, bukan halaman Maps biasa —
+     * jadi bila alamat kantor terisi, dibuat tautan pencarian Maps dari teks
+     * alamat itu. Baru jatuh ke `peta_embed` bila alamat tidak diisi.
+     */
+    public function tautanGoogleMaps(): ?string
+    {
+        if (filled($this->alamat_kantor)) {
+            $kueri = trim($this->alamat_kantor.', '.$this->wilayahLengkap(), ', ');
+
+            return 'https://www.google.com/maps/search/?api=1&query='.urlencode($kueri);
+        }
+
+        return $this->peta_embed ?: null;
+    }
+
     public function urlLogo(): string
     {
         return app(LayananUnggahGambar::class)->url($this->logo, 'bawaan');

@@ -31,7 +31,7 @@ class StatistikPublik
     ) {}
 
     /**
-     * @return array{jumlah_penduduk: int, jumlah_kk: int|null, tahun_kk: int|null, laki: int, perempuan: int, jiwa_per_kk: float|null}
+     * @return array{jumlah_penduduk: int, jumlah_kk: int|null, tahun_kk: int|null, laki: int, perempuan: int, jiwa_per_kk: float|null, jumlah_dusun: int}
      */
     public function ringkasan(): array
     {
@@ -46,6 +46,7 @@ class StatistikPublik
             'laki' => (int) ($gender['L']['jumlah'] ?? 0),
             'perempuan' => (int) ($gender['P']['jumlah'] ?? 0),
             'jiwa_per_kk' => $this->kk->rataJiwaPerKk(),
+            'jumlah_dusun' => $this->jumlahDusun(),
         ];
     }
 

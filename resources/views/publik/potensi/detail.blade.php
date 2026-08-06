@@ -24,7 +24,7 @@
         @endif
     </header>
 
-    <div class="overflow-hidden rounded-[12px] bg-surface-container-lowest">
+    <div class="overflow-hidden rounded-[12px] bg-surface-container-highest shadow-[0px_10px_30px_rgba(0,0,0,0.08)]">
         <img src="{{ $potensi->urlFoto() }}" alt="{{ $potensi->nama }}"
              class="max-h-[28rem] w-full object-cover">
     </div>
@@ -34,9 +34,9 @@
     @endif
 
     @if (filled($potensi->kontak))
-        <div class="mt-8 rounded-[12px] border border-outline-variant/30 bg-slate-50 p-5">
+        <div class="mt-8 rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest p-5 shadow-[0px_4px_20px_rgba(0,0,0,0.03)]">
             <p class="text-xs font-semibold tracking-wider text-on-surface-variant uppercase">Kontak</p>
-            <p class="mt-1.5 text-slate-800">{{ $potensi->kontak }}</p>
+            <p class="mt-1.5 text-on-surface">{{ $potensi->kontak }}</p>
         </div>
     @endif
 
@@ -48,8 +48,8 @@
             <div class="grid gap-5 sm:grid-cols-3">
                 @foreach ($lainnya as $lain)
                     <a href="{{ route('publik.potensi.show', $lain) }}"
-                       class="group overflow-hidden rounded-[12px] border border-outline-variant/30 transition hover:border-outline-variant/50">
-                        <div class="aspect-[4/3] overflow-hidden bg-surface-container-lowest">
+                       class="group overflow-hidden rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest shadow-[0px_4px_20px_rgba(0,0,0,0.03)] transition hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)]">
+                        <div class="aspect-[4/3] overflow-hidden bg-surface-container-highest">
                             <img src="{{ $lain->urlFotoKecil() }}" alt="{{ $lain->nama }}" loading="lazy"
                                  class="h-full w-full object-cover transition group-hover:scale-105">
                         </div>
