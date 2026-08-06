@@ -13,7 +13,7 @@
     </nav>
 
     <header class="mb-10 max-w-2xl">
-        <h1 class="text-3xl font-semibold text-on-surface">Struktur Organisasi</h1>
+        <h1 class="text-3xl font-semibold text-primary">Struktur Organisasi</h1>
         <p class="mt-2 text-on-surface-variant">
             Susunan pengurus {{ $desa->nama_desa }} beserta jabatan dan kontak resminya.
             Silakan hubungi pengurus sesuai keperluan Anda.
@@ -23,17 +23,17 @@
     @forelse ($kelompok as $namaOrganisasi => $daftarPengurus)
         <section class="mb-12">
             <div class="mb-5 flex items-baseline gap-3">
-                <h2 class="text-xl font-semibold text-on-surface">{{ $namaOrganisasi }}</h2>
+                <h2 class="text-xl font-semibold text-primary">{{ $namaOrganisasi }}</h2>
                 <span class="text-sm text-on-surface-variant">{{ $daftarPengurus->count() }} orang</span>
             </div>
 
             <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($daftarPengurus as $pengurus)
-                    <article class="flex gap-4 rounded-[12px] border border-outline-variant/30 p-4 transition hover:border-primary/50 hover:shadow-md">
+                    <article class="flex gap-4 rounded-[12px] bg-white border border-outline-variant p-4 shadow-sm transition-[transform,box-shadow,border-color] duration-200 ease-out hover:border-primary/50 hover:shadow-md hover:-translate-y-0.5">
                         <img src="{{ $pengurus->urlFotoKecil() }}"
                              alt="Foto {{ $pengurus->nama }}"
                              loading="lazy"
-                             class="h-20 w-20 shrink-0 rounded-[12px] bg-surface-container-lowest object-cover">
+                             class="h-20 w-20 shrink-0 rounded-[12px] bg-surface-container object-cover">
 
                         <div class="min-w-0 flex-1">
                             <p class="truncate font-semibold text-on-surface">{{ $pengurus->nama }}</p>
@@ -46,7 +46,7 @@
                             @if (filled($pengurus->nomor_hp))
                                 <div class="mt-2.5 flex flex-wrap gap-2">
                                     <a href="tel:{{ preg_replace('/\D/', '', $pengurus->nomor_hp) }}"
-                                       class="rounded-[12px] bg-surface-container-lowest px-2.5 py-1 text-xs font-medium text-on-surface transition hover:bg-surface-container-low">
+                                       class="rounded-[12px] bg-surface-container px-2.5 py-1 text-xs font-medium text-on-surface transition-colors duration-150 hover:bg-surface-container-high">
                                         {{ $pengurus->nomor_hp }}
                                     </a>
                                     @if ($pengurus->nomorWhatsapp())

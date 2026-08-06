@@ -13,7 +13,7 @@
     </nav>
 
     <header class="mb-8 max-w-2xl">
-        <h1 class="text-3xl font-semibold text-on-surface">Galeri Kegiatan</h1>
+        <h1 class="text-3xl font-semibold text-primary">Galeri Kegiatan</h1>
         <p class="mt-2 text-on-surface-variant">
             Dokumentasi kegiatan dan acara yang berlangsung di {{ $desa->nama_desa }}.
         </p>
@@ -30,8 +30,8 @@
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ($daftar as $acara)
                 <a href="{{ route('publik.galeri.show', $acara) }}"
-                   class="group overflow-hidden rounded-[12px] border border-outline-variant/30 transition hover:border-outline-variant/50 hover:shadow-md">
-                    <div class="relative aspect-[4/3] overflow-hidden bg-surface-container-lowest">
+                   class="group overflow-hidden rounded-[12px] bg-white border border-outline-variant shadow-sm transition-[transform,box-shadow,border-color] duration-200 ease-out hover:border-primary/40 hover:shadow-md hover:-translate-y-1">
+                    <div class="relative aspect-[4/3] overflow-hidden bg-surface-container">
                         <img src="{{ $acara->urlSampulKecil() }}" alt="{{ $acara->judul }}" loading="lazy"
                              class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
                         @if ($acara->foto_count > 1)

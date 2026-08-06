@@ -13,7 +13,7 @@
     </nav>
 
     <header class="mb-8 max-w-2xl">
-        <h1 class="text-3xl font-semibold text-on-surface">Statistik Penduduk</h1>
+        <h1 class="text-3xl font-semibold text-primary">Statistik Penduduk</h1>
         <p class="mt-2 text-on-surface-variant">
             Gambaran kependudukan {{ $desa->nama_desa }} sebagai bentuk keterbukaan informasi desa.
         </p>
@@ -67,7 +67,7 @@
     <div class="grid gap-6 lg:grid-cols-2">
 
         <section class="rounded-[12px] border border-outline-variant/30 p-5" data-grafik>
-            <h2 class="mb-4 text-sm font-semibold text-on-surface">Sebaran Kelompok Umur</h2>
+            <h2 class="mb-4 text-sm font-semibold text-primary">Sebaran Kelompok Umur</h2>
             <div class="relative h-72">
                 <canvas id="grafikUmurPublik" class="hidden"></canvas>
                 <div data-status="muat" class="absolute inset-0 flex items-center justify-center text-sm text-on-surface-variant">Memuat…</div>
@@ -96,7 +96,7 @@
         </section>
 
         <section class="rounded-[12px] border border-outline-variant/30 p-5" data-grafik>
-            <h2 class="mb-4 text-sm font-semibold text-on-surface">Tingkat Pendidikan</h2>
+            <h2 class="mb-4 text-sm font-semibold text-primary">Tingkat Pendidikan</h2>
             <div class="relative h-72">
                 <canvas id="grafikPendidikanPublik" class="hidden"></canvas>
                 <div data-status="muat" class="absolute inset-0 flex items-center justify-center text-sm text-on-surface-variant">Memuat…</div>
@@ -127,7 +127,7 @@
     {{-- ------------------------- Sebaran dusun ------------------------- --}}
     <section class="mt-6 overflow-hidden rounded-[12px] border border-outline-variant/30">
         <div class="border-b border-outline-variant/30 px-5 py-4">
-            <h2 class="text-sm font-semibold text-on-surface">Sebaran Penduduk per Dusun</h2>
+            <h2 class="text-sm font-semibold text-primary">Sebaran Penduduk per Dusun</h2>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">

@@ -29,7 +29,7 @@
 
             {{-- Header info --}}
             <div class="lg:col-span-2 md:col-span-1">
-                <h1 class="font-headline-lg text-4xl md:text-5xl font-bold text-on-surface mb-2">{{ $desa->nama_desa }}</h1>
+                <h1 class="font-headline-lg text-4xl md:text-5xl font-bold text-primary mb-2">{{ $desa->nama_desa }}</h1>
                 @if ($desa->wilayahLengkap())
                     <p class="font-body-md text-lg text-on-surface-variant mb-6">{{ $desa->wilayahLengkap() }}</p>
                 @endif
@@ -76,7 +76,7 @@
     {{-- Misi --}}
     @if ($desa->misiSebagaiDaftar())
         <section data-fade-in>
-            <h2 class="font-headline-lg text-3xl font-bold text-on-surface mb-6">Misi Desa</h2>
+            <h2 class="font-headline-lg text-3xl font-bold text-primary mb-6">Misi Desa</h2>
             <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-[12px] p-8 shadow-[0px_4px_20px_rgba(0,0,0,0.02)]">
                 <ol class="list-decimal space-y-4 pl-6 text-on-surface-variant">
                     @foreach ($desa->misiSebagaiDaftar() as $misi)
@@ -90,7 +90,7 @@
     {{-- Nilai & Tujuan --}}
     @if (filled($desa->nilai_tujuan))
         <section data-fade-in>
-            <h2 class="font-headline-lg text-3xl font-bold text-on-surface mb-6">Nilai & Tujuan Pembangunan</h2>
+            <h2 class="font-headline-lg text-3xl font-bold text-primary mb-6">Nilai & Tujuan Pembangunan</h2>
             <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-[12px] p-8 shadow-[0px_4px_20px_rgba(0,0,0,0.02)]">
                 <p class="font-body-md text-base text-on-surface-variant leading-relaxed whitespace-pre-line">{{ $desa->nilai_tujuan }}</p>
             </div>
@@ -100,7 +100,7 @@
     {{-- Sejarah --}}
     @if (filled($desa->sejarah))
         <section data-fade-in>
-            <h2 class="font-headline-lg text-3xl font-bold text-on-surface mb-6">Sejarah Desa</h2>
+            <h2 class="font-headline-lg text-3xl font-bold text-primary mb-6">Sejarah Desa</h2>
             <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-[12px] p-8 shadow-[0px_4px_20px_rgba(0,0,0,0.02)]">
                 <div class="prose-desa font-body-md text-base text-on-surface-variant leading-relaxed whitespace-pre-line">{{ $desa->sejarah }}</div>
             </div>
@@ -110,7 +110,7 @@
     {{-- Letak Geografis --}}
     @if (filled($desa->letak_geografis))
         <section data-fade-in>
-            <h2 class="font-headline-lg text-3xl font-bold text-on-surface mb-6">Letak Geografis</h2>
+            <h2 class="font-headline-lg text-3xl font-bold text-primary mb-6">Letak Geografis</h2>
             <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-[12px] p-8 shadow-[0px_4px_20px_rgba(0,0,0,0.02)]">
                 <p class="font-body-md text-base text-on-surface-variant leading-relaxed whitespace-pre-line">{{ $desa->letak_geografis }}</p>
             </div>
@@ -120,7 +120,7 @@
     {{-- Peta Lokasi --}}
     @if (filled($desa->peta_embed))
         <section data-fade-in>
-            <h2 class="font-headline-lg text-3xl font-bold text-on-surface mb-6">Peta Lokasi</h2>
+            <h2 class="font-headline-lg text-3xl font-bold text-primary mb-6">Peta Lokasi</h2>
             <div class="overflow-hidden rounded-[12px] shadow-[0px_10px_30px_rgba(0,0,0,0.1)] border border-outline-variant/30">
                 <iframe src="{{ $desa->peta_embed }}" class="w-full h-96" style="border:0"
                         loading="lazy" referrerpolicy="no-referrer-when-downgrade"

@@ -13,7 +13,7 @@
     </nav>
 
     <header class="mb-8 max-w-2xl">
-        <h1 class="text-3xl font-semibold text-on-surface">Potensi Desa</h1>
+        <h1 class="text-3xl font-semibold text-primary">Potensi Desa</h1>
         <p class="mt-2 text-on-surface-variant">
             UMKM, hasil bumi, wisata, dan kerajinan yang dimiliki {{ $desa->nama_desa }}.
         </p>
@@ -21,19 +21,17 @@
 
     {{-- Saringan kategori --}}
     @if ($jumlahPerKategori->isNotEmpty())
-        <div class="mb-8 flex flex-wrap gap-2">
+        <div class="mb-8 flex flex-wrap gap-4">
             <a href="{{ route('publik.potensi.index') }}"
-               class="rounded-full px-4 py-2 text-sm font-medium transition
-                      {{ $kategoriId === null ? 'bg-primary text-on-primary' : 'bg-surface-container-lowest text-on-surface hover:bg-surface-container-low' }}">
+               class="badge-kategori-filter {{ $kategoriId === null ? 'active' : 'inactive' }}">
                 Semua
             </a>
             @foreach ($kategoriFilter as $k)
                 @if ($jumlahPerKategori->has($k->nama))
                     <a href="{{ route('publik.potensi.index', ['kategori' => $k->id]) }}"
-                       class="rounded-full px-4 py-2 text-sm font-medium transition
-                              {{ $kategoriId === $k->id ? 'bg-primary text-on-primary' : 'bg-surface-container-lowest text-on-surface hover:bg-surface-container-low' }}">
+                       class="badge-kategori-filter {{ $kategoriId === $k->id ? 'active' : 'inactive' }}">
                         {{ $k->nama }}
-                        <span class="ml-1 opacity-60">{{ $jumlahPerKategori[$k->nama] }}</span>
+                        <span class="ml-1.5 text-xs opacity-70">{{ $jumlahPerKategori[$k->nama] }}</span>
                     </a>
                 @endif
             @endforeach
@@ -61,16 +59,16 @@
         <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             @foreach ($daftar as $potensi)
                 <a href="{{ route('publik.potensi.show', $potensi) }}"
-                   class="group overflow-hidden rounded-[12px] border border-outline-variant/30 transition hover:border-outline-variant/50 hover:shadow-md">
-                    <div class="aspect-[4/3] overflow-hidden bg-surface-container-lowest">
+                   class="group overflow-hidden rounded-[12px] bg-white border border-outline-variant shadow-sm transition-[transform,box-shadow,border-color] duration-200 ease-out hover:border-primary/40 hover:shadow-md hover:-translate-y-1">
+                    <div class="aspect-[4/3] overflow-hidden bg-surface-container">
                         <img src="{{ $potensi->urlFotoKecil() }}" alt="{{ $potensi->nama }}" loading="lazy"
-                             class="h-full w-full object-cover transition duration-300 group-hover:scale-105">
+                             class="h-full w-full object-cover transition-transform duration-300 ease-out group-hover:scale-105">
                     </div>
                     <div class="p-5">
-                        <span class="rounded-full px-2.5 py-1 text-xs font-medium bg-primary-container text-on-primary-container">
+                        <span class="badge-kategori">
                             {{ $potensi->kategori?->nama ?? 'Lainnya' }}
                         </span>
-                        <h2 class="mt-3 font-semibold text-on-surface group-hover:text-primary transition-colors">
+                        <h2 class="mt-3 font-semibold text-on-surface transition-colors duration-200 group-hover:text-primary">
                             {{ $potensi->nama }}
                         </h2>
                         @if ($potensi->ringkasan())

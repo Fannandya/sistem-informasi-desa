@@ -37,3 +37,8 @@ DESAIN-FIGMA.md
 PRD.md
 PROMPT-SESSION-BERIKUTNYA.md
 PROMPT-TAHAP-2-DAN-3.md
+
+.agent/
+.claude/
+.codex/
+.impeccable/

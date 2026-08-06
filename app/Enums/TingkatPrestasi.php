@@ -21,16 +21,9 @@ enum TingkatPrestasi: string
         };
     }
 
-    /** Warna menguat seiring naiknya tingkat, agar hierarkinya terbaca. */
     public function warna(): string
     {
-        return match ($this) {
-            self::Desa => 'bg-slate-200 text-slate-700',
-            self::Kecamatan => 'bg-cyan-100 text-cyan-800',
-            self::Kabupaten => 'bg-blue-100 text-blue-800',
-            self::Provinsi => 'bg-violet-100 text-violet-800',
-            self::Nasional => 'bg-amber-100 text-amber-900',
-        };
+        return 'bg-primary-fixed text-on-primary-fixed-variant';
     }
 
     /** @return array<string, string> */

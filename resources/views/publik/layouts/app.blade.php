@@ -32,7 +32,22 @@
 <body class="flex min-h-full flex-col bg-surface-container-lowest text-slate-800">
 
     {{-- ------------------------------ Kop ------------------------------ --}}
-    <header x-data="{ menu: false }" class="bg-surface-container-lowest shadow-sm z-50 top-0 sticky">
+    <header
+        x-data="{
+            menu: false,
+            scrolled: false,
+            init() {
+                this.scrolled = window.scrollY > 20;
+                window.addEventListener('scroll', () => {
+                    this.scrolled = window.scrollY > 20;
+                }, { passive: true });
+            }
+        }"
+        :class="scrolled
+            ? 'bg-surface-container-lowest shadow-sm'
+            : 'bg-transparent shadow-none'"
+        class="z-50 top-0 left-0 right-0 fixed w-full transition-[background-color,box-shadow] duration-300 ease-out">
+
         <div class="flex justify-between items-center w-full px-6 max-w-7xl mx-auto h-16">
             <a href="{{ route('beranda') }}" class="flex items-center gap-3">
                 @if (filled($desa->logo))
@@ -43,20 +58,29 @@
                         {{ mb_strtoupper(mb_substr($desa->nama_desa, 0, 1)) }}
                     </div>
                 @endif
-                <div class="font-headline-md text-xl font-bold text-primary hidden sm:block">{{ $desa->nama_desa }}</div>
+                <div
+                    :class="scrolled ? 'text-primary' : 'text-white'"
+                    class="font-headline-md text-xl font-bold truncate max-w-[180px] sm:max-w-none transition-colors duration-300">
+                    {{ $desa->nama_desa }}
+                </div>
             </a>
-            
+
             <nav class="hidden md:flex space-x-8">
                 @foreach (\App\Support\MenuPublik::tautan() as $tautan)
                     <a href="{{ $tautan['url'] }}"
-                       class="font-label-md text-sm transition-colors {{ $tautan['aktif'] ? 'text-primary border-b-2 border-primary pb-1' : 'text-on-surface-variant hover:text-primary' }}">
+                       data-aktif="{{ $tautan['aktif'] ? '1' : '0' }}"
+                       :class="scrolled
+                           ? ($el.dataset.aktif === '1' ? 'text-primary border-b-2 border-primary pb-1' : 'text-on-surface-variant hover:text-primary')
+                           : ($el.dataset.aktif === '1' ? 'text-white border-b-2 border-white/60 pb-1' : 'text-white/80 hover:text-white')"
+                       class="font-label-md text-sm transition-colors duration-200">
                         {{ $tautan['label'] }}
                     </a>
                 @endforeach
             </nav>
-            
-            
-            <button type="button" @click="menu = !menu" class="md:hidden text-on-surface">
+
+            <button type="button" @click="menu = !menu"
+                    :class="scrolled ? 'text-on-surface' : 'text-white'"
+                    class="md:hidden transition-colors duration-300">
                 <span class="material-symbols-outlined" x-show="!menu">menu</span>
                 <span class="material-symbols-outlined" x-show="menu" x-cloak>close</span>
             </button>
@@ -66,22 +90,21 @@
             <div class="mx-auto max-w-7xl px-4 py-2 sm:px-6">
                 @foreach (\App\Support\MenuPublik::tautan() as $tautan)
                     <a href="{{ $tautan['url'] }}"
-                       class="block rounded-lg px-3 py-2.5 text-sm transition {{ $tautan['aktif'] ? 'bg-primary-fixed/20 font-medium text-primary' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
+                       class="block rounded-lg px-3 py-2.5 text-sm transition-colors duration-150 {{ $tautan['aktif'] ? 'bg-primary-fixed/20 font-medium text-primary' : 'text-on-surface-variant hover:bg-surface-container-low' }}">
                         {{ $tautan['label'] }}
                     </a>
                 @endforeach
-
             </div>
         </nav>
     </header>
 
-    <main class="flex-1">
+    <main class="flex-1 pt-16">
         @yield('konten')
     </main>
 
     {{-- ----------------------------- Footer ----------------------------- --}}
-    <footer class="@yield('footer_margin', 'mt-16') bg-primary dark:bg-primary-container w-full">
-        <div class="py-12 md:py-16 px-6 grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-10 max-w-7xl mx-auto">
+    <footer class="@yield('footer_margin', 'mt-16') bg-primary w-full">
+        <div class="py-12 md:py-16 px-6 grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 max-w-7xl mx-auto">
             {{-- Identitas Desa --}}
             <div>
                 <div class="font-headline-md text-2xl font-bold text-on-primary mb-4">{{ $desa->nama_desa }}</div>
@@ -91,8 +114,7 @@
                 @if (filled($desa->alamat_kantor))
                     <p class="font-body-md text-sm md:text-base text-on-primary/80 mb-4">{{ $desa->alamat_kantor }}</p>
                 @endif
-                <p class="font-body-md text-sm md:text-base text-on-primary/80 mb-4">{{ \App\Support\Teks::ambil('footer.pengelola') }}</p>
-                <p class="font-label-sm text-xs text-on-primary/80">&copy; {{ now()->year }} {{ $desa->nama_desa }}. Hak Cipta Dilindungi.</p>
+                <p class="font-body-md text-sm md:text-base text-on-primary/80">{{ \App\Support\Teks::ambil('footer.pengelola') }}</p>
             </div>
 
             {{-- Kontak & Menu --}}
@@ -169,22 +191,52 @@
                     </div>
                 @endif
             </div>
+        </div>
 
-            {{-- Peta / Google Maps --}}
-            <div>
-                @if (filled($desa->peta_embed))
-                    <div class="h-48 bg-surface-container-highest rounded-lg overflow-hidden relative">
-                        <iframe src="{{ $desa->peta_embed }}" class="absolute inset-0 w-full h-full" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        {{-- Peta & tombol Google Maps (Full Section) --}}
+        <section class="relative w-full h-[380px] md:h-[450px] bg-surface-container overflow-hidden">
+            @if (filled($desa->peta_embed))
+                <iframe
+                    src="{{ $desa->peta_embed }}"
+                    class="w-full h-full block border-0"
+                    allowfullscreen
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade"
+                    title="Peta lokasi {{ $desa->nama_desa }}">
+                </iframe>
+            @else
+                <div class="w-full h-full bg-surface-container-high flex flex-col items-center justify-center gap-3 text-on-surface-variant">
+                    <span class="material-symbols-outlined text-5xl text-on-surface-variant/40">location_on</span>
+                    <p class="font-body-md text-sm">Lokasi {{ $desa->nama_desa }} belum diatur</p>
+                </div>
+            @endif
+
+            {{-- Overlay info lokasi & tombol Google Maps --}}
+            <div class="absolute bottom-6 left-6 right-6 sm:right-auto sm:max-w-md bg-surface-container-lowest/95 dark:bg-surface-container-high/95 backdrop-blur-md p-5 rounded-2xl shadow-xl border border-outline-variant/30 z-10">
+                <div class="flex items-start gap-3.5">
+                    <div class="p-2.5 rounded-xl bg-primary/10 text-primary shrink-0 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-xl">location_on</span>
                     </div>
-                @else
-                    <div class="h-48 bg-surface-container-highest rounded-lg flex items-center justify-center text-on-surface-variant">
-                        <div class="text-center">
-                            <span class="material-symbols-outlined text-4xl block mb-2 opacity-50">location_on</span>
-                            <p class="font-label-md text-xs">Lokasi belum diatur</p>
-                        </div>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="font-headline-md text-base font-bold text-on-surface truncate">{{ $desa->nama_desa }}</h4>
+                        <p class="font-body-md text-xs text-on-surface-variant mt-0.5 line-clamp-2">
+                            {{ collect([$desa->kecamatan, $desa->kabupaten, $desa->provinsi])->filter()->implode(', ') }}
+                        </p>
                     </div>
-                @endif
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode(collect([$desa->nama_desa, $desa->kecamatan, $desa->kabupaten])->filter()->implode(', ')) }}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="mt-4 w-full bg-primary hover:bg-primary/90 text-on-primary py-2.5 px-4 rounded-xl font-label-md text-xs font-semibold transition-colors flex items-center justify-center gap-2 shadow-sm">
+                    <span class="material-symbols-outlined text-base">map</span>
+                    Buka di Google Maps
+                </a>
             </div>
+        </section>
+
+        {{-- Hak Cipta --}}
+        <div class="py-4 px-6 text-center">
+            <p class="font-label-sm text-xs text-on-primary/70">&copy; {{ now()->year }} {{ $desa->nama_desa }}. Hak Cipta Dilindungi.</p>
         </div>
     </footer>
 

@@ -21,12 +21,12 @@
     <header class="mb-6">
         @if ($berita->kategori)
             <a href="{{ route('publik.berita.kategori', $berita->kategori) }}"
-               class="rounded-full bg-primary-container px-2.5 py-1 text-xs font-medium text-primary hover:bg-primary-container">
+               class="badge-kategori inline-block hover:border-primary-container">
                 {{ $berita->kategori->nama }}
             </a>
         @endif
 
-        <h1 class="mt-3 text-3xl leading-tight font-semibold text-on-surface">{{ $berita->judul }}</h1>
+        <h1 class="mt-3 text-3xl leading-tight font-semibold text-primary">{{ $berita->judul }}</h1>
 
         <p class="mt-3 text-sm text-on-surface-variant">
             {{ $berita->tanggal_terbit?->translatedFormat('l, d F Y') }}
@@ -51,7 +51,7 @@
 
     @if ($lainnya->isNotEmpty())
         <section class="mt-14 border-t border-outline-variant/30 pt-10">
-            <h2 class="mb-5 text-lg font-semibold text-on-surface">Berita lainnya</h2>
+            <h2 class="mb-5 text-lg font-semibold text-primary">Berita lainnya</h2>
             <div class="grid gap-5 sm:grid-cols-3">
                 @foreach ($lainnya as $lain)
                     <a href="{{ route('publik.berita.show', $lain) }}"

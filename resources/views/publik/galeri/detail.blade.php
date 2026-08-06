@@ -16,7 +16,7 @@
     </nav>
 
     <header class="mb-8 max-w-2xl">
-        <h1 class="text-3xl font-semibold text-on-surface">{{ $acara->judul }}</h1>
+        <h1 class="text-3xl font-semibold text-primary">{{ $acara->judul }}</h1>
         <p class="mt-2 text-sm text-on-surface-variant">
             {{ $acara->tanggal_acara->translatedFormat('l, d F Y') }}
             @if (filled($acara->lokasi))
@@ -48,7 +48,7 @@
 
     @if ($lainnya->isNotEmpty())
         <section class="mt-14 border-t border-outline-variant/30 pt-10">
-            <h2 class="mb-5 text-lg font-semibold text-on-surface">Kegiatan lainnya</h2>
+            <h2 class="mb-5 text-lg font-semibold text-primary">Kegiatan lainnya</h2>
             <div class="grid gap-5 sm:grid-cols-3">
                 @foreach ($lainnya as $lain)
                     <a href="{{ route('publik.galeri.show', $lain) }}"

@@ -15,10 +15,10 @@
     </nav>
 
     <header class="mb-6">
-        <span class="rounded-full px-2.5 py-1 text-xs font-medium bg-primary-container text-on-primary-container">
+        <span class="badge-kategori">
             {{ $potensi->kategori?->nama ?? 'Lainnya' }}
         </span>
-        <h1 class="mt-3 text-3xl font-semibold text-on-surface">{{ $potensi->nama }}</h1>
+        <h1 class="mt-3 text-3xl font-semibold text-primary">{{ $potensi->nama }}</h1>
         @if ($potensi->deskripsi_singkat)
             <p class="mt-2 text-lg text-on-surface-variant">{{ $potensi->deskripsi_singkat }}</p>
         @endif
@@ -42,7 +42,7 @@
 
     @if ($lainnya->isNotEmpty())
         <section class="mt-14 border-t border-outline-variant/30 pt-10">
-            <h2 class="mb-5 text-lg font-semibold text-on-surface">
+            <h2 class="mb-5 text-lg font-semibold text-primary">
                 {{ $potensi->kategori?->nama ?? 'Lainnya' }} lainnya
             </h2>
             <div class="grid gap-5 sm:grid-cols-3">

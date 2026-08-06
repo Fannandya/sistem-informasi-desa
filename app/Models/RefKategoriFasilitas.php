@@ -25,7 +25,7 @@ class RefKategoriFasilitas extends Model
 
     public function warna(): string
     {
-        return 'bg-secondary/15 text-secondary';
+        return 'bg-primary-fixed text-on-primary-fixed-variant';
     }
 
     public function label(): string

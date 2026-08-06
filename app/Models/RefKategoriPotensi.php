@@ -25,7 +25,7 @@ class RefKategoriPotensi extends Model
 
     public function warna(): string
     {
-        return 'bg-tertiary/15 text-tertiary';
+        return 'bg-primary-fixed text-on-primary-fixed-variant';
     }
 
     public function label(): string

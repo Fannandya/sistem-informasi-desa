@@ -13,26 +13,24 @@
     </nav>
 
     <header class="mb-8 max-w-2xl">
-        <h1 class="text-3xl font-semibold text-on-surface">Fasilitas Umum</h1>
+        <h1 class="text-3xl font-semibold text-primary">Fasilitas Umum</h1>
         <p class="mt-2 text-on-surface-variant">
             Sarana yang tersedia di {{ $desa->nama_desa }} dan dapat dimanfaatkan warga.
         </p>
     </header>
 
     @if ($jumlahPerKategori->isNotEmpty())
-        <div class="mb-10 flex flex-wrap gap-2">
+        <div class="mb-10 flex flex-wrap gap-4">
             <a href="{{ route('publik.fasilitas') }}"
-               class="rounded-full px-4 py-2 text-sm font-medium transition
-                      {{ $kategoriId === null ? 'bg-primary text-on-primary' : 'bg-surface-container-lowest text-on-surface border border-outline-variant/30 hover:border-primary/50' }}">
+               class="badge-kategori-filter {{ $kategoriId === null ? 'active' : 'inactive' }}">
                 Semua
             </a>
             @foreach ($kategoriFilter as $k)
                 @if ($jumlahPerKategori->has($k->nama))
                     <a href="{{ route('publik.fasilitas', ['kategori' => $k->id]) }}"
-                       class="rounded-full px-4 py-2 text-sm font-medium transition
-                              {{ $kategoriId === $k->id ? 'bg-primary text-on-primary' : 'bg-surface-container-lowest text-on-surface border border-outline-variant/30 hover:border-primary/50' }}">
+                       class="badge-kategori-filter {{ $kategoriId === $k->id ? 'active' : 'inactive' }}">
                         {{ $k->nama }}
-                        <span class="ml-1 opacity-60">{{ $jumlahPerKategori[$k->nama] }}</span>
+                        <span class="ml-1.5 text-xs opacity-70">{{ $jumlahPerKategori[$k->nama] }}</span>
                     </a>
                 @endif
             @endforeach
@@ -42,14 +40,14 @@
     @forelse ($kelompok as $kategoriNama => $items)
         <section class="mb-12">
             <div class="mb-5 flex items-baseline gap-3">
-                <h2 class="text-xl font-semibold text-on-surface">{{ $kategoriNama }}</h2>
+                <h2 class="text-xl font-semibold text-primary">{{ $kategoriNama }}</h2>
                 <span class="text-sm text-slate-400">{{ $items->count() }} tempat</span>
             </div>
 
             <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
                 @foreach ($items as $fasilitas)
-                    <article class="overflow-hidden rounded-[12px] border border-outline-variant/30">
-                        <div class="aspect-[16/10] overflow-hidden bg-surface-container-highest">
+                    <article class="overflow-hidden rounded-[12px] bg-white border border-outline-variant shadow-sm transition-[box-shadow] duration-200 ease-out hover:shadow-md">
+                        <div class="aspect-[16/10] overflow-hidden bg-surface-container">
                             <img src="{{ $fasilitas->urlFotoKecil() }}" alt="{{ $fasilitas->nama }}"
                                  loading="lazy" class="h-full w-full object-cover">
                         </div>
