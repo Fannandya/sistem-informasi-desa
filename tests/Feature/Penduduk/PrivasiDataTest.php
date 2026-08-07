@@ -35,7 +35,6 @@ class PrivasiDataTest extends TestCase
             'nomor HP' => ['no_hp'],
             'WhatsApp' => ['whatsapp'],
             'alamat rumah detail' => ['alamat'],
-            'agama' => ['agama'],
             'penghasilan' => ['penghasilan'],
             'golongan darah' => ['golongan_darah'],
         ];
@@ -102,7 +101,7 @@ class PrivasiDataTest extends TestCase
             ->assertOk()
             ->getContent();
 
-        foreach (['name="nik"', 'name="nomor_kk"', 'name="telepon"', 'name="alamat"', 'name="agama"'] as $pola) {
+        foreach (['name="nik"', 'name="nomor_kk"', 'name="telepon"', 'name="alamat"'] as $pola) {
             $this->assertStringNotContainsString($pola, $html, "Formulir memuat isian terlarang: {$pola}");
         }
     }
@@ -133,5 +132,18 @@ class PrivasiDataTest extends TestCase
         $this->assertArrayNotHasKey('nik', $warga->getAttributes());
         $this->assertArrayNotHasKey('nomor_kk', $warga->getAttributes());
         $this->assertArrayNotHasKey('telepon', $warga->getAttributes());
+    }
+
+    public function test_kolom_agama_tidak_lagi_terlarang_pada_impor(): void
+    {
+        $this->assertFalse(\App\Imports\KolomImporPenduduk::terlarang('agama'));
+        $this->assertSame('agama', \App\Imports\KolomImporPenduduk::PETA['agama'] ?? null);
+    }
+
+    public function test_kolom_lain_tetap_terlarang(): void
+    {
+        foreach (['nik', 'nomor kk', 'telepon', 'alamat', 'penghasilan', 'golongan darah'] as $kolom) {
+            $this->assertTrue(\App\Imports\KolomImporPenduduk::terlarang($kolom), "\"{$kolom}\" seharusnya masih terlarang.");
+        }
     }
 }

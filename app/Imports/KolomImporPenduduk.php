@@ -26,6 +26,8 @@ class KolomImporPenduduk
         'rt' => 'rt',
         'pekerjaan' => 'pekerjaan',
         'pendidikan' => 'pendidikan',
+        'agama' => 'agama',
+        'status perkawinan' => 'status_perkawinan',
     ];
 
     /** Kolom yang wajib ada di berkas. */
@@ -44,7 +46,7 @@ class KolomImporPenduduk
         'telepon', 'no telepon', 'nomor telepon', 'hp', 'no hp', 'nomor hp',
         'telp', 'whatsapp', 'wa',
         'alamat', 'alamat rumah', 'jalan',
-        'agama', 'penghasilan', 'gaji', 'golongan darah', 'gol darah',
+        'penghasilan', 'gaji', 'golongan darah', 'gol darah',
     ];
 
     /**
@@ -64,6 +66,8 @@ class KolomImporPenduduk
         'RT',
         'Pekerjaan',
         'Pendidikan',
+        'Agama',
+        'Status Perkawinan',
     ];
 
     /** @return array<int, string> */
