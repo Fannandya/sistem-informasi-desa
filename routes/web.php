@@ -51,7 +51,12 @@ Route::name('publik.')->group(function () {
     Route::view('profil', 'publik.profil')->name('profil');
 
     Route::get('statistik', [StatistikPublikController::class, 'halaman'])->name('statistik');
-    Route::get('statistik/data/{jenis}', [StatistikPublikController::class, 'data'])->name('statistik.data');
+    // Terbuka tanpa autentikasi. Cache membuat tiap permintaan murah, tetapi
+    // tidak gratis — batas ini menahan skrip yang menembakinya terus-menerus
+    // tanpa mengganggu pengunjung biasa, yang hanya memuat tiga grafik.
+    Route::get('statistik/data/{jenis}', [StatistikPublikController::class, 'data'])
+        ->middleware('throttle:60,1')
+        ->name('statistik.data');
 
     Route::get('struktur-organisasi', StrukturOrganisasiController::class)->name('struktur');
 

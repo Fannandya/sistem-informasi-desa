@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\MenyegarkanStatistikPublik;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class RekapKk extends Model
 {
+    use MenyegarkanStatistikPublik;
+
     protected $table = 'rekap_kk';
 
     protected $guarded = [];

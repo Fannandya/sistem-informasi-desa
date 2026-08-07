@@ -7,6 +7,7 @@ use App\Enums\JenisKelamin;
 use App\Enums\JenisMasuk;
 use App\Enums\KelompokUmur;
 use App\Enums\Pendidikan;
+use App\Models\Concerns\MenyegarkanStatistikPublik;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -25,6 +26,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Penduduk extends Model
 {
     use HasFactory;
+    use MenyegarkanStatistikPublik;
     use SoftDeletes;
 
     protected $table = 'penduduk';

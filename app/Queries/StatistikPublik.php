@@ -5,6 +5,7 @@ namespace App\Queries;
 use App\Models\Penduduk;
 use App\Models\Wilayah;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 /**
  * PRD 2.6 — statistik untuk halaman publik.
@@ -25,6 +26,46 @@ class StatistikPublik
     /** Ambang minimum agar sebuah kelompok boleh ditampilkan sebagai angka. */
     public const AMBANG = 5;
 
+    private const PREFIX_CACHE = 'statistik_publik.';
+
+    /** Seluruh kunci cache yang dikelola kelas ini. */
+    private const KUNCI_CACHE = [
+        'ringkasan',
+        'sebaran_umur',
+        'rasio_gender',
+        'pendidikan',
+        'sebaran_dusun',
+        'jumlah_dusun',
+        'tanggal_pembaruan',
+    ];
+
+    /**
+     * Penanda bahwa cache sudah dikosongkan dalam permintaan ini.
+     *
+     * Impor warga menyimpan sampai 2.000 baris dalam satu transaksi, dan
+     * setiap baris memicu invalidasi. Tanpa penanda ini, satu impor berubah
+     * menjadi belasan ribu penghapusan cache — pada penyimpanan cache
+     * database, belasan ribu kueri DELETE.
+     *
+     * Aman karena invariannya dijaga: penanda hanya bernilai true selama
+     * cache memang kosong. Begitu sebuah nilai dihitung dan disimpan ulang,
+     * hafalkan() mengembalikannya ke false.
+     */
+    private static bool $sudahDilupakan = false;
+
+    /**
+     * Instance aplikasi pemilik penanda di atas — pola yang sama dengan
+     * TeksTampilan::$memoUntukAplikasi.
+     *
+     * Di PHP-FPM biasa satu proses melayani satu permintaan, sehingga
+     * properti statis lenyap dengan sendirinya. Tidak demikian pada proses
+     * yang berumur panjang (Octane, pekerja antrean) maupun di dalam satu
+     * proses PHPUnit: penanda dari permintaan sebelumnya akan bertahan dan
+     * membuat pengosongan cache berikutnya dilewati, padahal cache sudah
+     * terisi lagi oleh proses lain.
+     */
+    private static ?object $penandaUntukAplikasi = null;
+
     public function __construct(
         private readonly StatistikPenduduk $statistik = new StatistikPenduduk(),
         private readonly RingkasanKk $kk = new RingkasanKk(),
@@ -35,19 +76,21 @@ class StatistikPublik
      */
     public function ringkasan(): array
     {
-        $gender = collect($this->statistik->rasioGender())->keyBy('kunci');
+        return $this->hafalkan('ringkasan', function (): array {
+            $gender = collect($this->statistik->rasioGender())->keyBy('kunci');
 
-        return [
-            'jumlah_penduduk' => $this->statistik->totalWargaAktif(),
-            // Bila belum ada rekap sama sekali, kartunya disembunyikan
-            // seluruhnya alih-alih menampilkan nol yang menyesatkan.
-            'jumlah_kk' => $this->kk->adaData() ? $this->kk->total() : null,
-            'tahun_kk' => $this->kk->tahunAcuan(),
-            'laki' => (int) ($gender['L']['jumlah'] ?? 0),
-            'perempuan' => (int) ($gender['P']['jumlah'] ?? 0),
-            'jiwa_per_kk' => $this->kk->rataJiwaPerKk(),
-            'jumlah_dusun' => $this->jumlahDusun(),
-        ];
+            return [
+                'jumlah_penduduk' => $this->statistik->totalWargaAktif(),
+                // Bila belum ada rekap sama sekali, kartunya disembunyikan
+                // seluruhnya alih-alih menampilkan nol yang menyesatkan.
+                'jumlah_kk' => $this->kk->adaData() ? $this->kk->total() : null,
+                'tahun_kk' => $this->kk->tahunAcuan(),
+                'laki' => (int) ($gender['L']['jumlah'] ?? 0),
+                'perempuan' => (int) ($gender['P']['jumlah'] ?? 0),
+                'jiwa_per_kk' => $this->kk->rataJiwaPerKk(),
+                'jumlah_dusun' => $this->jumlahDusun(),
+            ];
+        });
     }
 
     /**
@@ -55,7 +98,10 @@ class StatistikPublik
      */
     public function sebaranUmur(): array
     {
-        return $this->lindungi($this->statistik->sebaranUmur());
+        return $this->hafalkan(
+            'sebaran_umur',
+            fn () => $this->lindungi($this->statistik->sebaranUmur()),
+        );
     }
 
     /**
@@ -65,7 +111,10 @@ class StatistikPublik
     {
         // Gender hanya dua kelompok dan selalu besar; tidak perlu digabung,
         // tetapi ambang tetap diterapkan demi konsistensi aturan.
-        return $this->lindungi($this->statistik->rasioGender());
+        return $this->hafalkan(
+            'rasio_gender',
+            fn () => $this->lindungi($this->statistik->rasioGender()),
+        );
     }
 
     /**
@@ -73,7 +122,10 @@ class StatistikPublik
      */
     public function pendidikan(): array
     {
-        return $this->lindungi($this->statistik->pendidikan());
+        return $this->hafalkan(
+            'pendidikan',
+            fn () => $this->lindungi($this->statistik->pendidikan()),
+        );
     }
 
     /**
@@ -82,6 +134,14 @@ class StatistikPublik
      * @return array<int, array{label: string, jumlah_warga: int|null, tampilan: string, jumlah_kk: int, persen: float}>
      */
     public function sebaranDusun(): array
+    {
+        return $this->hafalkan('sebaran_dusun', fn () => $this->hitungSebaranDusun());
+    }
+
+    /**
+     * @return array<int, array{label: string, jumlah_warga: int|null, tampilan: string, jumlah_kk: int, persen: float}>
+     */
+    private function hitungSebaranDusun(): array
     {
         $baris = collect($this->statistik->sebaranWilayah('dusun', 'desc'));
         $total = max(1, (int) $baris->sum('jumlah_warga'));
@@ -118,14 +178,91 @@ class StatistikPublik
 
     public function jumlahDusun(): int
     {
-        return Wilayah::query()->distinct()->count('dusun');
+        return $this->hafalkan(
+            'jumlah_dusun',
+            fn () => Wilayah::query()->distinct()->count('dusun'),
+        );
     }
 
     public function tanggalPembaruan(): ?string
     {
-        $terakhir = Penduduk::withTrashed()->max('updated_at');
+        return $this->hafalkan('tanggal_pembaruan', function (): ?string {
+            $terakhir = Penduduk::withTrashed()->max('updated_at');
 
-        return $terakhir ? \Illuminate\Support\Carbon::parse($terakhir)->translatedFormat('d F Y') : null;
+            return $terakhir ? \Illuminate\Support\Carbon::parse($terakhir)->translatedFormat('d F Y') : null;
+        });
+    }
+
+    // ------------------------------------------------------------------
+    // Cache
+    // ------------------------------------------------------------------
+
+    /**
+     * Menyimpan hasil perhitungan sampai tengah malam.
+     *
+     * Bukan rememberForever seperti PengaturanDesa dan TeksTampilan: sebaran
+     * umur dihitung terhadap tanggal hari ini, sehingga hasil kemarin sudah
+     * keliru begitu hari berganti — meski tidak ada satu baris pun yang
+     * disunting.
+     *
+     * @template T
+     *
+     * @param  callable(): T  $hitung
+     * @return T
+     */
+    private function hafalkan(string $nama, callable $hitung): mixed
+    {
+        self::segarkanPenanda();
+
+        $nilai = Cache::remember(
+            self::PREFIX_CACHE.$nama,
+            now()->endOfDay(),
+            $hitung,
+        );
+
+        // Cache kembali terisi, jadi penghapusan berikutnya harus benar-benar
+        // dijalankan lagi. Lihat catatan pada $sudahDilupakan.
+        self::$sudahDilupakan = false;
+
+        return $nilai;
+    }
+
+    /** Banyaknya kunci yang dihapus sekali pengosongan cache. */
+    public static function jumlahKunciCache(): int
+    {
+        return count(self::KUNCI_CACHE);
+    }
+
+    /**
+     * Dipanggil oleh model yang datanya membentuk statistik ini —
+     * lihat App\Models\Concerns\MenyegarkanStatistikPublik.
+     */
+    public static function lupakanCache(): void
+    {
+        self::segarkanPenanda();
+
+        if (self::$sudahDilupakan) {
+            return;
+        }
+
+        foreach (self::KUNCI_CACHE as $nama) {
+            Cache::forget(self::PREFIX_CACHE.$nama);
+        }
+
+        self::$sudahDilupakan = true;
+    }
+
+    /**
+     * Membuang penanda milik aplikasi sebelumnya. Tanpa ini, penanda dari
+     * permintaan lama ikut terbawa dan pengosongan cache berikutnya dilewati
+     * meski cachenya sudah terisi kembali.
+     */
+    private static function segarkanPenanda(): void
+    {
+        if (self::$penandaUntukAplikasi !== app()) {
+            self::$sudahDilupakan = false;
+            self::$penandaUntukAplikasi = app();
+        }
     }
 
     /**
