@@ -328,7 +328,7 @@ class RekapKkTest extends TestCase
             ->assertOk()
             ->assertSee('Jumlah KK')
             ->assertSee('90')
-            ->assertSee('data tahun '.now()->year);
+            ->assertSee('Data tahun '.now()->year);
     }
 
     public function test_dashboard_menandai_rekap_yang_belum_lengkap(): void
