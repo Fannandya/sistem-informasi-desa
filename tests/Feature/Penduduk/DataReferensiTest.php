@@ -4,6 +4,7 @@ namespace Tests\Feature\Penduduk;
 
 use App\Models\Admin;
 use App\Models\Penduduk;
+use App\Models\RefAgama;
 use App\Models\RefPekerjaan;
 use App\Models\Wilayah;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -169,5 +170,40 @@ class DataReferensiTest extends TestCase
     {
         $this->get(route('admin.wilayah.index'))->assertRedirect(route('admin.login'));
         $this->get(route('admin.pekerjaan.index'))->assertRedirect(route('admin.login'));
+    }
+
+    // ------------------------------------------------------------------
+    // Agama
+    // ------------------------------------------------------------------
+
+    public function test_agama_baru_tersimpan(): void
+    {
+        $agama = RefAgama::create(['nama' => 'Islam', 'is_template' => false]);
+
+        $this->assertDatabaseHas('ref_agama', ['id' => $agama->id, 'nama' => 'Islam']);
+    }
+
+    public function test_agama_dipakai_terdeteksi(): void
+    {
+        $agama = RefAgama::create(['nama' => 'Kristen']);
+        $wilayah = Wilayah::create(['dusun' => 'Krajan', 'rw' => '001', 'rt' => '001']);
+
+        Penduduk::create([
+            'nama_lengkap' => 'Warga Uji', 'tanggal_lahir' => now()->subYears(30),
+            'jenis_kelamin' => 'L', 'wilayah_id' => $wilayah->id, 'agama_id' => $agama->id,
+            'jenis_masuk' => 'pendataan_awal', 'tanggal_masuk' => now(),
+        ]);
+
+        $this->assertTrue($agama->fresh()->sedangDipakai());
+        $this->assertSame(1, $agama->fresh()->jumlahPemakai());
+    }
+
+    public function test_seeder_agama_membuat_tujuh_entri_bawaan(): void
+    {
+        (new \Database\Seeders\RefAgamaSeeder())->run();
+
+        $this->assertSame(7, RefAgama::template()->count());
+        $this->assertDatabaseHas('ref_agama', ['nama' => 'Islam', 'is_template' => true]);
+        $this->assertDatabaseHas('ref_agama', ['nama' => 'Tidak Ingin Menyebutkan', 'is_template' => true]);
     }
 }
