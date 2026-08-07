@@ -7,6 +7,7 @@ use App\Models\Penduduk;
 use App\Models\RefAgama;
 use App\Models\RefPekerjaan;
 use App\Models\Wilayah;
+use Database\Seeders\RefAgamaSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -200,7 +201,7 @@ class DataReferensiTest extends TestCase
 
     public function test_seeder_agama_membuat_tujuh_entri_bawaan(): void
     {
-        (new \Database\Seeders\RefAgamaSeeder())->run();
+        (new RefAgamaSeeder)->run();
 
         $this->assertSame(7, RefAgama::template()->count());
         $this->assertDatabaseHas('ref_agama', ['nama' => 'Islam', 'is_template' => true]);
@@ -264,5 +265,51 @@ class DataReferensiTest extends TestCase
     public function test_tamu_ditolak_di_halaman_agama(): void
     {
         $this->get(route('admin.agama.index'))->assertRedirect(route('admin.login'));
+    }
+
+    public function test_nama_agama_mirip_tidak_langsung_ditolak(): void
+    {
+        RefAgama::create(['nama' => 'Islam']);
+
+        $respons = $this->sebagaiAdmin()->post(route('admin.agama.store'), ['nama' => 'islam']);
+
+        // Bukan galat validasi — sesi membawa data untuk dialog konfirmasi.
+        $respons->assertSessionHasNoErrors();
+        $respons->assertSessionHas('agama_duplikat');
+        $this->assertSame(1, RefAgama::count());
+    }
+
+    public function test_nama_agama_mirip_tersimpan_bila_dipaksa(): void
+    {
+        RefAgama::create(['nama' => 'Islam']);
+
+        $this->sebagaiAdmin()->post(route('admin.agama.store'), ['nama' => 'islam', 'paksa' => '1'])
+            ->assertSessionHasNoErrors()
+            ->assertSessionMissing('agama_duplikat');
+
+        $this->assertSame(2, RefAgama::count());
+        $this->assertDatabaseHas('ref_agama', ['nama' => 'islam']);
+    }
+
+    public function test_nama_agama_beda_tersimpan_tanpa_konfirmasi(): void
+    {
+        RefAgama::create(['nama' => 'Islam']);
+
+        $this->sebagaiAdmin()->post(route('admin.agama.store'), ['nama' => 'Kristen'])
+            ->assertSessionHasNoErrors()
+            ->assertSessionMissing('agama_duplikat');
+
+        $this->assertSame(2, RefAgama::count());
+    }
+
+    public function test_ubah_nama_agama_jadi_mirip_entri_lain_butuh_konfirmasi(): void
+    {
+        RefAgama::create(['nama' => 'Islam']);
+        $kedua = RefAgama::create(['nama' => 'Kristen']);
+
+        $respons = $this->sebagaiAdmin()->put(route('admin.agama.update', $kedua), ['nama' => 'ISLAM']);
+
+        $respons->assertSessionHas('agama_duplikat');
+        $this->assertSame('Kristen', $kedua->fresh()->nama);
     }
 }

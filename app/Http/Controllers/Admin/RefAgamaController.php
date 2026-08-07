@@ -21,7 +21,7 @@ class RefAgamaController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        return $this->simpan(new RefAgama(), $request, 'Agama berhasil ditambahkan.');
+        return $this->simpan(new RefAgama, $request, 'Agama berhasil ditambahkan.');
     }
 
     public function update(Request $request, RefAgama $agama): RedirectResponse
@@ -59,6 +59,20 @@ class RefAgamaController extends Controller
         ], [], ['nama' => 'nama agama']);
 
         $nama = trim($data['nama']);
+
+        $serupa = RefAgama::whereRaw('LOWER(nama) = ?', [mb_strtolower($nama)])
+            ->when($agama->exists, fn ($q) => $q->whereKeyNot($agama->getKey()))
+            ->first();
+
+        if ($serupa && ! $request->boolean('paksa')) {
+            // Belum disimpan — halaman akan menampilkan dialog tanya, bukan
+            // galat validasi, karena ini bukan kesalahan tetapi keputusan admin.
+            return back()->withInput()->with('agama_duplikat', [
+                'ada' => $serupa->nama,
+                'baru' => $nama,
+                'form' => $agama->exists ? "formAgamaUbah{$agama->id}" : 'formAgamaTambah',
+            ]);
+        }
 
         $agama->fill(['nama' => $nama])->save();
 

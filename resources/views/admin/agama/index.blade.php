@@ -47,7 +47,8 @@
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         @foreach ($daftar as $agama)
-                            <tr x-data="{ ubah: false }" class="hover:bg-slate-50">
+                            @php $bukaOtomatis = session('agama_duplikat.form') === "formAgamaUbah{$agama->id}"; @endphp
+                            <tr x-data="{ ubah: {{ $bukaOtomatis ? 'true' : 'false' }} }" class="hover:bg-slate-50">
                                 <td class="px-4 py-3 font-medium text-slate-900" x-show="!ubah">
                                     {{ $agama->nama }}
                                 </td>
@@ -116,4 +117,35 @@
         </div>
     </div>
 </div>
+
+@if (session('agama_duplikat'))
+    <script type="application/json" id="agamaDuplikat">@json(session('agama_duplikat'))</script>
+@endif
+
+@push('skrip')
+<script>
+    const dataAgamaDuplikat = document.getElementById('agamaDuplikat');
+
+    if (dataAgamaDuplikat) {
+        const { ada, baru, form: idForm } = JSON.parse(dataAgamaDuplikat.textContent);
+
+        window.Dialog.buka({
+            jenis: 'tanya',
+            judul: 'Nama agama serupa sudah terdaftar',
+            pesan: `Sudah ada "${ada}" di daftar. Tetap tambahkan "${baru}" sebagai entri terpisah?`,
+            catatan: 'Ini bisa memecah data pada tabel/grafik agama menjadi dua kategori berbeda.',
+            tombol: 'Tetap Tambahkan',
+            batal: 'Batal, saya ubah dulu',
+        }).then((lanjut) => {
+            if (!lanjut) return;
+
+            const form = document.getElementById(idForm);
+            if (!form) return;
+
+            form.querySelector('[name="paksa"]').value = '1';
+            form.requestSubmit();
+        });
+    }
+</script>
+@endpush
 @endsection
