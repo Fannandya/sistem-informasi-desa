@@ -167,9 +167,15 @@ return [
     | to the server if the browser has a HTTPS connection. This will keep
     | the cookie from being sent to you when it can't be done securely.
     |
+    | Bawaannya mengikuti APP_ENV: menyala sendiri di produksi, mati saat
+    | pengembangan lokal yang berjalan di atas http. Sebelumnya nilai ini
+    | kosong kecuali seseorang ingat mengisinya — dan yang lupa tidak
+    | mendapat peringatan apa pun, hanya cookie sesi admin yang ikut
+    | terkirim pada permintaan http biasa.
+    |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    'secure' => env('SESSION_SECURE_COOKIE', env('APP_ENV') === 'production'),
 
     /*
     |--------------------------------------------------------------------------

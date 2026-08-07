@@ -18,8 +18,13 @@ class EmbedPeta
 {
     /**
      * Host yang diterima sebagai sumber peta.
+     *
+     * Publik karena Content-Security-Policy harus mengizinkan host yang sama
+     * persis pada frame-src. Dua daftar terpisah cepat atau lambat akan
+     * berbeda, dan gejalanya membingungkan: peta lolos validasi saat disimpan
+     * tetapi diblokir peramban saat ditampilkan.
      */
-    private const HOST_DIIZINKAN = [
+    public const HOST_DIIZINKAN = [
         'www.google.com',
         'google.com',
         'maps.google.com',
