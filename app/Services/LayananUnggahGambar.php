@@ -123,12 +123,29 @@ class LayananUnggahGambar
         $this->hapusDiam($this->pathThumbnail($path));
     }
 
+    /*
+     * Pembentukan URL di bawah ini sengaja tidak bertanya ke penyimpanan.
+     *
+     * Memanggil exists() berarti satu operasi stat per gambar di disk lokal,
+     * dan satu permintaan HTTP per gambar begitu unggahan pindah ke
+     * Cloudflare R2 (PRD 7). Satu halaman publik memuat belasan gambar, jadi
+     * ongkos itu dibayar pada setiap kunjungan — hanya untuk berjaga-jaga
+     * terhadap berkas hilang, keadaan yang seharusnya tidak pernah terjadi.
+     *
+     * Kelengkapan berkas dijaga di tempat yang tepat: simpan() menulis gambar
+     * utama beserta thumbnailnya dan membatalkan keduanya bila salah satu
+     * gagal, hapus() membuang keduanya, dan berkas yatim ditemukan lewat
+     * `php artisan unggahan:berkas-yatim`. Bila sebuah berkas tetap hilang,
+     * penanganannya ada di peramban: resources/js/app.js mengganti gambar
+     * yang gagal dimuat dengan placeholder.
+     */
+
     /**
      * URL publik gambar utama, atau gambar pengganti bila belum ada foto.
      */
     public function url(?string $path, string $jenis = 'bawaan'): string
     {
-        if (blank($path) || ! $this->disk()->exists($path)) {
+        if (blank($path)) {
             return $this->urlPlaceholder($jenis);
         }
 
@@ -145,14 +162,7 @@ class LayananUnggahGambar
             return $this->urlPlaceholder($jenis);
         }
 
-        $thumbnail = $this->pathThumbnail($path);
-
-        if ($this->disk()->exists($thumbnail)) {
-            return $this->disk()->url($thumbnail);
-        }
-
-        // Thumbnail hilang bukan alasan menyembunyikan gambar.
-        return $this->url($path, $jenis);
+        return $this->disk()->url($this->pathThumbnail($path));
     }
 
     public function urlPlaceholder(string $jenis = 'bawaan'): string

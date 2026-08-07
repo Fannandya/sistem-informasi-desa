@@ -182,12 +182,43 @@ class LayananUnggahGambarTest extends TestCase
         $this->assertStringContainsString($path, $this->layanan->url($path, 'potensi'));
     }
 
-    public function test_url_thumbnail_kembali_ke_gambar_utama_bila_thumbnail_hilang(): void
+    public function test_url_thumbnail_mengembalikan_placeholder_bila_belum_ada_gambar(): void
+    {
+        $this->assertStringContainsString(
+            'placeholder/potensi.svg',
+            $this->layanan->urlThumbnail(null, 'potensi'),
+        );
+    }
+
+    // ------------------------------------------------------------------
+    // Pembentukan URL tidak boleh menyentuh penyimpanan
+    //
+    // Menanyakan keberadaan berkas pada setiap gambar berarti satu operasi
+    // stat per gambar di disk lokal — dan satu permintaan HTTP per gambar
+    // begitu unggahan pindah ke Cloudflare R2. Satu halaman publik memuat
+    // belasan gambar, jadi ongkosnya dibayar setiap kunjungan.
+    //
+    // Kelengkapan berkas dijaga di tempat lain: simpan() menulis gambar
+    // utama dan thumbnail sekaligus lalu membatalkan keduanya bila salah
+    // satu gagal, hapus() membuang keduanya, dan berkas yatim ditemukan
+    // lewat `php artisan unggahan:berkas-yatim`.
+    // ------------------------------------------------------------------
+
+    public function test_url_dibentuk_tanpa_memeriksa_keberadaan_berkas(): void
     {
         $path = $this->layanan->simpan($this->gambar(), 'potensi');
-        Storage::disk('public')->delete($this->layanan->pathThumbnail($path));
+        Storage::disk('public')->delete($path);
 
-        $this->assertStringContainsString($path, $this->layanan->urlThumbnail($path, 'potensi'));
+        $this->assertStringContainsString($path, $this->layanan->url($path, 'potensi'));
+    }
+
+    public function test_url_thumbnail_dibentuk_tanpa_memeriksa_keberadaan_berkas(): void
+    {
+        $path = $this->layanan->simpan($this->gambar(), 'potensi');
+        $thumbnail = $this->layanan->pathThumbnail($path);
+        Storage::disk('public')->delete($thumbnail);
+
+        $this->assertStringContainsString($thumbnail, $this->layanan->urlThumbnail($path, 'potensi'));
     }
 
     public function test_aturan_validasi_memuat_batas_dari_konfigurasi(): void
