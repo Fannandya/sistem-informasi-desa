@@ -15,7 +15,6 @@
 @section('konten')
 
 {{-- ============================== HERO ============================== --}}
-<section class="-mt-16 relative w-full h-[600px] md:h-[819px] flex items-center justify-center overflow-hidden bg-on-surface"
 {{-- -mt-16 menarik hero naik ke belakang header (h-16) yang transparan di
      beranda, supaya gambar hero benar-benar terlihat di balik navbar. --}}
 <section class="relative -mt-16 w-full h-[600px] md:h-[819px] flex items-center justify-center overflow-hidden bg-on-surface"
@@ -27,8 +26,6 @@
         @forelse ($carousel as $item)
             <img src="{{ $layanan->url($item->path) }}"
                  alt="{{ $item->judul }}"
-                 :class="{ 'slide-aktif': currentIndex === {{ $loop->index }} }"
-                 class="slide-carousel absolute inset-0 h-full w-full object-cover">
                  :class="{ 'slide-aktif': currentIndex === {{ $loop->index }} }"
                  class="slide-carousel absolute inset-0 h-full w-full object-cover">
         @empty
@@ -108,7 +105,6 @@ function carousel() {
             this.autoplayInterval = setInterval(() => {
                 this.currentIndex = (this.currentIndex + 1) % this.totalSlides;
             }, 5000);
-            }, 5000); // 5 seconds
         },
 
         goToSlide(index) {
@@ -205,10 +201,6 @@ function carousel() {
                         <div class="w-12 h-12 mx-auto {{ $stat['color'] }} rounded-full flex items-center justify-center mb-4">
                             <span class="material-symbols-outlined text-2xl">{{ $stat['icon'] }}</span>
                         </div>
-                    <div class="snap-start shrink-0 w-[160px] md:w-full bg-surface-container-lowest/80 text-on-surface border border-outline-variant/30 backdrop-blur-md shadow-[0px_4px_20px_rgba(0,0,0,0.05)] p-6 rounded-[12px] text-center hover:-translate-y-2 transition-transform duration-300">
-                        <div class="w-12 h-12 mx-auto {{ $stat['color'] }} rounded-full flex items-center justify-center mb-4">
-                            <span class="material-symbols-outlined text-2xl">{{ $stat['icon'] }}</span>
-                        </div>
                         <div class="font-display-lg text-3xl font-bold mb-1">{{ $stat['nilai'] }}</div>
                         <div class="font-label-md text-xs">{{ $stat['label'] }}</div>
                     </div>
@@ -219,9 +211,6 @@ function carousel() {
             <a href="{{ route('publik.statistik') }}"
                class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
                 {{ Teks::ambil('beranda.statistik.tautan') }}
-                <span class="material-symbols-outlined text-sm">arrow_forward</span>
-               class="inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-2 font-label-md text-sm text-primary transition-colors hover:bg-primary hover:text-on-primary">
-                {{ trim(str_replace('→', '', Teks::ambil('beranda.statistik.tautan'))) }}
                 <span class="material-symbols-outlined text-sm">arrow_forward</span>
             </a>
         </div>
@@ -240,10 +229,6 @@ function carousel() {
                 <a href="{{ route('publik.potensi.index') }}"
                    class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
                     {{ Teks::ambil('beranda.potensi.tautan') }}
-                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                </a>
-                   class="shrink-0 inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-2 font-label-md text-sm text-primary transition-colors hover:bg-primary hover:text-on-primary">
-                    {{ trim(str_replace('→', '', Teks::ambil('beranda.potensi.tautan'))) }}
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
             </div>
@@ -282,10 +267,6 @@ function carousel() {
                 <a href="{{ route('publik.berita.index') }}"
                    class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
                     {{ Teks::ambil('beranda.berita.tautan') }}
-                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                </a>
-                   class="shrink-0 inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-2 font-label-md text-sm text-primary transition-colors hover:bg-primary hover:text-on-primary">
-                    {{ trim(str_replace('→', '', Teks::ambil('beranda.berita.tautan'))) }}
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
             </div>
@@ -353,10 +334,6 @@ function carousel() {
                     {{ Teks::ambil('beranda.galeri.tautan') }}
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
-                   class="shrink-0 inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-2 font-label-md text-sm text-primary transition-colors hover:bg-primary hover:text-on-primary">
-                    {{ trim(str_replace('→', '', Teks::ambil('beranda.galeri.tautan'))) }}
-                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                </a>
             </div>
 
             <div class="overflow-x-auto snap-x snap-mandatory scrollbar-hide md:overflow-visible md:grid md:gap-6 md:grid-cols-2 lg:grid-cols-3 flex gap-4">
@@ -400,11 +377,7 @@ function carousel() {
                         <div class="flex justify-end mb-4 lg:hidden">
                             <a href="{{ route('publik.fasilitas') }}"
                                class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
-                                   {{ Teks::ambil('beranda.tautan_lihat_semua') }}
-                                   <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                               </a>
-                               class="inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-2 font-label-md text-sm text-primary transition-colors hover:bg-primary hover:text-on-primary">
-                                {{ trim(str_replace('→', '', Teks::ambil('beranda.tautan_lihat_semua'))) }}
+                                {{ Teks::ambil('beranda.tautan_lihat_semua') }}
                                 <span class="material-symbols-outlined text-sm">arrow_forward</span>
                             </a>
                         </div>
@@ -425,11 +398,7 @@ function carousel() {
                         <div class="hidden lg:flex justify-end">
                             <a href="{{ route('publik.fasilitas') }}"
                                class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
-                                   {{ Teks::ambil('beranda.tautan_lihat_semua') }}
-                                   <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                               </a>
-                               class="inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-2 font-label-md text-sm text-primary transition-colors hover:bg-primary hover:text-on-primary">
-                                {{ trim(str_replace('→', '', Teks::ambil('beranda.tautan_lihat_semua'))) }}
+                                {{ Teks::ambil('beranda.tautan_lihat_semua') }}
                                 <span class="material-symbols-outlined text-sm">arrow_forward</span>
                             </a>
                         </div>
@@ -448,11 +417,7 @@ function carousel() {
                         <div class="flex justify-end mb-4 lg:hidden">
                             <a href="{{ route('publik.prestasi') }}"
                                class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
-                                   {{ Teks::ambil('beranda.tautan_lihat_semua') }}
-                                   <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                               </a>
-                               class="inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-2 font-label-md text-sm text-primary transition-colors hover:bg-primary hover:text-on-primary">
-                                {{ trim(str_replace('→', '', Teks::ambil('beranda.tautan_lihat_semua'))) }}
+                                {{ Teks::ambil('beranda.tautan_lihat_semua') }}
                                 <span class="material-symbols-outlined text-sm">arrow_forward</span>
                             </a>
                         </div>
@@ -472,11 +437,7 @@ function carousel() {
                         <div class="hidden lg:flex justify-end">
                             <a href="{{ route('publik.prestasi') }}"
                                class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
-                                   {{ Teks::ambil('beranda.tautan_lihat_semua') }}
-                                   <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                               </a>
-                               class="inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-2 font-label-md text-sm text-primary transition-colors hover:bg-primary hover:text-on-primary">
-                                {{ trim(str_replace('→', '', Teks::ambil('beranda.tautan_lihat_semua'))) }}
+                                {{ Teks::ambil('beranda.tautan_lihat_semua') }}
                                 <span class="material-symbols-outlined text-sm">arrow_forward</span>
                             </a>
                         </div>
@@ -499,10 +460,6 @@ function carousel() {
                 <a href="{{ route('publik.struktur') }}"
                    class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
                     {{ Teks::ambil('beranda.pengurus.tautan') }}
-                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                </a>
-                   class="shrink-0 inline-flex items-center gap-2 rounded-lg border-2 border-primary px-6 py-2 font-label-md text-sm text-primary transition-colors hover:bg-primary hover:text-on-primary">
-                    {{ trim(str_replace('→', '', Teks::ambil('beranda.pengurus.tautan'))) }}
                     <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
             </div>
