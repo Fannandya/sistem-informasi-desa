@@ -14,7 +14,7 @@ class GaleriController extends Controller
             'daftar' => AcaraDesa::query()
                 ->terbit()
                 ->withCount('foto')
-                ->with('foto')
+                ->with('sampul')
                 ->terbaru()
                 ->paginate(12),
         ]);
@@ -30,7 +30,7 @@ class GaleriController extends Controller
             'lainnya' => AcaraDesa::query()
                 ->terbit()
                 ->whereKeyNot($acara->id)
-                ->with('foto')
+                ->with('sampul')
                 ->terbaru()
                 ->take(3)
                 ->get(),

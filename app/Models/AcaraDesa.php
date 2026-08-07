@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 
 class AcaraDesa extends Model
@@ -43,6 +44,26 @@ class AcaraDesa extends Model
         return $this->hasMany(FotoAcara::class, 'acara_id')->orderBy('urutan')->orderBy('id');
     }
 
+    /**
+     * Satu foto sampul saja, untuk daftar dan kartu.
+     *
+     * Daftar galeri hanya menampilkan satu foto per acara. Memuat relasi
+     * `foto` di sana berarti menghidrasi seluruh foto setiap acara menjadi
+     * model — 12 acara berisi 50 foto menjadi 600 baris — lalu membuang
+     * hampir semuanya. Relasi ini menyerahkan pemilihannya ke basis data.
+     *
+     * Urutan pemilihannya sama persis dengan fotoSampul(): yang ditandai
+     * admin lebih dulu, selebihnya urutan terkecil.
+     */
+    public function sampul(): HasOne
+    {
+        return $this->hasOne(FotoAcara::class, 'acara_id')->ofMany([
+            'sampul' => 'max',
+            'urutan' => 'min',
+            'id' => 'min',
+        ]);
+    }
+
     public function admin(): BelongsTo
     {
         return $this->belongsTo(Admin::class);
@@ -69,7 +90,13 @@ class AcaraDesa extends Model
      */
     public function fotoSampul(): ?FotoAcara
     {
-        return $this->foto->firstWhere('sampul', true) ?? $this->foto->first();
+        // Halaman detail sudah memuat seluruh fotonya untuk galeri; memakai
+        // koleksi itu menghindari satu kueri tambahan hanya untuk sampul.
+        if ($this->relationLoaded('foto')) {
+            return $this->foto->firstWhere('sampul', true) ?? $this->foto->first();
+        }
+
+        return $this->sampul;
     }
 
     public function urlSampul(): string

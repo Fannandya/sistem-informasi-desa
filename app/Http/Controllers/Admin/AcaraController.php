@@ -22,7 +22,7 @@ class AcaraController extends Controller
         return view('admin.acara.index', [
             'daftar' => AcaraDesa::query()
                 ->withCount('foto')
-                ->with('foto')
+                ->with('sampul')
                 ->when($request->input('status'), fn ($q, $s) => $q->where('status', $s))
                 ->terbaru()
                 ->paginate(20)
