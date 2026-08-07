@@ -37,7 +37,7 @@ class HeaderKeamananTest extends TestCase
 
     public function test_halaman_publik_mengirim_content_security_policy(): void
     {
-        $csp = $this->get('/')->assertOk()->headers->get('Content-Security-Policy');
+        $csp = $this->cspDenganHot(null);
 
         $this->assertNotNull($csp);
 
@@ -51,7 +51,7 @@ class HeaderKeamananTest extends TestCase
 
     public function test_csp_masih_mengizinkan_peta_google_disematkan(): void
     {
-        $csp = $this->get('/')->headers->get('Content-Security-Policy');
+        $csp = $this->cspDenganHot(null);
 
         $this->assertMatchesRegularExpression(
             '/frame-src[^;]*https:\/\/www\.google\.com/',
@@ -64,7 +64,7 @@ class HeaderKeamananTest extends TestCase
         config()->set('unggahan.disk', 'r2');
         config()->set('filesystems.disks.r2.url', 'https://berkas.contoh.test/desa');
 
-        $csp = $this->get('/')->headers->get('Content-Security-Policy');
+        $csp = $this->cspDenganHot(null);
 
         $this->assertMatchesRegularExpression(
             '/img-src[^;]*https:\/\/berkas\.contoh\.test/',
@@ -82,6 +82,80 @@ class HeaderKeamananTest extends TestCase
     {
         $this->get('https://localhost/')
             ->assertHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+    }
+
+    // ------------------------------------------------------------------
+    // Server pengembangan Vite
+    //
+    // Vite bisa mengikat ke loopback IPv6, sehingga public/hot berisi
+    // http://[::1]:5173. Tata bahasa CSP tidak mengenal literal IPv6 dalam
+    // kurung siku: peramban membuang sumber itu sebagai tidak sah, lalu
+    // memblokir CSS dan JS yang datang darinya — halaman tampil sebagai HTML
+    // polos tanpa gaya sama sekali.
+    // ------------------------------------------------------------------
+
+    public function test_asal_vite_ipv6_tidak_pernah_masuk_ke_csp(): void
+    {
+        $csp = $this->cspDenganHot('http://[::1]:5173');
+
+        if ($csp !== null) {
+            $this->assertStringNotContainsString('[::1]', $csp);
+        }
+
+        $this->assertTrue(true);
+    }
+
+    public function test_halaman_tetap_bergaya_saat_vite_mengikat_ipv6(): void
+    {
+        // Bila asal dev tidak bisa dinyatakan dalam CSP, lebih baik tidak
+        // mengirim CSP sama sekali daripada mengirim kebijakan yang memblokir
+        // seluruh gaya halaman.
+        $this->assertNull(
+            $this->cspDenganHot('http://[::1]:5173'),
+            'CSP yang tidak bisa mengizinkan asal dev seharusnya tidak dikirim.',
+        );
+    }
+
+    public function test_asal_vite_ipv4_tetap_diizinkan(): void
+    {
+        $csp = $this->cspDenganHot('http://127.0.0.1:5173');
+
+        $this->assertNotNull($csp);
+        $this->assertStringContainsString('http://127.0.0.1:5173', $csp);
+        $this->assertStringContainsString('ws://127.0.0.1:5173', $csp);
+    }
+
+    /**
+     * Menjalankan satu permintaan pada keadaan Vite tertentu, lalu
+     * mengembalikan header CSP-nya. `null` berarti `npm run dev` tidak
+     * sedang berjalan — keadaan yang sama dengan produksi.
+     *
+     * Keadaan public/hot ditetapkan secara eksplisit, bukan diwarisi dari
+     * mesin yang menjalankan tes: hasil tes tidak boleh berbeda hanya karena
+     * seorang pengembang kebetulan sedang menyalakan server Vite. Isi
+     * semulanya dipulihkan setelahnya, karena berkas itu milik Vite.
+     */
+    private function cspDenganHot(?string $asal): ?string
+    {
+        $berkas = public_path('hot');
+        $adaSebelumnya = is_file($berkas);
+        $isiSemula = $adaSebelumnya ? file_get_contents($berkas) : null;
+
+        if ($asal === null) {
+            @unlink($berkas);
+        } else {
+            file_put_contents($berkas, $asal);
+        }
+
+        try {
+            return $this->get('/')->assertOk()->headers->get('Content-Security-Policy');
+        } finally {
+            if ($adaSebelumnya) {
+                file_put_contents($berkas, $isiSemula);
+            } else {
+                @unlink($berkas);
+            }
+        }
     }
 
     // ------------------------------------------------------------------

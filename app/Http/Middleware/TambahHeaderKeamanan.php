@@ -49,7 +49,10 @@ class TambahHeaderKeamanan
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('X-Frame-Options', 'DENY');
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
-        $response->headers->set('Content-Security-Policy', $this->kebijakan());
+
+        if ($kebijakan = $this->kebijakan()) {
+            $response->headers->set('Content-Security-Policy', $kebijakan);
+        }
 
         // Hanya bermakna di atas HTTPS. Mengirimkannya lewat HTTP biasa akan
         // mengunci pengembang keluar dari `php artisan serve`.
@@ -63,9 +66,19 @@ class TambahHeaderKeamanan
         return $response;
     }
 
-    private function kebijakan(): string
+    /**
+     * Mengembalikan null bila kebijakan tidak mungkin dibuat tanpa merusak
+     * halaman — lihat sumberPengembangan().
+     */
+    private function kebijakan(): ?string
     {
-        $sumberPengembangan = $this->sumberPengembangan();
+        $asalDev = $this->asalPengembangan();
+
+        if ($asalDev === false) {
+            return null;
+        }
+
+        $sumberPengembangan = $this->sumberPengembangan($asalDev);
 
         $arahan = [
             "default-src 'self'",
@@ -124,21 +137,55 @@ class TambahHeaderKeamanan
      * Server pengembangan Vite. Tanpa ini `npm run dev` berhenti bekerja
      * begitu CSP aktif — dan CSP yang hanya menyala di produksi berarti
      * kesalahannya baru ketahuan setelah rilis.
+     *
+     * Mengembalikan:
+     *   null   — Vite tidak sedang berjalan, tidak ada yang perlu diizinkan
+     *   string — asal yang bisa dinyatakan sebagai sumber CSP
+     *   false  — Vite berjalan pada alamat yang TIDAK bisa dinyatakan dalam
+     *            CSP; pemanggil harus membatalkan seluruh kebijakan
      */
-    private function sumberPengembangan(): string
+    private function asalPengembangan(): string|false|null
     {
         if (! Vite::isRunningHot()) {
-            return '';
+            return null;
         }
 
-        $asal = trim((string) @file_get_contents(public_path('hot')));
+        $asal = rtrim(trim((string) @file_get_contents(public_path('hot'))), '/');
 
         if ($asal === '') {
+            return null;
+        }
+
+        return $this->bisaDinyatakanDalamCsp($asal) ? $asal : false;
+    }
+
+    private function sumberPengembangan(?string $asal): string
+    {
+        if ($asal === null) {
             return '';
         }
 
-        $asal = rtrim($asal, '/');
-
         return $asal.' '.str_replace(['http://', 'https://'], ['ws://', 'wss://'], $asal);
+    }
+
+    /**
+     * Tata bahasa host-source pada CSP hanya mengenal huruf, angka, tanda
+     * hubung, dan titik. Literal IPv6 dalam kurung siku — bentuk yang dipakai
+     * Vite ketika mengikat loopback IPv6, `http://[::1]:5173` — tidak sah.
+     *
+     * Peramban tidak menolak kebijakannya, melainkan diam-diam membuang
+     * sumber yang tidak sah itu lalu memblokir seluruh CSS dan JS yang datang
+     * dari sana. Gejalanya menyesatkan: halaman tampil sebagai HTML polos
+     * tanpa gaya, seolah bundelnya yang rusak.
+     *
+     * Karena asal itu mustahil diizinkan, kebijakannya dibatalkan seluruhnya
+     * alih-alih dikirim dalam keadaan pasti merusak halaman. Ini hanya
+     * menyangkut pengembangan lokal: public/hot tidak pernah ada di produksi.
+     */
+    private function bisaDinyatakanDalamCsp(string $asal): bool
+    {
+        $host = parse_url($asal, PHP_URL_HOST);
+
+        return is_string($host) && preg_match('/^[A-Za-z0-9.-]+$/', $host) === 1;
     }
 }
