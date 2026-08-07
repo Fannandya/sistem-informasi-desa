@@ -97,6 +97,41 @@ class SessionTimeoutTest extends TestCase
         $this->assertGreaterThan($oldTime, $newTime);
     }
 
+    /**
+     * Timeout ini menghitung kelambanan di panel admin. Membaca halaman
+     * publik desa bukan aktivitas admin, jadi tidak boleh memperpanjang
+     * sesinya — dan pemeriksaannya tidak perlu ikut berjalan di setiap
+     * kunjungan publik.
+     */
+    public function test_kunjungan_halaman_publik_tidak_memperpanjang_sesi_admin(): void
+    {
+        $this->actingAs($this->admin, 'admin');
+
+        $lama = time() - 1800;
+        session(['last_activity' => $lama]);
+
+        $this->get('/')->assertOk();
+
+        $this->assertSame($lama, session('last_activity'));
+    }
+
+    /**
+     * Sesi yang kedaluwarsa harus benar-benar dibuang, bukan sekadar
+     * dilepas autentikasinya — sisa isinya masih menempel pada id sesi yang
+     * sama.
+     */
+    public function test_sesi_kedaluwarsa_ikut_membuang_isi_sesinya(): void
+    {
+        $this->actingAs($this->admin, 'admin');
+
+        session(['last_activity' => time() - 3660]);
+
+        $this->get(route('admin.dashboard'))->assertRedirectToRoute('admin.login');
+
+        $this->assertGuest('admin');
+        $this->assertFalse(session()->has('last_activity'));
+    }
+
     public function test_logout_hapus_session(): void
     {
         $this->actingAs($this->admin, 'admin');

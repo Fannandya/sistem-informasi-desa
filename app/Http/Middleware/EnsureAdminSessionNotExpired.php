@@ -6,36 +6,54 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+/**
+ * Timeout sesi panel admin (fitur 01).
+ *
+ * SESSION_LIFETIME sendiri sudah mengakhiri sesi yang menganggur, tetapi
+ * tidak memberi tahu apa yang terjadi — admin hanya terlempar ke halaman
+ * login tanpa penjelasan. Middleware ini mencatat waktu aktivitas terakhir
+ * sehingga sistem bisa membedakan "belum pernah masuk" dari "sesi berakhir".
+ *
+ * Terpasang pada grup rute admin, bukan secara global: yang dihitung adalah
+ * kelambanan di panel admin. Membaca halaman publik desa bukan aktivitas
+ * admin dan tidak memperpanjang sesinya.
+ */
 class EnsureAdminSessionNotExpired
 {
     public function handle(Request $request, Closure $next): Response
     {
-        // Check if admin is authenticated
-        if (!auth('admin')->check()) {
+        if (! auth('admin')->check()) {
             return $next($request);
         }
 
-        // Get last activity timestamp
-        $lastActivity = session('last_activity');
-        $timeout = config('session.lifetime') * 60; // Convert to seconds
+        $aktivitasTerakhir = session('last_activity');
+        $batasDetik = config('session.lifetime') * 60;
 
-        // Check if session has expired
-        if ($lastActivity && (time() - $lastActivity) > $timeout) {
-            auth('admin')->logout();
-
-            // If AJAX request, return 401
-            if ($request->expectsJson()) {
-                return response()->json(['message' => 'Session expired'], 401);
-            }
-
-            // Redirect to login with message
-            return redirect(route('admin.login'))
-                ->with('error', 'Sesi Anda telah berakhir. Silakan login kembali.');
+        if ($aktivitasTerakhir && (time() - $aktivitasTerakhir) > $batasDetik) {
+            return $this->akhiriSesi($request);
         }
 
-        // Update last activity
         session(['last_activity' => time()]);
 
         return $next($request);
+    }
+
+    private function akhiriSesi(Request $request): Response
+    {
+        auth('admin')->logout();
+
+        // Melepas autentikasi saja tidak cukup: sisa isi sesi masih menempel
+        // pada id sesi yang sama.
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        // Permintaan latar (grafik dasbor) tidak boleh menerima halaman login
+        // sebagai jawaban — pemanggilnya mengharapkan JSON.
+        if ($request->expectsJson()) {
+            return response()->json(['message' => 'Session expired'], 401);
+        }
+
+        return redirect(route('admin.login'))
+            ->with('error', 'Sesi Anda telah berakhir. Silakan login kembali.');
     }
 }

@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Middleware\EnsureAdminIsActive;
-use App\Http\Middleware\EnsureAdminSessionIsFresh;
 use App\Http\Middleware\EnsureAdminSessionNotExpired;
 use App\Http\Middleware\PreventBackHistory;
 use App\Http\Middleware\RedirectIfAdminAuthenticated;
@@ -20,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'tamu.admin' => RedirectIfAdminAuthenticated::class,
-            'sesi.segar' => EnsureAdminSessionIsFresh::class,
+            'sesi.segar' => EnsureAdminSessionNotExpired::class,
             'admin.aktif' => EnsureAdminIsActive::class,
             'tanpa.cache' => PreventBackHistory::class,
             'admin.super' => VerifyAdminIsSuper::class,
@@ -32,9 +31,6 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Berlaku untuk seluruh halaman, publik maupun admin.
         $middleware->append(TambahHeaderKeamanan::class);
-
-        // Add session timeout check for admin routes
-        $middleware->append(EnsureAdminSessionNotExpired::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
