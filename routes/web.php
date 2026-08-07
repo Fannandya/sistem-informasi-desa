@@ -86,7 +86,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     // --- Sudah masuk ---
     // AuthenticateSession dibutuhkan agar logoutOtherDevices() bekerja saat
     // admin mengganti kata sandi (fitur 01).
-    Route::middleware(['auth:admin', AuthenticateSession::class, 'sesi.segar', 'tanpa.cache'])->group(function () {
+    Route::middleware(['auth:admin', AuthenticateSession::class, 'admin.aktif', 'sesi.segar', 'tanpa.cache'])->group(function () {
         Route::get('/', DashboardController::class)->name('dashboard');
 
         // --- Data penduduk ---

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureAdminIsActive;
 use App\Http\Middleware\EnsureAdminSessionIsFresh;
 use App\Http\Middleware\EnsureAdminSessionNotExpired;
 use App\Http\Middleware\PreventBackHistory;
@@ -19,6 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'tamu.admin' => RedirectIfAdminAuthenticated::class,
             'sesi.segar' => EnsureAdminSessionIsFresh::class,
+            'admin.aktif' => EnsureAdminIsActive::class,
             'tanpa.cache' => PreventBackHistory::class,
             'admin.super' => VerifyAdminIsSuper::class,
         ]);

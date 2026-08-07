@@ -313,4 +313,145 @@ class AdminManagementTest extends TestCase {
 
         $this->assertFalse($adminNonaktif->isAktif());
     }
+
+    // ------------------------------------------------------------------
+    // Kata sandi wajib saat membuat admin
+    //
+    // Aturan lama memakai `required_if:method,POST`, padahal tidak ada field
+    // bernama `method` dalam permintaan — Blade mengirim `_method`. Akibatnya
+    // `nullable` yang berlaku dan admin bisa lahir tanpa kata sandi.
+    // ------------------------------------------------------------------
+
+    public function test_admin_tidak_bisa_dibuat_tanpa_kata_sandi() {
+        $this->actingAs($this->superAdmin, 'admin')
+            ->post('/admin/admin', [
+                'nama' => 'Tanpa Sandi',
+                'email' => 'tanpa-sandi@test.test',
+            ])
+            ->assertSessionHasErrors('password');
+
+        $this->assertDatabaseMissing('admins', ['email' => 'tanpa-sandi@test.test']);
+    }
+
+    public function test_admin_tidak_bisa_dibuat_dengan_kata_sandi_kosong() {
+        $this->actingAs($this->superAdmin, 'admin')
+            ->post('/admin/admin', [
+                'nama' => 'Sandi Kosong',
+                'email' => 'sandi-kosong@test.test',
+                'password' => '',
+            ])
+            ->assertSessionHasErrors('password');
+
+        $this->assertDatabaseMissing('admins', ['email' => 'sandi-kosong@test.test']);
+    }
+
+    public function test_ubah_admin_tidak_wajib_mengisi_kata_sandi() {
+        $admin = Admin::create([
+            'nama' => 'Admin Ubah',
+            'email' => 'ubah@test.test',
+            'password' => bcrypt('password123'),
+        ]);
+
+        $this->actingAs($this->superAdmin, 'admin')
+            ->put('/admin/admin/'.$admin->id, [
+                'nama' => 'Admin Ubah Nama',
+                'email' => 'ubah@test.test',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertRedirect('/admin/admin');
+
+        $this->assertSame('Admin Ubah Nama', $admin->refresh()->nama);
+    }
+
+    // ------------------------------------------------------------------
+    // Perlindungan super admin terakhir
+    //
+    // Panel ini tidak punya jalur pemulihan lewat email. Sekali super admin
+    // terakhir terhapus, tercabut statusnya, atau dinonaktifkan, menu kelola
+    // admin lenyap dan hanya bisa dikembalikan lewat perintah artisan di
+    // server — yang belum tentu bisa dijangkau perangkat desa.
+    // ------------------------------------------------------------------
+
+    public function test_super_admin_tidak_bisa_menghapus_dirinya_sendiri() {
+        $this->actingAs($this->superAdmin, 'admin')
+            ->delete('/admin/admin/'.$this->superAdmin->id)
+            ->assertSessionHas('error');
+
+        $this->assertDatabaseHas('admins', ['id' => $this->superAdmin->id]);
+    }
+
+    public function test_super_admin_terakhir_tidak_bisa_mencabut_status_dirinya_sendiri() {
+        $this->actingAs($this->superAdmin, 'admin')
+            ->put('/admin/admin/'.$this->superAdmin->id, [
+                'nama' => 'Super Admin',
+                'email' => 'super@test.test',
+                'is_super_admin' => false,
+            ])
+            ->assertSessionHas('error');
+
+        $this->assertTrue($this->superAdmin->refresh()->is_super_admin);
+    }
+
+    public function test_super_admin_bisa_mencabut_status_dirinya_bila_ada_super_admin_aktif_lain() {
+        Admin::create([
+            'nama' => 'Super Kedua',
+            'email' => 'super2@test.test',
+            'password' => bcrypt('password123'),
+            'is_super_admin' => true,
+            'is_active' => true,
+        ]);
+
+        $this->actingAs($this->superAdmin, 'admin')
+            ->put('/admin/admin/'.$this->superAdmin->id, [
+                'nama' => 'Super Admin',
+                'email' => 'super@test.test',
+                'is_super_admin' => false,
+            ])
+            ->assertRedirect('/admin/admin');
+
+        $this->assertFalse($this->superAdmin->refresh()->is_super_admin);
+    }
+
+    /**
+     * Super admin yang nonaktif tidak bisa masuk, jadi ia tidak bisa
+     * menyelamatkan siapa pun. Penjagaan harus menghitung yang aktif saja.
+     */
+    public function test_super_admin_nonaktif_tidak_dihitung_sebagai_penjaga_terakhir() {
+        Admin::create([
+            'nama' => 'Super Nonaktif',
+            'email' => 'super-nonaktif@test.test',
+            'password' => bcrypt('password123'),
+            'is_super_admin' => true,
+            'is_active' => false,
+        ]);
+
+        $this->actingAs($this->superAdmin, 'admin')
+            ->put('/admin/admin/'.$this->superAdmin->id, [
+                'nama' => 'Super Admin',
+                'email' => 'super@test.test',
+                'is_super_admin' => false,
+            ])
+            ->assertSessionHas('error');
+
+        $this->assertTrue($this->superAdmin->refresh()->is_super_admin);
+    }
+
+    public function test_super_admin_masih_bisa_mencabut_status_super_admin_lain() {
+        $lain = Admin::create([
+            'nama' => 'Super Kedua',
+            'email' => 'super2@test.test',
+            'password' => bcrypt('password123'),
+            'is_super_admin' => true,
+        ]);
+
+        $this->actingAs($this->superAdmin, 'admin')
+            ->put('/admin/admin/'.$lain->id, [
+                'nama' => 'Super Kedua',
+                'email' => 'super2@test.test',
+                'is_super_admin' => false,
+            ])
+            ->assertRedirect('/admin/admin');
+
+        $this->assertFalse($lain->refresh()->is_super_admin);
+    }
 }

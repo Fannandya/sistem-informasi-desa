@@ -26,6 +26,19 @@ class Admin extends Authenticatable
         'remember_token',
     ];
 
+    /**
+     * Cerminan nilai bawaan kolom di basis data.
+     *
+     * Tanpa ini, `Admin::create()` mengembalikan instance yang belum memuat
+     * kolom bawaan — `is_active` bernilai null, bukan true — sampai model
+     * dibaca ulang. Pemeriksaan keamanan yang membaca instance itu langsung
+     * akan salah menyimpulkan bahwa akunnya nonaktif.
+     */
+    protected $attributes = [
+        'is_super_admin' => false,
+        'is_active' => true,
+    ];
+
     protected function casts(): array
     {
         return [

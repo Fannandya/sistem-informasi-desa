@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Password;
 
 class AdminRequest extends FormRequest {
     public function authorize(): bool {
@@ -14,7 +15,15 @@ class AdminRequest extends FormRequest {
         return [
             'nama' => 'required|string|max:100',
             'email' => 'required|email|unique:admins,email,' . $adminId,
-            'password' => 'required_if:method,POST|nullable|min:8',
+            // Wajib hanya saat membuat akun baru. Pada penyuntingan, kata
+            // sandi diubah lewat tombol "Reset Sandi" tersendiri.
+            //
+            // Jangan memakai required_if terhadap "method": Blade mengirim
+            // nama field `_method`, sehingga aturan itu tidak pernah aktif
+            // dan admin bisa lahir tanpa kata sandi sama sekali.
+            'password' => $this->isMethod('post')
+                ? ['required', 'string', Password::min(8)]
+                : ['nullable', 'string', Password::min(8)],
             'is_super_admin' => 'boolean',
         ];
     }
@@ -26,7 +35,7 @@ class AdminRequest extends FormRequest {
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Email tidak valid.',
             'email.unique' => 'Email sudah terdaftar.',
-            'password.required_if' => 'Sandi wajib diisi saat membuat admin baru.',
+            'password.required' => 'Sandi wajib diisi saat membuat admin baru.',
             'password.min' => 'Sandi minimal 8 karakter.',
         ];
     }

@@ -160,4 +160,54 @@ class AutentikasiTest extends TestCase
         $this->assertNotSame('rahasia123', $admin->password);
         $this->assertTrue(Hash::check('rahasia123', $admin->password));
     }
+
+    // ------------------------------------------------------------------
+    // Akun nonaktif
+    //
+    // Menonaktifkan admin harus benar-benar mencabut aksesnya. Kalau hanya
+    // menandai kolom tanpa menutup pintu masuk, tombol "Nonaktifkan" di panel
+    // memberi rasa aman yang keliru: akun yang dikira sudah dicabut masih
+    // bisa masuk dan membuka seluruh data warga.
+    // ------------------------------------------------------------------
+
+    public function test_admin_nonaktif_ditolak_meski_kata_sandinya_benar(): void
+    {
+        $admin = $this->admin();
+        $admin->forceFill(['is_active' => false])->save();
+
+        $this->from(route('admin.login'))
+            ->post(route('admin.login.proses'), [
+                'email' => 'admin@desa.test',
+                'password' => 'rahasia123',
+            ])
+            ->assertRedirect(route('admin.login'))
+            ->assertSessionHasErrors('email');
+
+        $this->assertGuest('admin');
+    }
+
+    public function test_admin_yang_dinonaktifkan_di_tengah_sesi_langsung_dikeluarkan(): void
+    {
+        $admin = $this->admin();
+
+        $this->actingAs($admin, 'admin')->get('/admin')->assertOk();
+
+        $admin->forceFill(['is_active' => false])->save();
+
+        $this->get('/admin')->assertRedirect(route('admin.login'));
+
+        $this->assertGuest('admin');
+    }
+
+    public function test_admin_aktif_tetap_bisa_masuk(): void
+    {
+        $this->admin();
+
+        $this->post(route('admin.login.proses'), [
+            'email' => 'admin@desa.test',
+            'password' => 'rahasia123',
+        ])->assertRedirect(route('admin.dashboard'));
+
+        $this->assertAuthenticated('admin');
+    }
 }

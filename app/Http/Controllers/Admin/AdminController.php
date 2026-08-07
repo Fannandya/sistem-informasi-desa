@@ -39,6 +39,14 @@ class AdminController extends Controller {
     }
 
     public function update(Admin $admin, AdminRequest $request) {
+        if ($this->menghabiskanSuperAdminTerakhir($admin, $request->boolean('is_super_admin'))) {
+            return back()->with(
+                'error',
+                'Tidak bisa mencabut status super admin terakhir yang aktif. '
+                .'Angkat super admin lain lebih dulu.',
+            );
+        }
+
         $admin->update([
             'nama' => $request->nama,
             'email' => $request->email,
@@ -50,6 +58,14 @@ class AdminController extends Controller {
     }
 
     public function destroy(Admin $admin) {
+        // Panel ini tidak punya pemulihan lewat email. Super admin yang
+        // menghapus akunnya sendiri akan kehilangan menu kelola admin untuk
+        // selamanya, dan hanya bisa dikembalikan lewat perintah artisan di
+        // server — yang belum tentu terjangkau perangkat desa.
+        if ($admin->id === auth('admin')->id()) {
+            return back()->with('error', 'Tidak bisa menghapus akun Anda sendiri.');
+        }
+
         $admin->delete();
         session()->flash('status', 'Admin berhasil dihapus');
         return redirect()->route('admin.admin.index');
@@ -75,5 +91,20 @@ class AdminController extends Controller {
 
         session()->flash('status', 'Sandi admin berhasil direset');
         return redirect()->route('admin.admin.index');
+    }
+
+    /**
+     * Apakah perubahan ini menyisakan desa tanpa satu pun super admin yang
+     * bisa masuk?
+     *
+     * Yang dihitung hanya super admin aktif: akun nonaktif tidak bisa login,
+     * jadi keberadaannya tidak menyelamatkan siapa pun.
+     */
+    private function menghabiskanSuperAdminTerakhir(Admin $admin, bool $tetapSuper): bool {
+        if ($tetapSuper || ! $admin->is_super_admin) {
+            return false;
+        }
+
+        return ! Admin::superAdmin()->aktif()->whereKeyNot($admin->getKey())->exists();
     }
 }

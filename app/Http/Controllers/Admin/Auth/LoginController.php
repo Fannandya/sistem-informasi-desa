@@ -44,6 +44,18 @@ class LoginController extends Controller
             ]);
         }
 
+        // Kredensial benar, tetapi aksesnya sudah dicabut. Dikeluarkan lagi
+        // sebelum sesi sempat membawa identitas admin. Tanpa ini, tombol
+        // "Nonaktifkan" pada kelola admin hanya menandai kolom di basis data
+        // tanpa benar-benar menutup pintu masuk.
+        if (! Auth::guard('admin')->user()->is_active) {
+            Auth::guard('admin')->logout();
+
+            throw ValidationException::withMessages([
+                'email' => 'Akun ini sedang dinonaktifkan. Hubungi admin utama desa.',
+            ]);
+        }
+
         RateLimiter::clear($kunci);
 
         $request->session()->regenerate();
