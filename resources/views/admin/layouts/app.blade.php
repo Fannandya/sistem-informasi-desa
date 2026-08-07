@@ -82,6 +82,12 @@
                 <span class="text-sm">Pekerjaan</span>
             </a>
 
+            <a href="{{ route('admin.agama.index') }}"
+               class="{{ request()->routeIs('admin.agama.*') ? $tautanAktif : $tautanBiasa }}">
+                <span class="material-symbols-outlined" {!! request()->routeIs('admin.agama.*') ? 'style="font-variation-settings: \'FILL\' 1;"' : '' !!}>self_improvement</span>
+                <span class="text-sm">Agama</span>
+            </a>
+
             <a href="{{ route('admin.ref-kategori-potensi.index') }}"
                class="{{ request()->routeIs('admin.ref-kategori-potensi.*') ? $tautanAktif : $tautanBiasa }}">
                 <span class="material-symbols-outlined" {!! request()->routeIs('admin.ref-kategori-potensi.*') ? 'style="font-variation-settings: \'FILL\' 1;"' : '' !!}>category</span>

@@ -206,4 +206,63 @@ class DataReferensiTest extends TestCase
         $this->assertDatabaseHas('ref_agama', ['nama' => 'Islam', 'is_template' => true]);
         $this->assertDatabaseHas('ref_agama', ['nama' => 'Tidak Ingin Menyebutkan', 'is_template' => true]);
     }
+
+    public function test_agama_baru_tersimpan_lewat_halaman(): void
+    {
+        $this->sebagaiAdmin()->post(route('admin.agama.store'), ['nama' => 'Buddha'])
+            ->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('ref_agama', ['nama' => 'Buddha']);
+    }
+
+    public function test_agama_template_tidak_bisa_dihapus(): void
+    {
+        $template = RefAgama::create(['nama' => 'Islam', 'is_template' => true]);
+
+        $this->sebagaiAdmin()->delete(route('admin.agama.destroy', $template))
+            ->assertSessionHasErrors(['nama']);
+
+        $this->assertDatabaseHas('ref_agama', ['id' => $template->id]);
+    }
+
+    public function test_agama_yang_dipakai_tidak_bisa_dihapus(): void
+    {
+        $agama = RefAgama::create(['nama' => 'Konghucu', 'is_template' => false]);
+        $wilayah = Wilayah::create(['dusun' => 'Krajan', 'rw' => '001', 'rt' => '001']);
+
+        Penduduk::create([
+            'nama_lengkap' => 'Warga Uji', 'tanggal_lahir' => now()->subYears(30),
+            'jenis_kelamin' => 'L', 'wilayah_id' => $wilayah->id, 'agama_id' => $agama->id,
+            'jenis_masuk' => 'pendataan_awal', 'tanggal_masuk' => now(),
+        ]);
+
+        $this->sebagaiAdmin()->delete(route('admin.agama.destroy', $agama))
+            ->assertSessionHasErrors(['nama']);
+
+        $this->assertDatabaseHas('ref_agama', ['id' => $agama->id]);
+    }
+
+    public function test_agama_custom_bisa_dihapus(): void
+    {
+        $agama = RefAgama::create(['nama' => 'Lainnya', 'is_template' => false]);
+
+        $this->sebagaiAdmin()->delete(route('admin.agama.destroy', $agama))
+            ->assertRedirectToRoute('admin.agama.index');
+
+        $this->assertDatabaseMissing('ref_agama', ['id' => $agama->id]);
+    }
+
+    public function test_halaman_agama_menampilkan_daftar(): void
+    {
+        RefAgama::create(['nama' => 'Islam', 'is_template' => true]);
+
+        $this->sebagaiAdmin()->get(route('admin.agama.index'))
+            ->assertOk()
+            ->assertSee('Islam');
+    }
+
+    public function test_tamu_ditolak_di_halaman_agama(): void
+    {
+        $this->get(route('admin.agama.index'))->assertRedirect(route('admin.login'));
+    }
 }

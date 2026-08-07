@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\FasilitasController;
 use App\Http\Controllers\Admin\KategoriBeritaController;
 use App\Http\Controllers\Admin\PotensiController;
 use App\Http\Controllers\Admin\PrestasiController;
+use App\Http\Controllers\Admin\RefAgamaController;
 use App\Http\Controllers\Admin\RefOrganisasiController;
 use App\Http\Controllers\Admin\RefPekerjaanController;
 use App\Http\Controllers\Admin\RekapKkController;
@@ -217,6 +218,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('pekerjaan', [RefPekerjaanController::class, 'store'])->name('pekerjaan.store');
         Route::put('pekerjaan/{pekerjaan}', [RefPekerjaanController::class, 'update'])->name('pekerjaan.update');
         Route::delete('pekerjaan/{pekerjaan}', [RefPekerjaanController::class, 'destroy'])->name('pekerjaan.destroy');
+
+        Route::get('agama', [RefAgamaController::class, 'index'])->name('agama.index');
+        Route::post('agama', [RefAgamaController::class, 'store'])->name('agama.store');
+        Route::put('agama/{agama}', [RefAgamaController::class, 'update'])->name('agama.update');
+        Route::delete('agama/{agama}', [RefAgamaController::class, 'destroy'])->name('agama.destroy');
 
         Route::get('kategori-potensi', [RefKategoriPotensiController::class, 'index'])->name('ref-kategori-potensi.index');
         Route::post('kategori-potensi', [RefKategoriPotensiController::class, 'store'])->name('ref-kategori-potensi.store');
