@@ -116,22 +116,51 @@ enum KelompokUmur: string
      * umur di dalam SQL. Fungsi penghitung umur berbeda antara MySQL dan
      * SQLite, sementara pengujian berjalan di SQLite dan produksi di MySQL.
      */
-    public function terapkanFilter(Builder $query, ?CarbonInterface $acuan = null): Builder
+    /**
+     * Rentang tanggal lahir yang termasuk kelompok ini pada hari acuan.
+     *
+     * Satu-satunya tempat umur diterjemahkan menjadi tanggal. Dipakai oleh
+     * penyaringan per kelompok maupun oleh perhitungan sebaran umur yang
+     * menjumlahkan semua kelompok sekaligus — bila keduanya menghitung
+     * sendiri-sendiri, cepat atau lambat batasnya akan berbeda.
+     *
+     * @return array{sampai: string, sesudah: string|null}|null
+     *   sampai  — lahir pada atau sebelum tanggal ini (batas umur minimal)
+     *   sesudah — lahir setelah tanggal ini (batas umur maksimal), null bila
+     *             kelompoknya tidak berbatas atas
+     *   null    — kelompok ini tidak ditentukan oleh tanggal lahir
+     */
+    public function rentangTanggalLahir(?CarbonInterface $acuan = null): ?array
     {
+        if ($this === self::TidakDiketahui) {
+            return null;
+        }
+
         $hariIni = $acuan?->copy() ?? now();
 
-        if ($this === self::TidakDiketahui) {
+        return [
+            // Umur >= minimal berarti lahir pada atau sebelum (hari ini - minimal tahun).
+            'sampai' => $hariIni->copy()->subYears($this->minimal())->toDateString(),
+            // Umur <= maksimal berarti lahir setelah (hari ini - (maksimal+1) tahun).
+            'sesudah' => $this->maksimal() === null
+                ? null
+                : $hariIni->copy()->subYears($this->maksimal() + 1)->toDateString(),
+        ];
+    }
+
+    public function terapkanFilter(Builder $query, ?CarbonInterface $acuan = null): Builder
+    {
+        $rentang = $this->rentangTanggalLahir($acuan);
+
+        if ($rentang === null) {
             return $query->whereNull('tanggal_lahir');
         }
 
-        $query->whereNotNull('tanggal_lahir');
+        $query->whereNotNull('tanggal_lahir')
+            ->whereDate('tanggal_lahir', '<=', $rentang['sampai']);
 
-        // Umur >= minimal berarti lahir pada atau sebelum (hari ini - minimal tahun).
-        $query->whereDate('tanggal_lahir', '<=', $hariIni->copy()->subYears($this->minimal()));
-
-        if ($this->maksimal() !== null) {
-            // Umur <= maksimal berarti lahir setelah (hari ini - (maksimal+1) tahun).
-            $query->whereDate('tanggal_lahir', '>', $hariIni->copy()->subYears($this->maksimal() + 1));
+        if ($rentang['sesudah'] !== null) {
+            $query->whereDate('tanggal_lahir', '>', $rentang['sesudah']);
         }
 
         return $query;

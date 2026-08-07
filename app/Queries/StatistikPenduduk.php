@@ -42,11 +42,12 @@ class StatistikPenduduk
      */
     public function sebaranUmur(): array
     {
-        $total = $this->totalWargaAktif();
+        ['hitungan' => $hitungan, 'total' => $total] = $this->hitungSebaranUmur();
+
         $hasil = [];
 
         foreach (KelompokUmur::cases() as $kelompok) {
-            $jumlah = Penduduk::query()->aktif()->diKelompokUmur($kelompok)->count();
+            $jumlah = $hitungan[$kelompok->value];
 
             // "Tidak Diketahui" hanya ditampilkan bila memang ada isinya,
             // supaya grafik desa yang datanya lengkap tidak terganggu
@@ -65,6 +66,69 @@ class StatistikPenduduk
         }
 
         return $hasil;
+    }
+
+    /**
+     * Menghitung seluruh kelompok umur dalam satu kueri.
+     *
+     * Sebelumnya tiap kelompok dihitung dengan COUNT-nya sendiri: tujuh
+     * pemindaian tabel penduduk untuk satu grafik. Batas tanggalnya diambil
+     * dari KelompokUmur, sumber yang sama dengan penyaringan per kelompok.
+     *
+     * @return array{hitungan: array<string, int>, total: int}
+     */
+    private function hitungSebaranUmur(): array
+    {
+        $pilih = [];
+        $binding = [];
+
+        foreach (KelompokUmur::cases() as $kelompok) {
+            $alias = $this->aliasKelompok($kelompok);
+            $rentang = $kelompok->rentangTanggalLahir();
+
+            if ($rentang === null) {
+                $pilih[] = "SUM(CASE WHEN tanggal_lahir IS NULL THEN 1 ELSE 0 END) as {$alias}";
+
+                continue;
+            }
+
+            // date() dipakai agar setara dengan whereDate() pada penyaringan
+            // per kelompok: kolom tanggal disimpan beserta jamnya oleh
+            // sebagian driver, dan '2007-08-07 00:00:00' <= '2007-08-07'
+            // bernilai salah bila dibandingkan sebagai teks — tepat pada hari
+            // ulang tahun, orangnya hilang dari kelompok mana pun.
+            $syarat = ['tanggal_lahir IS NOT NULL', 'date(tanggal_lahir) <= ?'];
+            $binding[] = $rentang['sampai'];
+
+            if ($rentang['sesudah'] !== null) {
+                $syarat[] = 'date(tanggal_lahir) > ?';
+                $binding[] = $rentang['sesudah'];
+            }
+
+            $pilih[] = 'SUM(CASE WHEN '.implode(' AND ', $syarat).' THEN 1 ELSE 0 END) as '.$alias;
+        }
+
+        // Total dihitung terpisah dari penjumlahan kelompok, persis seperti
+        // sebelumnya: warga dengan tanggal lahir di masa depan tidak masuk
+        // kelompok mana pun, tetapi tetap warga.
+        $pilih[] = 'COUNT(*) as total';
+
+        $baris = Penduduk::query()->aktif()
+            ->selectRaw(implode(', ', $pilih), $binding)
+            ->first();
+
+        $hitungan = [];
+
+        foreach (KelompokUmur::cases() as $kelompok) {
+            $hitungan[$kelompok->value] = (int) ($baris?->{$this->aliasKelompok($kelompok)} ?? 0);
+        }
+
+        return ['hitungan' => $hitungan, 'total' => (int) ($baris?->total ?? 0)];
+    }
+
+    private function aliasKelompok(KelompokUmur $kelompok): string
+    {
+        return 'umur_'.$kelompok->value;
     }
 
     // ------------------------------------------------------------------

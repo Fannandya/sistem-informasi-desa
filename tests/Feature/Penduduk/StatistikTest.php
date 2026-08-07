@@ -13,6 +13,7 @@ use App\Models\Wilayah;
 use App\Queries\StatistikPenduduk;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class StatistikTest extends TestCase
@@ -82,6 +83,47 @@ class StatistikTest extends TestCase
         $kunci = collect($this->statistik->sebaranUmur())->pluck('kunci');
 
         $this->assertContains(KelompokUmur::TidakDiketahui->value, $kunci);
+    }
+
+    /**
+     * Batas kelompok dihitung terhadap hari ini, dan pergeseran satu hari
+     * memindahkan seseorang ke kelompok lain. Inilah bagian yang paling mudah
+     * meleset ketika perhitungannya disusun ulang menjadi satu kueri.
+     */
+    public function test_sebaran_umur_tepat_pada_batas_kelompok(): void
+    {
+        // Berulang tahun ke-19 tepat hari ini -> Dewasa Muda (19-35).
+        $this->warga(['tanggal_lahir' => Carbon::today()->subYears(19)]);
+
+        // Berulang tahun ke-19 besok, hari ini masih 18 -> Remaja (13-18).
+        $this->warga(['tanggal_lahir' => Carbon::today()->subYears(19)->addDay()]);
+
+        $hasil = collect($this->statistik->sebaranUmur())->keyBy('kunci');
+
+        $this->assertSame(1, $hasil[KelompokUmur::DewasaMuda->value]['jumlah']);
+        $this->assertSame(1, $hasil[KelompokUmur::Remaja->value]['jumlah']);
+    }
+
+    public function test_sebaran_umur_dihitung_dalam_satu_kueri(): void
+    {
+        foreach ([3, 9, 15, 25, 45, 70] as $umur) {
+            $this->warga(['tanggal_lahir' => Carbon::today()->subYears($umur)->subDays(5)]);
+        }
+        $this->warga(['tanggal_lahir' => null]);
+
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+
+        $this->statistik->sebaranUmur();
+
+        $jumlahKueri = count(DB::getQueryLog());
+        DB::disableQueryLog();
+
+        $this->assertSame(
+            1,
+            $jumlahKueri,
+            'Sebaran umur seharusnya satu kueri agregat, bukan satu COUNT per kelompok.',
+        );
     }
 
     public function test_warga_terarsip_tidak_ikut_sebaran_umur(): void
