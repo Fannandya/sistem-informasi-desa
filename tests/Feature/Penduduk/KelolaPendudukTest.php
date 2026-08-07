@@ -337,4 +337,32 @@ class KelolaPendudukTest extends TestCase
         $this->assertCount(50, $response->viewData('daftar')->items());
         $this->assertSame(55, $response->viewData('daftar')->total());
     }
+
+    public function test_agama_dan_status_perkawinan_tersimpan(): void
+    {
+        $agama = \App\Models\RefAgama::create(['nama' => 'Hindu']);
+
+        $this->actingAs($this->admin, 'admin')
+            ->post(route('admin.penduduk.store'), $this->dataValid([
+                'agama_id' => $agama->id,
+                'status_perkawinan' => 'kawin_tercatat',
+            ]))
+            ->assertSessionHasNoErrors();
+
+        $warga = Penduduk::where('nama_lengkap', 'Budi Santoso')->first();
+
+        $this->assertSame($agama->id, $warga->agama_id);
+        $this->assertSame(\App\Enums\StatusPerkawinan::KawinTercatat, $warga->status_perkawinan);
+        $this->assertSame('Hindu', $warga->agama->nama);
+    }
+
+    public function test_agama_dan_status_perkawinan_opsional(): void
+    {
+        $this->actingAs($this->admin, 'admin')
+            ->post(route('admin.penduduk.store'), $this->dataValid([
+                'agama_id' => null,
+                'status_perkawinan' => null,
+            ]))
+            ->assertSessionHasNoErrors();
+    }
 }

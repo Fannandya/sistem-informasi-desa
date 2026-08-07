@@ -7,6 +7,7 @@ use App\Enums\JenisKelamin;
 use App\Enums\JenisMasuk;
 use App\Enums\KelompokUmur;
 use App\Enums\Pendidikan;
+use App\Enums\StatusPerkawinan;
 use App\Models\Concerns\MenyegarkanStatistikPublik;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Builder;
@@ -41,6 +42,7 @@ class Penduduk extends Model
             'tanggal_keluar' => 'date',
             'jenis_kelamin' => JenisKelamin::class,
             'pendidikan' => Pendidikan::class,
+            'status_perkawinan' => StatusPerkawinan::class,
             'jenis_masuk' => JenisMasuk::class,
             'alasan_keluar' => AlasanKeluar::class,
         ];
@@ -58,6 +60,11 @@ class Penduduk extends Model
     public function pekerjaan(): BelongsTo
     {
         return $this->belongsTo(RefPekerjaan::class, 'pekerjaan_id');
+    }
+
+    public function agama(): BelongsTo
+    {
+        return $this->belongsTo(RefAgama::class, 'agama_id');
     }
 
     // ------------------------------------------------------------------

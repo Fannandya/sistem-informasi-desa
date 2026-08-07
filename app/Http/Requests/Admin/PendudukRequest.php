@@ -5,6 +5,7 @@ namespace App\Http\Requests\Admin;
 use App\Enums\JenisKelamin;
 use App\Enums\JenisMasuk;
 use App\Enums\Pendidikan;
+use App\Enums\StatusPerkawinan;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -27,7 +28,9 @@ class PendudukRequest extends FormRequest
             'jenis_kelamin' => ['required', Rule::enum(JenisKelamin::class)],
             'wilayah_id' => ['required', 'exists:wilayah,id'],
             'pekerjaan_id' => ['nullable', 'exists:ref_pekerjaan,id'],
+            'agama_id' => ['nullable', 'exists:ref_agama,id'],
             'pendidikan' => ['nullable', Rule::enum(Pendidikan::class)],
+            'status_perkawinan' => ['nullable', Rule::enum(StatusPerkawinan::class)],
 
             'jenis_masuk' => ['required', Rule::enum(JenisMasuk::class)],
             'tanggal_masuk' => [
