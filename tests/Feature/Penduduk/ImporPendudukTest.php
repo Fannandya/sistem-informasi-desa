@@ -12,8 +12,10 @@ use App\Models\Admin;
 use App\Models\Penduduk;
 use App\Models\RefPekerjaan;
 use App\Models\Wilayah;
+use App\Queries\StatistikPublik;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
@@ -559,5 +561,125 @@ class ImporPendudukTest extends TestCase
 
         $this->assertSame(Pendidikan::SMA, Penduduk::where('nama_lengkap', 'A')->first()->pendidikan);
         $this->assertSame(Pendidikan::S1, Penduduk::where('nama_lengkap', 'B')->first()->pendidikan);
+    }
+
+    // ==================================================================
+    // Penyimpanan massal
+    //
+    // Satu berkas impor boleh memuat sampai 2.000 baris. Menyimpannya satu
+    // per satu berarti 2.000 perjalanan bolak-balik ke basis data di dalam
+    // satu transaksi — pada hosting bersama milik desa, itu selisih antara
+    // impor yang selesai dan impor yang kehabisan waktu.
+    // ==================================================================
+
+    /** @return array<int, array<int, string>> */
+    private function barisBanyak(int $jumlah): array
+    {
+        $baris = [$this->judul()];
+
+        for ($i = 1; $i <= $jumlah; $i++) {
+            $baris[] = ["Warga {$i}", '1990-01-20', $i % 2 ? 'L' : 'P', 'Dusun Krajan', '001', '001', 'Petani', 'SMA'];
+        }
+
+        return $baris;
+    }
+
+    public function test_penyimpanan_impor_tidak_satu_kueri_per_baris(): void
+    {
+        $analisis = $this->analisis($this->barisBanyak(30));
+
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+
+        (new ImporPenduduk())->simpan($analisis);
+
+        $insert = collect(DB::getQueryLog())
+            ->filter(fn (array $k) => str_starts_with(strtolower(trim($k['query'])), 'insert into "penduduk"'))
+            ->count();
+
+        DB::disableQueryLog();
+
+        $this->assertSame(30, Penduduk::count());
+        $this->assertLessThan(
+            30,
+            $insert,
+            'Penyimpanan impor seharusnya digabung, bukan satu INSERT per baris.',
+        );
+    }
+
+    /**
+     * Penyimpanan massal melewati proses hidrasi model, sehingga enum dan
+     * tanggal gampang tersimpan sebagai objek atau nilai kosong. Nilai yang
+     * masuk basis data harus tetap sama persis dengan jalur satu per satu.
+     */
+    public function test_penyimpanan_massal_tetap_menyimpan_enum_dan_tanggal_dengan_benar(): void
+    {
+        $analisis = $this->analisis([
+            $this->judul(),
+            ['Siti Aminah', '1985-04-17', 'P', 'Dusun Krajan', '001', '001', 'Petani', 'SMA'],
+        ]);
+
+        (new ImporPenduduk())->simpan($analisis);
+
+        $warga = Penduduk::where('nama_lengkap', 'Siti Aminah')->firstOrFail();
+
+        $this->assertSame(JenisKelamin::Perempuan, $warga->jenis_kelamin);
+        $this->assertSame(JenisMasuk::PendataanAwal, $warga->jenis_masuk);
+        $this->assertSame(Pendidikan::SMA, $warga->pendidikan);
+        $this->assertSame('1985-04-17', $warga->tanggal_lahir->toDateString());
+        $this->assertSame(now()->toDateString(), $warga->tanggal_masuk->toDateString());
+        $this->assertSame(Wilayah::first()->id, $warga->wilayah_id);
+        $this->assertSame(RefPekerjaan::first()->id, $warga->pekerjaan_id);
+        $this->assertNotNull($warga->created_at);
+        $this->assertNotNull($warga->updated_at);
+    }
+
+    /**
+     * insert() massal menyusun daftar kolom dari baris pertama. Bila baris
+     * berikutnya punya susunan kunci berbeda, nilainya bergeser ke kolom yang
+     * salah tanpa satu pun galat. Baris berisi kolom kosong dicampur dengan
+     * baris lengkap untuk memastikan hal itu tidak terjadi.
+     */
+    public function test_baris_dengan_kolom_kosong_tidak_menggeser_kolom_lain(): void
+    {
+        $analisis = $this->analisis([
+            $this->judul(),
+            ['Lengkap', '1985-04-17', 'P', 'Dusun Krajan', '001', '001', 'Petani', 'SMA'],
+            ['Tanpa Pekerjaan', '1990-01-20', 'L', 'Dusun Krajan', '001', '002', '', ''],
+            ['Tanpa Tanggal', '', 'P', 'Dusun Krajan', '001', '001', 'Petani', 'SMA'],
+        ]);
+
+        (new ImporPenduduk())->simpan($analisis);
+
+        $lengkap = Penduduk::where('nama_lengkap', 'Lengkap')->firstOrFail();
+        $this->assertSame(RefPekerjaan::first()->id, $lengkap->pekerjaan_id);
+        $this->assertSame(Pendidikan::SMA, $lengkap->pendidikan);
+        $this->assertSame('1985-04-17', $lengkap->tanggal_lahir->toDateString());
+
+        $tanpaKerja = Penduduk::where('nama_lengkap', 'Tanpa Pekerjaan')->firstOrFail();
+        $this->assertNull($tanpaKerja->pekerjaan_id);
+        $this->assertNull($tanpaKerja->pendidikan);
+        $this->assertSame(JenisKelamin::LakiLaki, $tanpaKerja->jenis_kelamin);
+
+        $tanpaTanggal = Penduduk::where('nama_lengkap', 'Tanpa Tanggal')->firstOrFail();
+        $this->assertNull($tanpaTanggal->tanggal_lahir);
+        $this->assertSame(RefPekerjaan::first()->id, $tanpaTanggal->pekerjaan_id);
+    }
+
+    /**
+     * Penyimpanan massal tidak memicu event model, sehingga cache statistik
+     * publik tidak ikut dibuang dengan sendirinya. Tanpa penanganan khusus,
+     * angka di beranda akan tertinggal sampai tengah malam setelah impor.
+     */
+    public function test_impor_menyegarkan_statistik_publik(): void
+    {
+        $sebelum = (new StatistikPublik())->ringkasan()['jumlah_penduduk'];
+
+        (new ImporPenduduk())->simpan($this->analisis($this->barisBanyak(6)));
+
+        $this->assertSame(
+            $sebelum + 6,
+            (new StatistikPublik())->ringkasan()['jumlah_penduduk'],
+        );
     }
 }
