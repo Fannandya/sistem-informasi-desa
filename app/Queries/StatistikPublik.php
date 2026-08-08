@@ -441,9 +441,31 @@ class StatistikPublik
      * terbit; ia tidak pernah bergantung pada angka yang sedang disensor,
      * sehingga banyaknya baris tersamarkan tidak ikut membocorkannya.
      *
+     * Aturan berhenti ini MENGURANGI celah pengurangan untuk kasus "hanya
+     * satu baris tersensor" — ia TIDAK menutupnya. Syarat "nilai > AMBANG"
+     * sendiri adalah informasi publik: siapa pun yang membaca kode ini tahu
+     * persis kapan penyamaran berhenti, dan pengetahuan itu bisa dipakai
+     * untuk mempersempit baris yang tersamarkan. Contoh: dua baris tampil
+     * bernilai 6 dan 6, satu baris tersensor bernilai 1. Baris terkecil
+     * pertama (6) ditutup lalu penyamaran berhenti karena 6 > AMBANG —
+     * tapi pembaca yang tahu aturan ini juga tahu baris yang baru ditutup
+     * tidak mungkin lebih dari AMBANG + 1 (kalau lebih besar dari itu,
+     * bukan ini baris "terkecil" yang dipilih), sehingga nilainya kembali
+     * bisa dipastikan meski sudah tersamarkan. Sudah disapu atas puluhan
+     * ribu kombinasi nilai kecil: jumlah kasus yang tetap bisa dipecahkan
+     * secara pasti kurang lebih sama dengan sebelum aturan berhenti ini
+     * ada — bukan perbaikan berarti, lebih tepat dibilang memindahkan
+     * sebagian kasus ke bentuk baru ini.
+     *
+     * Ini diterima sebagai batas struktural, bukan sesuatu yang dikejar
+     * lagi di sini: selama angka total yang pasti (mis. "Jumlah Penduduk")
+     * tetap terbit apa adanya di halaman yang sama, tidak ada aturan
+     * penyamaran berbasis tabel yang bisa menjamin lebar ambiguitas ≥ 2
+     * untuk semua kombinasi nilai — sama seperti batas berikut ini.
+     *
      * Bila SELURUH baris tampil bernilai persis di ambang, tidak ada lagi
      * yang bisa ditutup — menutup semuanya pun tidak menambah kemungkinan.
-     * Itu batas bawaan tabel sekecil itu, bukan sesuatu yang bisa
+     * Itu juga batas bawaan tabel sekecil itu, bukan sesuatu yang bisa
      * diperbaiki di sini.
      *
      * @param  array<int, array<string, mixed>>  $hasil  baris yang sudah lewat sensor utama
