@@ -124,28 +124,30 @@
 
 @push('skrip')
 <script>
-    const dataAgamaDuplikat = document.getElementById('agamaDuplikat');
+    document.addEventListener('DOMContentLoaded', () => {
+        const dataAgamaDuplikat = document.getElementById('agamaDuplikat');
 
-    if (dataAgamaDuplikat) {
-        const { ada, baru, form: idForm } = JSON.parse(dataAgamaDuplikat.textContent);
+        if (dataAgamaDuplikat) {
+            const { ada, baru, form: idForm } = JSON.parse(dataAgamaDuplikat.textContent);
 
-        window.Dialog.buka({
-            jenis: 'tanya',
-            judul: 'Nama agama serupa sudah terdaftar',
-            pesan: `Sudah ada "${ada}" di daftar. Tetap tambahkan "${baru}" sebagai entri terpisah?`,
-            catatan: 'Ini bisa memecah data pada tabel/grafik agama menjadi dua kategori berbeda.',
-            tombol: 'Tetap Tambahkan',
-            batal: 'Batal, saya ubah dulu',
-        }).then((lanjut) => {
-            if (!lanjut) return;
+            window.Dialog.buka({
+                jenis: 'tanya',
+                judul: 'Nama agama serupa sudah terdaftar',
+                pesan: `Sudah ada "${ada}" di daftar. Tetap tambahkan "${baru}" sebagai entri terpisah?`,
+                catatan: 'Ini bisa memecah data pada tabel/grafik agama menjadi dua kategori berbeda.',
+                tombol: 'Tetap Tambahkan',
+                batal: 'Batal, saya ubah dulu',
+            }).then((lanjut) => {
+                if (!lanjut) return;
 
-            const form = document.getElementById(idForm);
-            if (!form) return;
+                const form = document.getElementById(idForm);
+                if (!form) return;
 
-            form.querySelector('[name="paksa"]').value = '1';
-            form.requestSubmit();
-        });
-    }
+                form.querySelector('[name="paksa"]').value = '1';
+                form.requestSubmit();
+            });
+        }
+    });
 </script>
 @endpush
 @endsection
