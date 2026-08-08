@@ -89,6 +89,8 @@
                             'RT' => [true, 'Boleh ditulis 1 atau 001.'],
                             'Pekerjaan' => [false, 'Harus ada pada daftar pekerjaan. Kosongkan bila belum diketahui.'],
                             'Pendidikan' => [false, 'SD, SMP, SMA, D3, S1, dan seterusnya.'],
+                            'Agama' => [false, 'Harus ada pada daftar agama terdaftar di bawah. Kosongkan bila belum diketahui.'],
+                            'Status Perkawinan' => [false, 'Belum Kawin, Kawin, Kawin Tercatat, Kawin Tidak Tercatat, Cerai Hidup, atau Cerai Mati. Penulisan lain seperti Menikah, Lajang, Duda, atau Janda ikut dikenali.'],
                         ];
                     @endphp
                     @foreach ($panduan as $kolom => [$wajib, $keterangan])
@@ -138,6 +140,18 @@
                         <p>{{ $p->nama }}</p>
                     @empty
                         <p class="text-slate-400">Belum ada. Tambahkan di menu Pekerjaan lebih dulu.</p>
+                    @endforelse
+                </div>
+            </div>
+            <div>
+                <p class="mb-1.5 text-xs font-semibold tracking-wider text-slate-500 uppercase">
+                    Agama terdaftar ({{ $agamaList->count() }})
+                </p>
+                <div class="max-h-40 overflow-y-auto rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
+                    @forelse ($agamaList as $a)
+                        <p>{{ $a->nama }}</p>
+                    @empty
+                        <p class="text-slate-400">Belum ada. Tambahkan di menu Agama lebih dulu.</p>
                     @endforelse
                 </div>
             </div>

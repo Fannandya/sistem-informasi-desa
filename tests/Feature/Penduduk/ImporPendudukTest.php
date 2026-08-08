@@ -499,6 +499,29 @@ class ImporPendudukTest extends TestCase
         $this->assertStringContainsString('Nama Lengkap', $isi);
     }
 
+    /**
+     * Nama agama yang tidak terdaftar menggagalkan barisnya, persis seperti
+     * pekerjaan. Tanpa daftar acuan di halaman impor, admin baru mengetahui
+     * ejaan yang benar setelah berkasnya ditolak baris demi baris.
+     */
+    public function test_halaman_impor_menjelaskan_agama_dan_status_perkawinan(): void
+    {
+        \App\Models\RefAgama::create(['nama' => 'Katolik']);
+
+        $this->sebagaiAdmin()
+            ->get(route('admin.penduduk.impor'))
+            ->assertOk()
+            // Panduan kolom menyebut kedua kolom baru.
+            ->assertSee('Agama')
+            ->assertSee('Status Perkawinan')
+            ->assertSee('Harus ada pada daftar agama')
+            ->assertSee('Belum Kawin, Kawin, Kawin Tercatat')
+            // Daftar acuan, sejajar dengan panel Pekerjaan terdaftar.
+            ->assertSee('Agama terdaftar (2)')
+            ->assertSee('Islam')
+            ->assertSee('Katolik');
+    }
+
     public function test_tamu_ditolak(): void
     {
         $this->get(route('admin.penduduk.impor'))->assertRedirect(route('admin.login'));
