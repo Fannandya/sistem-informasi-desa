@@ -122,6 +122,33 @@ class KelolaPendudukTest extends TestCase
             ->assertSessionHasErrors('wilayah_id');
     }
 
+    public function test_form_tambah_warga_menampilkan_pilihan_agama_dan_perkawinan(): void
+    {
+        \App\Models\RefAgama::create(['nama' => 'Islam']);
+
+        $respons = $this->actingAs($this->admin, 'admin')->get(route('admin.penduduk.create'));
+
+        $respons->assertOk()
+            ->assertSee('name="agama_id"', false)
+            ->assertSee('Islam')
+            ->assertSee('name="status_perkawinan"', false)
+            ->assertSee('Kawin Tercatat');
+    }
+
+    public function test_agama_tidak_valid_ditolak(): void
+    {
+        $this->actingAs($this->admin, 'admin')
+            ->post(route('admin.penduduk.store'), $this->dataValid(['agama_id' => 9999]))
+            ->assertSessionHasErrors(['agama_id']);
+    }
+
+    public function test_status_perkawinan_tidak_valid_ditolak(): void
+    {
+        $this->actingAs($this->admin, 'admin')
+            ->post(route('admin.penduduk.store'), $this->dataValid(['status_perkawinan' => 'menikah_saja']))
+            ->assertSessionHasErrors(['status_perkawinan']);
+    }
+
     public function test_data_warga_bisa_diubah(): void
     {
         $warga = $this->warga();

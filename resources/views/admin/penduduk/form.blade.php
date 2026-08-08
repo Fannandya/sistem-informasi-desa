@@ -72,6 +72,18 @@
                             :value="$penduduk->pendidikan?->value"
                             :pilihan="\App\Enums\Pendidikan::pilihan()"
                             kosong="— Belum diisi —" />
+
+            <div class="grid gap-5 sm:grid-cols-2">
+                <x-admin.select name="agama_id" label="Agama"
+                                :value="$penduduk->agama_id"
+                                :pilihan="$agamaList->pluck('nama', 'id')"
+                                kosong="— Belum diisi —" />
+
+                <x-admin.select name="status_perkawinan" label="Status Perkawinan"
+                                :value="$penduduk->status_perkawinan?->value"
+                                :pilihan="\App\Enums\StatusPerkawinan::pilihan()"
+                                kosong="— Belum diisi —" />
+            </div>
         </div>
 
         {{-- ---------------- Data mutasi ---------------- --}}

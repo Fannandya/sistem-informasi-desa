@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ArsipkanPendudukRequest;
 use App\Http\Requests\Admin\PendudukRequest;
 use App\Models\Penduduk;
+use App\Models\RefAgama;
 use App\Models\RefPekerjaan;
 use App\Models\Wilayah;
 use App\Queries\PencarianPenduduk;
@@ -39,6 +40,7 @@ class PendudukController extends Controller
             'penduduk' => new Penduduk(),
             'wilayahList' => Wilayah::urut()->get(),
             'pekerjaanList' => RefPekerjaan::orderBy('nama')->get(),
+            'agamaList' => RefAgama::orderBy('nama')->get(),
         ]);
     }
 
@@ -60,6 +62,7 @@ class PendudukController extends Controller
             'penduduk' => $penduduk,
             'wilayahList' => Wilayah::urut()->get(),
             'pekerjaanList' => RefPekerjaan::orderBy('nama')->get(),
+            'agamaList' => RefAgama::orderBy('nama')->get(),
         ]);
     }
 

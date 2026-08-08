@@ -51,6 +51,8 @@ class PendudukRequest extends FormRequest
             'jenis_kelamin' => 'jenis kelamin',
             'wilayah_id' => 'wilayah',
             'pekerjaan_id' => 'pekerjaan',
+            'agama_id' => 'agama',
+            'status_perkawinan' => 'status perkawinan',
             'jenis_masuk' => 'cara masuk',
             'tanggal_masuk' => 'tanggal masuk',
         ];
