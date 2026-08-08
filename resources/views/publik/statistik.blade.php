@@ -23,8 +23,8 @@
     <div class="mb-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
         <div class="rounded-2xl border border-outline-variant/60 bg-surface-container-lowest p-6 shadow-sm hover:shadow-md transition-shadow">
             <p class="text-sm font-medium text-on-surface-variant">Jumlah Penduduk</p>
-            <p class="mt-2 text-4xl font-semibold text-on-surface font-headline-md tracking-tight">
-                {{ number_format($ringkasan['jumlah_penduduk'], 0, ',', '.') }}
+            <p class="mt-2 text-4xl font-semibold text-on-surface font-headline-md tracking-tight" x-data="countingNumber({{ $ringkasan['jumlah_penduduk'] }})" x-text="formatValue()">
+                0
             </p>
             <p class="mt-1 text-xs font-medium text-on-surface-variant/80">jiwa</p>
         </div>
@@ -32,8 +32,8 @@
         @if ($ringkasan['jumlah_kk'] !== null)
             <div class="rounded-2xl border border-outline-variant/60 bg-surface-container-lowest p-6 shadow-sm hover:shadow-md transition-shadow">
                 <p class="text-sm font-medium text-on-surface-variant">Kepala Keluarga</p>
-                <p class="mt-2 text-4xl font-semibold text-on-surface font-headline-md tracking-tight">
-                    {{ number_format($ringkasan['jumlah_kk'], 0, ',', '.') }}
+                <p class="mt-2 text-4xl font-semibold text-on-surface font-headline-md tracking-tight" x-data="countingNumber({{ $ringkasan['jumlah_kk'] }})" x-text="formatValue()">
+                    0
                 </p>
                 <p class="mt-1 text-xs font-medium text-on-surface-variant/80">data tahun {{ $ringkasan['tahun_kk'] }}</p>
             </div>
@@ -41,16 +41,16 @@
 
         <div class="rounded-2xl border border-outline-variant/60 bg-surface-container-lowest p-6 shadow-sm hover:shadow-md transition-shadow">
             <p class="text-sm font-medium text-on-surface-variant">Laki-laki</p>
-            <p class="mt-2 text-4xl font-semibold text-on-surface font-headline-md tracking-tight">
-                {{ number_format($ringkasan['laki'], 0, ',', '.') }}
+            <p class="mt-2 text-4xl font-semibold text-on-surface font-headline-md tracking-tight" x-data="countingNumber({{ $ringkasan['laki'] }})" x-text="formatValue()">
+                0
             </p>
             <p class="mt-1 text-xs font-medium text-on-surface-variant/80">jiwa</p>
         </div>
 
         <div class="rounded-2xl border border-outline-variant/60 bg-surface-container-lowest p-6 shadow-sm hover:shadow-md transition-shadow">
             <p class="text-sm font-medium text-on-surface-variant">Perempuan</p>
-            <p class="mt-2 text-4xl font-semibold text-on-surface font-headline-md tracking-tight">
-                {{ number_format($ringkasan['perempuan'], 0, ',', '.') }}
+            <p class="mt-2 text-4xl font-semibold text-on-surface font-headline-md tracking-tight" x-data="countingNumber({{ $ringkasan['perempuan'] }})" x-text="formatValue()">
+                0
             </p>
             <p class="mt-1 text-xs font-medium text-on-surface-variant/80">jiwa</p>
         </div>

@@ -53,7 +53,7 @@
             {{-- Nav Pill --}}
             <div 
                 :class="scrolled 
-                    ? 'bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-outline-variant/40' 
+                    ? 'bg-surface-container-lowest/30 backdrop-blur-xl backdrop-saturate-[1.8] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border-t border-t-white/80 border-b border-b-outline-variant/20 border-x border-x-outline-variant/20' 
                     : 'bg-transparent border border-transparent'"
                 class="flex items-center justify-between w-full rounded-2xl px-4 py-3 transition-all duration-500">
                 
@@ -123,8 +123,8 @@
     </main>
 
     {{-- ----------------------------- Footer ----------------------------- --}}
-    <footer class="@yield('footer_margin', 'mt-24') border-t border-outline-variant/30 bg-surface-container-lowest pt-16 pb-8 px-6">
-        <div class="max-w-7xl mx-auto">
+    <footer class="@yield('footer_margin', 'mt-24') border-t border-outline-variant/30 bg-surface-container-lowest pt-16">
+        <div class="max-w-7xl mx-auto px-6 pb-12">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-12 lg:gap-8">
                 
                 {{-- Col 1: Brand & Identitas (4 cols) --}}
@@ -153,8 +153,8 @@
                     </div>
                 </div>
 
-                {{-- Col 2: Halaman & Kontak (4 cols) --}}
-                <div class="lg:col-span-4 grid grid-cols-1 sm:grid-cols-2 gap-8">
+                {{-- Col 2: Halaman & Kontak (5 cols) --}}
+                <div class="lg:col-span-5 grid grid-cols-1 sm:grid-cols-2 gap-8">
                     <div>
                         <h3 class="font-headline-md font-semibold text-on-surface mb-5">{{ \App\Support\Teks::ambil('footer.kolom_halaman') }}</h3>
                         <ul class="space-y-3">
@@ -195,23 +195,11 @@
                     </div>
                 </div>
 
-                {{-- Col 3: Peta & Sosial (4 cols) --}}
-                <div class="lg:col-span-4 flex flex-col h-full">
-                    <h3 class="font-headline-md font-semibold text-on-surface mb-5">Peta Lokasi</h3>
-                    <div class="relative w-full h-48 sm:h-56 lg:h-40 bg-surface-container rounded-2xl overflow-hidden ring-1 ring-outline-variant/30 group">
-                        @if (filled($desa->peta_embed))
-                            <iframe src="{{ $desa->peta_embed }}" class="absolute inset-0 w-full h-full grayscale-[30%] opacity-90 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" loading="lazy" title="Peta lokasi {{ $desa->nama_desa }}"></iframe>
-                        @else
-                            <div class="absolute inset-0 flex flex-col items-center justify-center text-on-surface-variant/50">
-                                <span class="material-symbols-outlined text-3xl mb-2 opacity-50">map</span>
-                                <span class="font-body-md text-xs">Peta belum diatur</span>
-                            </div>
-                        @endif
-                    </div>
-                    
+                {{-- Col 3: Sosial (3 cols) --}}
+                <div class="lg:col-span-3 flex flex-col h-full">
                     @if ($desa->medsosTerisi())
-                        <div class="mt-8 flex items-center gap-3">
-                            <span class="font-label-md text-xs uppercase tracking-widest text-on-surface-variant/60 mr-2">Sosial</span>
+                        <h3 class="font-headline-md font-semibold text-on-surface mb-5">Media Sosial</h3>
+                        <div class="flex flex-wrap gap-3">
                             @foreach ($desa->medsosTerisi() as $nama => $url)
                                 <a href="{{ $url }}" target="_blank" rel="noopener noreferrer"
                                    class="w-9 h-9 rounded-full bg-surface-container hover:bg-primary text-on-surface-variant hover:text-white transition-all duration-300 flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-primary"
@@ -242,14 +230,26 @@
                 </div>
 
             </div>
+        </div>
 
-            {{-- Bottom Copyright --}}
-            <div class="mt-12 pt-8 border-t border-outline-variant/30 flex flex-col md:flex-row items-center justify-between gap-4">
-                <p class="font-label-sm text-xs text-on-surface-variant/70">&copy; {{ now()->year }} {{ $desa->nama_desa }}. Hak Cipta Dilindungi.</p>
-                <p class="font-label-sm text-xs text-on-surface-variant/50 flex items-center gap-1.5">
-                    Sistem Informasi Desa
-                </p>
-            </div>
+        {{-- Full Width Map Section --}}
+        <div class="w-full h-72 sm:h-80 md:h-[400px] bg-surface-container border-y border-outline-variant/30 relative">
+            @if (filled($desa->peta_embed))
+                <iframe src="{{ $desa->peta_embed }}" class="absolute inset-0 w-full h-full grayscale-[20%] hover:grayscale-0 transition-all duration-700" loading="lazy" title="Peta lokasi {{ $desa->nama_desa }}"></iframe>
+            @else
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-on-surface-variant/50">
+                    <span class="material-symbols-outlined text-4xl mb-2 opacity-50">map</span>
+                    <span class="font-body-md text-sm">Peta belum diatur</span>
+                </div>
+            @endif
+        </div>
+
+        {{-- Bottom Copyright --}}
+        <div class="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row items-center justify-between gap-4">
+            <p class="font-label-sm text-xs text-on-surface-variant/70">&copy; {{ now()->year }} {{ $desa->nama_desa }}. Hak Cipta Dilindungi.</p>
+            <p class="font-label-sm text-xs text-on-surface-variant/50 flex items-center gap-1.5">
+                Sistem Informasi Desa
+            </p>
         </div>
     </footer>
 

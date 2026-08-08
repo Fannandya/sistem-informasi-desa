@@ -17,7 +17,7 @@
 
 {{-- ============================== HERO ============================== --}}
 {{-- hero akan mengisi seluruh area atas karena main padding diset ke pt-0 --}}
-<section class="relative w-full h-[600px] md:h-[819px] flex items-center justify-center overflow-hidden bg-on-surface"
+<section class="relative w-full min-h-[80dvh] md:min-h-[100dvh] flex items-center justify-center overflow-hidden bg-on-surface"
          style="--hero-text-color: {{ $desa->hero_text_color ?? '#ffffff' }};"
          x-data="carousel()" x-init="init()">
     {{-- Carousel images --}}
@@ -189,10 +189,10 @@ function carousel() {
         <div class="overflow-x-auto snap-x snap-mandatory scrollbar-hide md:overflow-visible md:grid md:grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 md:gap-6 flex gap-4">
             @php
                 $statData = [
-                    ['icon' => 'group', 'color' => 'bg-primary-fixed text-on-primary-fixed', 'label' => Teks::ambil('beranda.statistik.label_penduduk'), 'nilai' => number_format($statistik['jumlah_penduduk'], 0, ',', '.'), 'satuan' => Teks::ambil('beranda.statistik.satuan_jiwa')],
-                    ['icon' => 'family_restroom', 'color' => 'bg-secondary-fixed text-on-secondary-fixed', 'label' => Teks::ambil('beranda.statistik.label_kk'), 'nilai' => $statistik['jumlah_kk'] !== null ? number_format($statistik['jumlah_kk'], 0, ',', '.') : null, 'satuan' => Teks::ambil('beranda.statistik.satuan_keluarga')],
-                    ['icon' => 'man', 'color' => 'bg-tertiary-fixed text-on-tertiary-fixed', 'label' => Teks::ambil('beranda.statistik.label_laki'), 'nilai' => number_format($statistik['laki'], 0, ',', '.'), 'satuan' => Teks::ambil('beranda.statistik.satuan_jiwa')],
-                    ['icon' => 'woman', 'color' => 'bg-error-container text-on-error-container', 'label' => Teks::ambil('beranda.statistik.label_perempuan'), 'nilai' => number_format($statistik['perempuan'], 0, ',', '.'), 'satuan' => Teks::ambil('beranda.statistik.satuan_jiwa')],
+                    ['icon' => 'group', 'color' => 'bg-primary-fixed text-on-primary-fixed', 'label' => Teks::ambil('beranda.statistik.label_penduduk'), 'nilai' => $statistik['jumlah_penduduk'], 'satuan' => Teks::ambil('beranda.statistik.satuan_jiwa')],
+                    ['icon' => 'family_restroom', 'color' => 'bg-secondary-fixed text-on-secondary-fixed', 'label' => Teks::ambil('beranda.statistik.label_kk'), 'nilai' => $statistik['jumlah_kk'], 'satuan' => Teks::ambil('beranda.statistik.satuan_keluarga')],
+                    ['icon' => 'man', 'color' => 'bg-tertiary-fixed text-on-tertiary-fixed', 'label' => Teks::ambil('beranda.statistik.label_laki'), 'nilai' => $statistik['laki'], 'satuan' => Teks::ambil('beranda.statistik.satuan_jiwa')],
+                    ['icon' => 'woman', 'color' => 'bg-error-container text-on-error-container', 'label' => Teks::ambil('beranda.statistik.label_perempuan'), 'nilai' => $statistik['perempuan'], 'satuan' => Teks::ambil('beranda.statistik.satuan_jiwa')],
                 ];
             @endphp
             @foreach ($statData as $stat)
@@ -201,7 +201,7 @@ function carousel() {
                         <div class="w-12 h-12 mx-auto {{ $stat['color'] }} rounded-full flex items-center justify-center mb-4">
                             <span class="material-symbols-outlined text-2xl">{{ $stat['icon'] }}</span>
                         </div>
-                        <div class="font-display-lg text-3xl font-bold mb-1">{{ $stat['nilai'] }}</div>
+                        <div class="font-display-lg text-3xl font-bold mb-1" x-data="countingNumber({{ $stat['nilai'] ?? 'null' }})" x-text="formatValue()">0</div>
                         <div class="font-label-md text-xs">{{ $stat['label'] }}</div>
                     </div>
                 @endif
@@ -256,7 +256,7 @@ function carousel() {
 @endif
 
 {{-- ============================= BERITA ============================= --}}
-@if ($beritaUtama)
+@if ($berita->isNotEmpty())
     <section id="berita" data-fade-in class="py-12 md:py-16 px-6 md:px-12 bg-surface-container-lowest border-t border-outline-variant/30">
         <div class="max-w-7xl mx-auto">
             <div class="mb-8 md:mb-10 flex flex-wrap items-end justify-between gap-4">
@@ -271,50 +271,30 @@ function carousel() {
                 </a>
             </div>
 
-            <div class="overflow-x-auto snap-x snap-mandatory scrollbar-hide md:overflow-visible md:grid md:gap-8 md:grid-cols-1 lg:grid-cols-2 flex gap-4">
-                <a href="{{ route('publik.berita.show', $beritaUtama) }}"
-                   class="snap-start shrink-0 w-[300px] md:w-full group overflow-hidden rounded-[12px] bg-surface border border-outline-variant/30 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1">
-                    <div class="aspect-[16/9] overflow-hidden bg-surface-container-highest">
-                        <img src="{{ $beritaUtama->urlSampul() }}" alt="{{ $beritaUtama->judul }}" loading="lazy"
-                             class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
-                    </div>
-                    <div class="p-6 md:p-8">
-                        @if ($beritaUtama->kategori)
-                            <span class="badge-kategori">
-                                {{ $beritaUtama->kategori->nama }}
-                            </span>
-                        @endif
-                        <h3 class="mt-3 md:mt-4 text-lg md:text-2xl font-bold text-on-surface group-hover:text-primary transition-colors leading-snug">
-                            {{ $beritaUtama->judul }}
-                        </h3>
-                        <p class="mt-2 md:mt-3 line-clamp-2 text-sm md:text-base text-on-surface-variant leading-relaxed">{{ $beritaUtama->ringkasanTampil() }}</p>
-                        <div class="mt-4 md:mt-5 flex items-center text-xs text-on-surface-variant font-medium">
-                            <span class="material-symbols-outlined text-[16px] mr-1">calendar_today</span>
-                            {{ $beritaUtama->tanggal_terbit?->translatedFormat('d F Y') }}
+            <div class="overflow-x-auto snap-x snap-mandatory scrollbar-hide md:overflow-visible md:grid md:gap-6 md:grid-cols-2 lg:grid-cols-3 flex gap-4 pb-4 md:pb-0">
+                @foreach ($berita->take(6) as $item)
+                    <a href="{{ route('publik.berita.show', $item) }}"
+                       class="snap-start shrink-0 w-[280px] md:w-full group flex flex-col overflow-hidden rounded-[12px] bg-surface border border-outline-variant/30 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)] hover:-translate-y-1">
+                        <div class="aspect-[16/9] overflow-hidden bg-surface-container-highest">
+                            <img src="{{ $item->urlSampul() }}" alt="{{ $item->judul }}" loading="lazy"
+                                 class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105">
                         </div>
-                    </div>
-                </a>
-
-                <div class="snap-start shrink-0 w-[300px] md:w-full md:space-y-4 flex flex-col gap-4">
-                    @foreach ($berita->where('id', '!=', $beritaUtama->id)->take(Teks::angka('kuota.beranda.berita_samping')) as $item)
-                        <a href="{{ route('publik.berita.show', $item) }}"
-                           class="group flex flex-col sm:flex-row gap-4 md:gap-5 rounded-[12px] border border-outline-variant/30 bg-surface p-4 shadow-[0px_4px_20px_rgba(0,0,0,0.03)] transition-all hover:shadow-[0px_10px_30px_rgba(0,0,0,0.08)] hover:-translate-x-1">
-                            <div class="h-32 sm:h-28 w-full sm:w-36 shrink-0 overflow-hidden rounded-lg bg-surface-container-highest">
-                                <img src="{{ $item->urlSampulKecil() }}" alt="" loading="lazy"
-                                     class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110">
+                        <div class="p-5 flex flex-col flex-1">
+                            @if ($item->kategori)
+                                <span class="badge-kategori mb-3 self-start">
+                                    {{ $item->kategori->nama }}
+                                </span>
+                            @endif
+                            <h3 class="text-lg font-bold text-on-surface group-hover:text-primary transition-colors leading-snug line-clamp-2">
+                                {{ $item->judul }}
+                            </h3>
+                            <div class="mt-auto pt-4 flex items-center text-xs text-on-surface-variant font-medium">
+                                <span class="material-symbols-outlined text-[16px] mr-1">calendar_today</span>
+                                {{ $item->tanggal_terbit?->translatedFormat('d F Y') }}
                             </div>
-                            <div class="min-w-0 flex flex-col justify-center py-1">
-                                <h3 class="line-clamp-2 text-base md:text-lg font-bold text-on-surface group-hover:text-primary transition-colors leading-tight">
-                                    {{ $item->judul }}
-                                </h3>
-                                <div class="mt-2 md:mt-3 flex items-center text-xs text-on-surface-variant font-medium">
-                                    <span class="material-symbols-outlined text-[14px] mr-1">calendar_today</span>
-                                    {{ $item->tanggal_terbit?->translatedFormat('d F Y') }}
-                                </div>
-                            </div>
-                        </a>
-                    @endforeach
-                </div>
+                        </div>
+                    </a>
+                @endforeach
             </div>
         </div>
     </section>
@@ -361,96 +341,79 @@ function carousel() {
     </section>
 @endif
 
-{{-- ===================== FASILITAS & PRESTASI ===================== --}}
-@if ($fasilitas->isNotEmpty() || $prestasi->isNotEmpty())
+{{-- ===================== FASILITAS UMUM ===================== --}}
+@if ($fasilitas->isNotEmpty())
     <section data-fade-in class="py-12 md:py-16 px-6 md:px-12 bg-surface-container-lowest border-t border-outline-variant/30">
-        <div class="max-w-7xl mx-auto grid gap-8 md:gap-12 lg:grid-cols-2">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-8 md:mb-10 flex flex-wrap items-end justify-between gap-4">
+                <div>
+                    <h2 class="font-headline-lg text-3xl font-bold text-primary">{{ Teks::ambil('beranda.fasilitas.judul') }}</h2>
+                    <p class="mt-2 text-on-surface-variant">Infrastruktur dan fasilitas publik yang tersedia.</p>
+                </div>
+                <a href="{{ route('publik.fasilitas') }}"
+                   class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
+                    {{ Teks::ambil('beranda.tautan_lihat_semua') }}
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </a>
+            </div>
 
-            @if ($fasilitas->isNotEmpty())
-                <div x-data="{ buka: false }" class="lg:block">
-                    <button type="button" @click="buka = !buka" class="lg:hidden w-full mb-6 flex items-center justify-between p-4 rounded-[12px] border border-outline-variant/30 bg-surface shadow-[0px_4px_15px_rgba(0,0,0,0.02)] hover:border-primary/50 transition-colors">
-                        <h2 class="font-headline-lg text-2xl font-bold text-primary text-left">{{ Teks::ambil('beranda.fasilitas.label_toggle') }}</h2>
-                        <span class="material-symbols-outlined text-primary transition-transform" :class="{ 'rotate-180': buka }">expand_more</span>
-                    </button>
-                    <h2 class="hidden lg:block font-headline-lg text-3xl font-bold text-primary mb-8">{{ Teks::ambil('beranda.fasilitas.judul') }}</h2>
-                    <div x-show="buka || window.innerWidth >= 1024" x-cloak class="space-y-4">
-                        <div class="flex justify-end mb-4 lg:hidden">
-                            <a href="{{ route('publik.fasilitas') }}"
-                               class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
-                                {{ Teks::ambil('beranda.tautan_lihat_semua') }}
-                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                            </a>
+            <div class="overflow-x-auto snap-x snap-mandatory scrollbar-hide md:overflow-visible md:grid md:gap-6 md:grid-cols-2 lg:grid-cols-3 flex gap-4 pb-4 md:pb-0">
+                @foreach ($fasilitas as $item)
+                    <div class="snap-start shrink-0 w-[260px] md:w-full flex flex-col rounded-[12px] border border-outline-variant/30 bg-surface overflow-hidden shadow-[0px_4px_15px_rgba(0,0,0,0.02)] transition-colors hover:border-primary/50">
+                        <div class="aspect-[16/9] w-full overflow-hidden bg-surface-container-highest">
+                            <img src="{{ $item->urlFotoKecil() }}" alt="" loading="lazy" class="h-full w-full object-cover">
                         </div>
-                        @foreach ($fasilitas as $item)
-                            <div class="flex items-center gap-5 rounded-[12px] border border-outline-variant/30 bg-surface p-4 shadow-[0px_4px_15px_rgba(0,0,0,0.02)] transition-colors hover:border-primary/50">
-                                <div class="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-surface-container-highest">
-                                    <img src="{{ $item->urlFotoKecil() }}" alt="" loading="lazy"
-                                         class="h-full w-full object-cover">
-                                </div>
-                                <div class="min-w-0">
-                                    <p class="truncate text-lg font-bold text-on-surface">{{ $item->nama }}</p>
-                                    <span class="mt-1 inline-block text-xs font-medium tracking-wide text-primary underline decoration-2 underline-offset-4">
-                                        {{ $item->kategori->label() }}
-                                    </span>
-                                </div>
-                            </div>
-                        @endforeach
-                        <div class="hidden lg:flex justify-end">
-                            <a href="{{ route('publik.fasilitas') }}"
-                               class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
-                                {{ Teks::ambil('beranda.tautan_lihat_semua') }}
-                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                            </a>
+                        <div class="p-5 flex flex-col flex-1">
+                            <span class="mb-2 inline-block text-xs font-medium tracking-wide text-primary underline decoration-2 underline-offset-4 self-start">
+                                {{ $item->kategori->label() }}
+                            </span>
+                            <p class="text-lg font-bold text-on-surface line-clamp-2">{{ $item->nama }}</p>
                         </div>
                     </div>
-                </div>
-            @endif
+                @endforeach
+            </div>
+        </div>
+    </section>
+@endif
 
-            @if ($prestasi->isNotEmpty())
-                <div x-data="{ buka: false }" class="lg:block">
-                    <button type="button" @click="buka = !buka" class="lg:hidden w-full mb-6 flex items-center justify-between p-4 rounded-[12px] border border-outline-variant/30 bg-surface shadow-[0px_4px_15px_rgba(0,0,0,0.02)] hover:border-primary/50 transition-colors">
-                        <h2 class="font-headline-lg text-2xl font-bold text-primary text-left">{{ Teks::ambil('beranda.prestasi.label_toggle') }}</h2>
-                        <span class="material-symbols-outlined text-primary transition-transform" :class="{ 'rotate-180': buka }">expand_more</span>
-                    </button>
-                    <h2 class="hidden lg:block font-headline-lg text-3xl font-bold text-primary mb-8">{{ Teks::ambil('beranda.prestasi.judul') }}</h2>
-                    <div x-show="buka || window.innerWidth >= 1024" x-cloak class="space-y-4">
-                        <div class="flex justify-end mb-4 lg:hidden">
-                            <a href="{{ route('publik.prestasi') }}"
-                               class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
-                                {{ Teks::ambil('beranda.tautan_lihat_semua') }}
-                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                            </a>
-                        </div>
-                        @foreach ($prestasi as $item)
-                            <div class="rounded-[12px] border border-outline-variant/30 bg-surface p-5 shadow-[0px_4px_15px_rgba(0,0,0,0.02)] transition-colors hover:bg-surface-container-low">
-                                <div class="flex flex-wrap items-center gap-3">
-                                    <span class="font-bold text-on-surface-variant tabular-nums">{{ $item->tahun }}</span>
-                                    @if ($item->tingkat)
-                                        <span class="text-xs font-medium tracking-wide text-primary underline decoration-2 underline-offset-4">
-                                            {{ $item->tingkat->label() }}
-                                        </span>
-                                    @endif
-                                </div>
-                                <p class="mt-2 text-lg font-bold text-on-surface leading-snug">{{ $item->judul }}</p>
-                            </div>
-                        @endforeach
-                        <div class="hidden lg:flex justify-end">
-                            <a href="{{ route('publik.prestasi') }}"
-                               class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
-                                {{ Teks::ambil('beranda.tautan_lihat_semua') }}
-                                <span class="material-symbols-outlined text-sm">arrow_forward</span>
-                            </a>
-                        </div>
-                    </div>
+{{-- ===================== PRESTASI ===================== --}}
+@if ($prestasi->isNotEmpty())
+    <section data-fade-in class="py-12 md:py-16 px-6 md:px-12 bg-surface border-t border-outline-variant/30">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-8 md:mb-10 flex flex-wrap items-end justify-between gap-4">
+                <div>
+                    <h2 class="font-headline-lg text-3xl font-bold text-primary">{{ Teks::ambil('beranda.prestasi.judul') }}</h2>
+                    <p class="mt-2 text-on-surface-variant">Pencapaian dan penghargaan desa.</p>
                 </div>
-            @endif
+                <a href="{{ route('publik.prestasi') }}"
+                   class="border-2 border-primary text-primary px-6 py-2 rounded-lg font-label-md text-sm hover:bg-primary hover:text-on-primary transition-colors inline-flex items-center gap-2">
+                    {{ Teks::ambil('beranda.tautan_lihat_semua') }}
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+                </a>
+            </div>
+
+            <div class="overflow-x-auto snap-x snap-mandatory scrollbar-hide md:overflow-visible md:grid md:gap-6 md:grid-cols-2 lg:grid-cols-3 flex gap-4 pb-4 md:pb-0">
+                @foreach ($prestasi as $item)
+                    <div class="snap-start shrink-0 w-[280px] md:w-full rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest p-6 shadow-[0px_4px_15px_rgba(0,0,0,0.02)] transition-colors hover:bg-surface-container-low flex flex-col h-full hover:-translate-y-1">
+                        <div class="flex flex-wrap items-center gap-3 mb-3">
+                            <span class="font-bold text-on-surface-variant tabular-nums">{{ $item->tahun }}</span>
+                            @if ($item->tingkat)
+                                <span class="text-xs font-medium tracking-wide text-primary underline decoration-2 underline-offset-4">
+                                    {{ $item->tingkat->label() }}
+                                </span>
+                            @endif
+                        </div>
+                        <p class="text-lg font-bold text-on-surface leading-snug">{{ $item->judul }}</p>
+                    </div>
+                @endforeach
+            </div>
         </div>
     </section>
 @endif
 
 {{-- ============================ PENGURUS ============================ --}}
 @if ($pengurus->isNotEmpty())
-    <section id="pengurus" data-fade-in class="pt-12 md:pt-16 pb-12 md:pb-16 px-6 md:px-12 bg-surface border-t border-outline-variant/30">
+    <section id="pengurus" data-fade-in class="pt-12 md:pt-16 pb-12 md:pb-16 px-6 md:px-12 bg-surface-container-lowest border-t border-outline-variant/30">
         <div class="max-w-7xl mx-auto">
             <div class="mb-8 md:mb-10 flex flex-wrap items-end justify-between gap-4">
                 <div>

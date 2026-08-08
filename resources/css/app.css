@@ -15,59 +15,59 @@
         'Segoe UI Symbol', 'Noto Color Emoji';
     --font-serif: 'Literata', ui-serif, Georgia, serif;
 
-    /* Terra Design Palette (dari DESAIN-FIGMA.md) */
-    --color-primary: #4a7c59;
-    --color-primary-container: #78a886;
-    --color-primary-fixed: #c8e8d0;
-    --color-primary-fixed-dim: #8ecf9e;
+    /* Terra Design Palette - Botanical Update */
+    --color-primary: #778873;
+    --color-primary-container: #A1BC98;
+    --color-primary-fixed: #D2DCB6;
+    --color-primary-fixed-dim: #A1BC98;
     --color-on-primary: #ffffff;
-    --color-on-primary-fixed: #002110;
-    --color-on-primary-fixed-variant: #2a6038;
-    --color-on-primary-container: #d8f0de;
-    --color-inverse-primary: #8ecf9e;
+    --color-on-primary-fixed: #1e261a;
+    --color-on-primary-fixed-variant: #4a5946;
+    --color-on-primary-container: #1e261a;
+    --color-inverse-primary: #D2DCB6;
 
-    --color-secondary: #6b6358;
-    --color-secondary-container: #f0e8db;
-    --color-secondary-fixed: #f0e8db;
-    --color-secondary-fixed-dim: #d4ccbf;
+    --color-secondary: #A1BC98;
+    --color-secondary-container: #D2DCB6;
+    --color-secondary-fixed: #D2DCB6;
+    --color-secondary-fixed-dim: #c5d1a5;
     --color-on-secondary: #ffffff;
-    --color-on-secondary-fixed: #1e1a13;
-    --color-on-secondary-fixed-variant: #4a4538;
-    --color-on-secondary-container: #5e5548;
+    --color-on-secondary-fixed: #1f2918;
+    --color-on-secondary-fixed-variant: #4b5941;
+    --color-on-secondary-container: #1f2918;
 
-    --color-tertiary: #705c30;
-    --color-tertiary-container: #c4a66a;
-    --color-tertiary-fixed: #f8e0a8;
-    --color-tertiary-fixed-dim: #dcc48e;
-    --color-on-tertiary: #ffffff;
-    --color-on-tertiary-fixed: #221a05;
-    --color-on-tertiary-fixed-variant: #554020;
-    --color-on-tertiary-container: #554020;
+    --color-tertiary: #D2DCB6;
+    --color-tertiary-container: #e6edd1;
+    --color-tertiary-fixed: #e6edd1;
+    --color-tertiary-fixed-dim: #D2DCB6;
+    --color-on-tertiary: #2e3620;
+    --color-on-tertiary-fixed: #2e3620;
+    --color-on-tertiary-fixed-variant: #566141;
+    --color-on-tertiary-container: #2e3620;
 
     --color-error: #b83230;
     --color-error-container: #ffdad8;
     --color-on-error: #ffffff;
     --color-on-error-container: #690005;
 
-    --color-surface: #faf6f0;
-    --color-surface-bright: #faf6f0;
-    --color-surface-dim: #dbd7cf;
+    --color-surface: #F1F3E0;
+    --color-surface-bright: #F1F3E0;
+    --color-surface-dim: #e1e4cb;
     --color-surface-container-lowest: #ffffff;
-    --color-surface-container-low: #f5f1ea;
-    --color-surface-container: #f0ece4;
-    --color-surface-container-high: #eae6de;
-    --color-surface-container-highest: #e4e0d8;
-    --color-surface-tint: #4a7c59;
-    --color-on-surface: #2e3230;
-    --color-on-surface-variant: #4a4e4a;
-    --color-inverse-surface: #2e3230;
-    --color-inverse-on-surface: #f5f0e8;
+    --color-surface-container-low: #f8f9ef;
+    --color-surface-container: #e8ead2;
+    --color-surface-container-high: #e0e2c6;
+    --color-surface-container-highest: #d7dabb;
+    --color-surface-tint: #778873;
+    --color-on-surface: #262c24;
+    --color-on-surface-variant: #4e594a;
+    --color-inverse-surface: #262c24;
+    --color-inverse-on-surface: #F1F3E0;
 
-    --color-outline: #74796e;
-    --color-outline-variant: #c4c8bc;
+    --color-outline: #7c8a77;
+    --color-outline-variant: #b8c4b2;
 
-    --color-background: #faf6f0;
-    --color-on-background: #2e3230;
+    --color-background: #F1F3E0;
+    --color-on-background: #262c24;
 
     --radius-default: 0.75rem;
 }
