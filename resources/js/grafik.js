@@ -291,9 +291,18 @@ const konfigurasiPiramida = (baris) => ({
                         const nilai = laki ? b.laki : b.perempuan;
                         const tampilan = laki ? b.laki_tampilan : b.perempuan_tampilan;
 
-                        return nilai === null
-                            ? `${k.dataset.label}: kurang dari 5 orang`
-                            : `${k.dataset.label}: ${tampilan} warga`;
+                        if (nilai !== null) {
+                            return `${k.dataset.label}: ${tampilan} warga`;
+                        }
+
+                        // Sel tanpa angka berarti tiga hal berbeda: benar-benar
+                        // kosong, di bawah ambang, atau sengaja disamarkan agar
+                        // sel tersensor di kolom yang sama tidak bisa dihitung
+                        // lewat pengurangan. Keterangannya mengikuti tampilan,
+                        // bukan menebak salah satunya.
+                        return tampilan.startsWith('<')
+                            ? `${k.dataset.label}: kurang dari ${tampilan.slice(1)} orang`
+                            : `${k.dataset.label}: ${tampilan}`;
                     },
                 },
             },

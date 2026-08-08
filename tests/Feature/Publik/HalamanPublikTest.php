@@ -158,9 +158,19 @@ class HalamanPublikTest extends TestCase
 
         $pendidikan = collect((new StatistikPublik())->pendidikan())->keyBy('label');
 
-        $this->assertSame(20, $pendidikan['SMA / SMK / Sederajat']['jumlah']);
         $this->assertNull($pendidikan['Doktor (S3)']['jumlah']);
         $this->assertSame('<5', $pendidikan['Doktor (S3)']['tampilan']);
+
+        // S3 satu-satunya baris tersensor di tabel ini, sementara jumlah
+        // seluruh barisnya tercetak apa adanya sebagai "Jumlah Penduduk".
+        // Menampilkan SMA sebagai 20 berarti menyerahkan angka S3 lewat
+        // pengurangan: 22 - 20 = 2. Karena itu SMA ikut ditutup — lihat
+        // StatistikPublik::samarkanPelengkap().
+        $this->assertNull($pendidikan['SMA / SMK / Sederajat']['jumlah']);
+        $this->assertSame(
+            StatistikPublik::LABEL_DISAMARKAN,
+            $pendidikan['SMA / SMK / Sederajat']['tampilan'],
+        );
     }
 
     public function test_angka_kelompok_kecil_tidak_ikut_terkirim_ke_peramban(): void

@@ -249,6 +249,152 @@ class StatistikPublikCacheTest extends TestCase
         $this->assertSame('<5', $hasil['Konghucu']['tampilan']);
     }
 
+    // ------------------------------------------------------------------
+    // Sensor pelengkap — menutup celah pengurangan
+    //
+    // Tabel Agama, Status Perkawinan, dan Pekerjaan adalah pembagian habis
+    // atas seluruh warga: barisnya selalu berjumlah persis sama dengan
+    // "Jumlah Penduduk" yang tercetak apa adanya di halaman yang sama.
+    // Ketika hanya SATU baris yang tersensor, angka pastinya bisa dihitung
+    // kembali dengan pengurangan biasa. Karena itu satu baris lain ikut
+    // disamarkan sehingga tersisa dua nilai tak diketahui untuk satu
+    // persamaan — tidak lagi terpecahkan.
+    // ------------------------------------------------------------------
+
+    public function test_baris_tunggal_yang_tersensor_tidak_bisa_dihitung_lewat_pengurangan(): void
+    {
+        $islam = \App\Models\RefAgama::create(['nama' => 'Islam']);
+        $konghucu = \App\Models\RefAgama::create(['nama' => 'Konghucu']);
+
+        foreach (range(1, 12) as $i) {
+            $this->warga(['agama_id' => $islam->id]);
+        }
+        foreach (range(1, 2) as $i) {
+            $this->warga(['agama_id' => $konghucu->id]);
+        }
+        // Warga tanpa data agama — baris "Belum diisi", tetap bagian dari
+        // pembagian habis yang sama.
+        foreach (range(1, 6) as $i) {
+            $this->warga();
+        }
+
+        $statistik = new StatistikPublik();
+        $total = $statistik->ringkasan()['jumlah_penduduk'];
+        $hasil = collect($statistik->agama());
+
+        $this->assertSame(20, $total);
+
+        // Sensor utama tetap berjalan.
+        $this->assertNull($hasil->firstWhere('label', 'Konghucu')['jumlah']);
+
+        // Inti perbaikan: harus tersisa minimal dua baris tanpa angka pasti,
+        // sehingga total dikurangi baris-baris yang tampil tidak pernah
+        // menyisakan satu nilai tunggal.
+        $this->assertGreaterThanOrEqual(
+            2,
+            $hasil->whereNull('jumlah')->count(),
+            'Hanya satu baris tersensor: angka pastinya masih bisa dihitung dari total.',
+        );
+
+        // Sisa pengurangan harus tetap lebih besar dari nilai Konghucu yang
+        // sebenarnya — bukti bahwa "2" tidak lagi bisa direkonstruksi.
+        $sisa = $total - $hasil->whereNotNull('jumlah')->sum('jumlah');
+        $this->assertGreaterThan(2, $sisa);
+
+        // Baris yang dipilih adalah yang terkecil di antara yang masih
+        // tampil (Belum diisi = 6, bukan Islam = 12), dan diberi label jujur:
+        // "<5" akan menjadi keterangan yang keliru untuk angka sebesar itu.
+        $belumDiisi = $hasil->firstWhere('label', 'Belum diisi');
+        $this->assertNull($belumDiisi['jumlah']);
+        $this->assertSame('Disamarkan', $belumDiisi['tampilan']);
+        $this->assertSame(12, $hasil->firstWhere('label', 'Islam')['jumlah']);
+    }
+
+    public function test_dua_baris_tersensor_tidak_menambah_penyamaran_lagi(): void
+    {
+        $islam = \App\Models\RefAgama::create(['nama' => 'Islam']);
+        $konghucu = \App\Models\RefAgama::create(['nama' => 'Konghucu']);
+        $hindu = \App\Models\RefAgama::create(['nama' => 'Hindu']);
+
+        foreach (range(1, 12) as $i) {
+            $this->warga(['agama_id' => $islam->id]);
+        }
+        foreach (range(1, 2) as $i) {
+            $this->warga(['agama_id' => $konghucu->id]);
+        }
+        foreach (range(1, 3) as $i) {
+            $this->warga(['agama_id' => $hindu->id]);
+        }
+
+        $hasil = collect((new StatistikPublik())->agama())->keyBy('label');
+
+        // Dua nilai tak diketahui atas satu persamaan sudah aman dengan
+        // sendirinya; menyamarkan baris ketiga hanya membuang informasi.
+        $this->assertSame('<5', $hasil['Konghucu']['tampilan']);
+        $this->assertSame('<5', $hasil['Hindu']['tampilan']);
+        $this->assertSame(12, $hasil['Islam']['jumlah']);
+        $this->assertSame('12', $hasil['Islam']['tampilan']);
+    }
+
+    public function test_baris_bernilai_nol_tidak_pernah_ikut_disamarkan(): void
+    {
+        // Balita = 3 (tersensor), Dewasa Muda = 9, sisanya benar-benar nol.
+        foreach (range(1, 3) as $i) {
+            $this->warga(['tanggal_lahir' => Carbon::today()->subYears(2)]);
+        }
+        foreach (range(1, 9) as $i) {
+            $this->warga(['tanggal_lahir' => Carbon::today()->subYears(30)]);
+        }
+
+        $hasil = collect((new StatistikPublik())->sebaranUmur())->keyBy('label');
+
+        $this->assertSame('<5', $hasil['Balita & Anak']['tampilan']);
+
+        // Nol bukan rahasia: tidak ada seorang pun yang bisa dikenali dari
+        // kelompok kosong, jadi ia tetap tampil sebagai "0".
+        foreach (['Anak Sekolah', 'Remaja', 'Dewasa', 'Lansia'] as $label) {
+            $this->assertSame('0', $hasil[$label]['tampilan'], "Kelompok kosong \"{$label}\" ikut disamarkan.");
+        }
+
+        // Yang disamarkan justru satu-satunya baris tampil yang berisi.
+        $this->assertSame('Disamarkan', $hasil['Dewasa Muda']['tampilan']);
+        $this->assertNull($hasil['Dewasa Muda']['jumlah']);
+    }
+
+    public function test_sensor_pelengkap_piramida_berlaku_per_kolom_gender(): void
+    {
+        foreach (range(1, 2) as $i) {
+            $this->warga(['tanggal_lahir' => Carbon::today()->subYears(2), 'jenis_kelamin' => 'L']);
+        }
+        foreach (range(1, 9) as $i) {
+            $this->warga(['tanggal_lahir' => Carbon::today()->subYears(30), 'jenis_kelamin' => 'L']);
+        }
+        foreach (range(1, 6) as $i) {
+            $this->warga(['tanggal_lahir' => Carbon::today()->subYears(37), 'jenis_kelamin' => 'L']);
+        }
+        foreach (range(1, 8) as $i) {
+            $this->warga(['tanggal_lahir' => Carbon::today()->subYears(30), 'jenis_kelamin' => 'P']);
+        }
+        foreach (range(1, 7) as $i) {
+            $this->warga(['tanggal_lahir' => Carbon::today()->subYears(37), 'jenis_kelamin' => 'P']);
+        }
+
+        $hasil = collect((new StatistikPublik())->piramidaUmurGender())->keyBy('label');
+
+        // Kolom laki: satu sel tersensor, jadi sel tampil terkecil (35–39 = 6)
+        // ikut disamarkan.
+        $this->assertSame('<5', $hasil['0–4']['laki_tampilan']);
+        $this->assertNull($hasil['35–39']['laki']);
+        $this->assertSame('Disamarkan', $hasil['35–39']['laki_tampilan']);
+        $this->assertSame(9, $hasil['30–34']['laki']);
+
+        // Kolom perempuan tabel tertutupnya sendiri: tidak ada sel tersensor
+        // di sana, jadi tidak ada yang perlu disamarkan.
+        $this->assertSame(8, $hasil['30–34']['perempuan']);
+        $this->assertSame(7, $hasil['35–39']['perempuan']);
+        $this->assertSame('0', $hasil['0–4']['perempuan_tampilan']);
+    }
+
     public function test_untuk_grafik_piramida_mengembalikan_data_piramida(): void
     {
         $this->warga(['tanggal_lahir' => Carbon::today()->subYears(30)]);

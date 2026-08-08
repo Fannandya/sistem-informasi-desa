@@ -325,9 +325,22 @@
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
-                        label: (k) => baris[k.dataIndex].jumlah === null
-                            ? `kurang dari ${@js(\App\Queries\StatistikPublik::AMBANG)} orang`
-                            : `${baris[k.dataIndex].tampilan} warga (${baris[k.dataIndex].persen}%)`,
+                        label: (k) => {
+                            const b = baris[k.dataIndex];
+
+                            if (b.jumlah !== null) {
+                                return `${b.tampilan} warga (${b.persen}%)`;
+                            }
+
+                            // Tidak semua batang kosong berarti "di bawah
+                            // ambang": ada juga yang benar-benar nol dan ada
+                            // yang sengaja disamarkan agar kelompok kecil di
+                            // tabel yang sama tidak bisa dihitung lewat
+                            // pengurangan. Keterangannya mengikuti tampilan.
+                            return b.tampilan.startsWith('<')
+                                ? `kurang dari ${@js(\App\Queries\StatistikPublik::AMBANG)} orang`
+                                : b.tampilan;
+                        },
                     },
                 },
             },

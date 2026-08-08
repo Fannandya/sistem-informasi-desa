@@ -15,16 +15,26 @@ use Illuminate\Support\Facades\Cache;
  * disembunyikan di tampilan: angka yang hanya di-hide lewat CSS tetap terkirim
  * ke peramban dan bisa dibaca siapa saja lewat "lihat sumber halaman".
  *
- * Dua perlindungan yang diterapkan:
+ * Tiga perlindungan yang diterapkan:
  * 1. Kelompok berisi kurang dari 5 warga tidak pernah menjadi angka pasti.
  *    Di RT kecil, "1 orang lulusan S3" praktis menunjuk satu orang tertentu.
- * 2. Rincian berhenti di tingkat dusun. Sebaran per RT terlalu sempit untuk
+ * 2. Bila hanya satu baris yang tersensor pada tabel yang habis dibagi,
+ *    satu baris lain ikut ditutup — tanpa itu angka yang disensor bisa
+ *    dihitung kembali dengan pengurangan. Lihat samarkanPelengkap().
+ * 3. Rincian berhenti di tingkat dusun. Sebaran per RT terlalu sempit untuk
  *    tetap anonim.
  */
 class StatistikPublik
 {
     /** Ambang minimum agar sebuah kelompok boleh ditampilkan sebagai angka. */
     public const AMBANG = 5;
+
+    /**
+     * Keterangan untuk baris yang ditutup demi menghalangi pengurangan —
+     * lihat samarkanPelengkap(). Sengaja bukan "<5": angkanya bisa saja
+     * besar, dan yang hilang adalah angkanya, bukan ukurannya.
+     */
+    public const LABEL_DISAMARKAN = 'Disamarkan';
 
     private const PREFIX_CACHE = 'statistik_publik.';
 
@@ -324,17 +334,16 @@ class StatistikPublik
      */
     private function lindungi(array $baris): array
     {
-        return collect($baris)
-            ->map(fn (array $b) => [
-                'label' => $b['label'],
-                'jumlah' => $b['jumlah'] >= self::AMBANG ? $b['jumlah'] : null,
-                'tampilan' => $b['jumlah'] >= self::AMBANG
-                    ? number_format($b['jumlah'], 0, ',', '.')
-                    : ($b['jumlah'] === 0 ? '0' : '<'.self::AMBANG),
-                'persen' => $b['persen'],
-            ])
-            ->values()
-            ->all();
+        $baris = array_values($baris);
+
+        $hasil = array_map(fn (array $b) => [
+            'label' => $b['label'],
+            'jumlah' => $b['jumlah'] >= self::AMBANG ? $b['jumlah'] : null,
+            'tampilan' => $this->tampilkan($b['jumlah']),
+            'persen' => $b['persen'],
+        ], $baris);
+
+        return $this->samarkanPelengkap($hasil, array_column($baris, 'jumlah'), 'jumlah', 'tampilan');
     }
 
     /**
@@ -347,20 +356,92 @@ class StatistikPublik
      */
     private function lindungiPiramida(array $baris): array
     {
-        $tampilkan = fn (int $jumlah) => $jumlah >= self::AMBANG
-            ? number_format($jumlah, 0, ',', '.')
-            : ($jumlah === 0 ? '0' : '<'.self::AMBANG);
+        $baris = array_values($baris);
 
-        return collect($baris)
-            ->map(fn (array $b) => [
-                'label' => $b['label'],
-                'laki' => $b['laki'] >= self::AMBANG ? $b['laki'] : null,
-                'laki_tampilan' => $tampilkan($b['laki']),
-                'perempuan' => $b['perempuan'] >= self::AMBANG ? $b['perempuan'] : null,
-                'perempuan_tampilan' => $tampilkan($b['perempuan']),
-            ])
-            ->values()
-            ->all();
+        $hasil = array_map(fn (array $b) => [
+            'label' => $b['label'],
+            'laki' => $b['laki'] >= self::AMBANG ? $b['laki'] : null,
+            'laki_tampilan' => $this->tampilkan($b['laki']),
+            'perempuan' => $b['perempuan'] >= self::AMBANG ? $b['perempuan'] : null,
+            'perempuan_tampilan' => $this->tampilkan($b['perempuan']),
+        ], $baris);
+
+        // Tiap kolom gender adalah tabel tertutupnya sendiri: jumlah seluruh
+        // sel "laki" mendekati ringkasan['laki'], begitu pula perempuan.
+        // Karena itu keduanya diperiksa terpisah — penyamaran di satu kolom
+        // tidak boleh mengurangi informasi di kolom sebelahnya.
+        $hasil = $this->samarkanPelengkap($hasil, array_column($baris, 'laki'), 'laki', 'laki_tampilan');
+
+        return $this->samarkanPelengkap($hasil, array_column($baris, 'perempuan'), 'perempuan', 'perempuan_tampilan');
+    }
+
+    /** Bentuk tampilan sebuah angka setelah ambang diterapkan. */
+    private function tampilkan(int $jumlah): string
+    {
+        if ($jumlah >= self::AMBANG) {
+            return number_format($jumlah, 0, ',', '.');
+        }
+
+        // Nol bukan rahasia — tidak ada seorang pun yang bisa dikenali dari
+        // kelompok kosong — jadi ia tetap tampil sebagai angka.
+        return $jumlah === 0 ? '0' : '<'.self::AMBANG;
+    }
+
+    /**
+     * Sensor pelengkap — menutup celah pengurangan.
+     *
+     * Tabel Agama, Status Perkawinan, dan Pekerjaan adalah pembagian habis
+     * atas seluruh warga: barisnya selalu berjumlah persis sama dengan
+     * "Jumlah Penduduk" yang tercetak apa adanya di halaman yang sama. Bila
+     * hanya SATU baris yang tersensor, angka pastinya kembali terbaca lewat
+     * pengurangan sederhana — total dikurangi semua baris yang tampil.
+     * "Islam 850, Konghucu <5, Belum diisi 30, total 882" berarti Konghucu
+     * tepat dua orang, dan perlindungan ambangnya jadi sia-sia.
+     *
+     * Karena itu satu baris lain ikut ditutup sehingga tersisa dua nilai tak
+     * diketahui untuk satu persamaan — tidak lagi terpecahkan. Yang dipilih
+     * adalah baris tampil terkecil: keputusannya bisa diulang oleh siapa pun
+     * yang membaca kode ini, dan informasi yang hilang paling sedikit.
+     *
+     * Nol tidak pernah dihitung sebagai baris tersensor maupun dipilih
+     * sebagai pelengkap. Bila tidak ada baris tampil yang berisi, tidak ada
+     * yang perlu ditutup: tanpa sisa pengurangan yang bersih, persamaannya
+     * memang tidak bisa dipecahkan.
+     *
+     * @param  array<int, array<string, mixed>>  $hasil  baris yang sudah lewat sensor utama
+     * @param  array<int, int>  $asli  angka sebenarnya, indeksnya sejajar dengan $hasil
+     * @return array<int, array<string, mixed>>
+     */
+    private function samarkanPelengkap(array $hasil, array $asli, string $kunciJumlah, string $kunciTampilan): array
+    {
+        $tersensor = array_filter($asli, fn (int $jumlah) => $jumlah > 0 && $jumlah < self::AMBANG);
+
+        if (count($tersensor) !== 1) {
+            return $hasil;
+        }
+
+        $pilihan = null;
+
+        foreach ($hasil as $i => $baris) {
+            if ($baris[$kunciJumlah] === null || $baris[$kunciJumlah] <= 0) {
+                continue;
+            }
+
+            if ($pilihan === null || $baris[$kunciJumlah] < $hasil[$pilihan][$kunciJumlah]) {
+                $pilihan = $i;
+            }
+        }
+
+        if ($pilihan === null) {
+            return $hasil;
+        }
+
+        // Bukan "<5": angkanya bisa saja besar, dan keterangan yang keliru
+        // lebih buruk daripada keterangan yang jujur soal ketiadaannya.
+        $hasil[$pilihan][$kunciJumlah] = null;
+        $hasil[$pilihan][$kunciTampilan] = self::LABEL_DISAMARKAN;
+
+        return $hasil;
     }
 
     /**
