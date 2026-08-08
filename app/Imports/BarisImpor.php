@@ -29,6 +29,8 @@ class BarisImpor
         public readonly string $wilayah,
         public readonly ?string $pekerjaan,
         public readonly ?string $pendidikan,
+        public readonly ?string $agama = null,
+        public readonly ?string $statusPerkawinan = null,
         public ?Penduduk $miripDengan = null,
         public ?int $gandaDenganBaris = null,
     ) {}

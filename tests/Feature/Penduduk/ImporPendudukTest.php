@@ -39,11 +39,12 @@ class ImporPendudukTest extends TestCase
         Wilayah::create(['dusun' => 'Dusun Krajan', 'rw' => '001', 'rt' => '001']);
         Wilayah::create(['dusun' => 'Dusun Krajan', 'rw' => '001', 'rt' => '002']);
         RefPekerjaan::create(['nama' => 'Petani']);
+        \App\Models\RefAgama::create(['nama' => 'Islam']);
     }
 
     private function judul(): array
     {
-        return ['Nama Lengkap', 'Tanggal Lahir', 'Jenis Kelamin', 'Dusun', 'RW', 'RT', 'Pekerjaan', 'Pendidikan'];
+        return ['Nama Lengkap', 'Tanggal Lahir', 'Jenis Kelamin', 'Dusun', 'RW', 'RT', 'Pekerjaan', 'Pendidikan', 'Agama', 'Status Perkawinan'];
     }
 
     /** @param array<int, array<int, string>> $baris */
@@ -307,7 +308,10 @@ class ImporPendudukTest extends TestCase
 
     public static function kolomTerlarangProvider(): array
     {
-        return [['NIK'], ['No KK'], ['Nomor Telepon'], ['Alamat'], ['Agama']];
+        // 'Agama' sengaja tidak lagi ada di sini: Task 3 mencabut larangan
+        // privasi khususnya, dan kolom itu kini diproses (lihat blok tes
+        // "Agama & status perkawinan" di bawah), bukan ditolak.
+        return [['NIK'], ['No KK'], ['Nomor Telepon'], ['Alamat']];
     }
 
     #[DataProvider('kolomTerlarangProvider')]
@@ -681,5 +685,68 @@ class ImporPendudukTest extends TestCase
             $sebelum + 6,
             (new StatistikPublik())->ringkasan()['jumlah_penduduk'],
         );
+    }
+
+    // ==================================================================
+    // Agama & status perkawinan
+    // ==================================================================
+
+    public function test_agama_dan_status_perkawinan_terbaca(): void
+    {
+        $hasil = $this->analisis([
+            $this->judul(),
+            ['Siti Nurhayati', '1985-04-17', 'P', 'Dusun Krajan', '001', '001', 'Petani', 'SMA', 'Islam', 'Kawin Tercatat'],
+        ]);
+
+        $baris = $hasil->siap[0];
+
+        $this->assertSame(\App\Models\RefAgama::where('nama', 'Islam')->value('id'), $baris->data['agama_id']);
+        $this->assertSame(\App\Enums\StatusPerkawinan::KawinTercatat, $baris->data['status_perkawinan']);
+    }
+
+    public function test_agama_kosong_tidak_menggagalkan_baris(): void
+    {
+        $hasil = $this->analisis([
+            $this->judul(),
+            ['Siti Nurhayati', '1985-04-17', 'P', 'Dusun Krajan', '001', '001', 'Petani', 'SMA', '', ''],
+        ]);
+
+        $this->assertCount(1, $hasil->siap);
+        $this->assertNull($hasil->siap[0]->data['agama_id']);
+        $this->assertNull($hasil->siap[0]->data['status_perkawinan']);
+    }
+
+    public function test_agama_yang_belum_terdaftar_membuat_baris_gagal(): void
+    {
+        $hasil = $this->analisis([
+            $this->judul(),
+            ['Siti Nurhayati', '1985-04-17', 'P', 'Dusun Krajan', '001', '001', 'Petani', 'SMA', 'Agama Antah Berantah', ''],
+        ]);
+
+        $this->assertCount(0, $hasil->siap);
+        $this->assertCount(1, $hasil->gagal);
+        $this->assertStringContainsString('Agama "Agama Antah Berantah" belum terdaftar', $hasil->gagal[0]['alasan']);
+    }
+
+    public function test_status_perkawinan_sinonim_dikenali(): void
+    {
+        $hasil = $this->analisis([
+            $this->judul(),
+            ['Siti Nurhayati', '1985-04-17', 'P', 'Dusun Krajan', '001', '001', 'Petani', 'SMA', '', 'menikah'],
+        ]);
+
+        $this->assertSame(\App\Enums\StatusPerkawinan::Kawin, $hasil->siap[0]->data['status_perkawinan']);
+    }
+
+    public function test_status_perkawinan_tidak_dikenal_membuat_baris_gagal(): void
+    {
+        $hasil = $this->analisis([
+            $this->judul(),
+            ['Siti Nurhayati', '1985-04-17', 'P', 'Dusun Krajan', '001', '001', 'Petani', 'SMA', '', 'entah apa'],
+        ]);
+
+        $this->assertCount(0, $hasil->siap);
+        $this->assertCount(1, $hasil->gagal);
+        $this->assertStringContainsString('Status perkawinan "entah apa" tidak dikenali', $hasil->gagal[0]['alasan']);
     }
 }

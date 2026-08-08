@@ -5,8 +5,10 @@ namespace App\Imports;
 use App\Enums\JenisKelamin;
 use App\Enums\JenisMasuk;
 use App\Enums\Pendidikan;
+use App\Enums\StatusPerkawinan;
 use App\Exceptions\ImporDitolak;
 use App\Models\Penduduk;
+use App\Models\RefAgama;
 use App\Models\RefPekerjaan;
 use App\Models\Wilayah;
 use Illuminate\Support\Carbon;
@@ -31,6 +33,9 @@ class AnalisisImpor
 
     /** @var array<string, int> nama pekerjaan huruf kecil => id */
     private array $petaPekerjaan = [];
+
+    /** @var array<string, int> nama agama huruf kecil => id */
+    private array $petaAgama = [];
 
     /** @var array<string, Penduduk> kunci warga => warga yang sudah ada */
     private array $wargaAda = [];
@@ -143,6 +148,37 @@ class AnalisisImpor
 
         $pendidikan = $this->bacaPendidikan($data['pendidikan'] ?? null);
 
+        $agamaId = null;
+        $namaAgama = null;
+
+        if (filled($data['agama'] ?? null)) {
+            $namaAgama = trim($data['agama']);
+            $agamaId = $this->petaAgama[mb_strtolower($namaAgama)] ?? null;
+
+            if ($agamaId === null) {
+                $hasil->gagal[] = [
+                    'baris' => $nomorBaris,
+                    'nama' => $nama,
+                    'alasan' => "Agama \"{$namaAgama}\" belum terdaftar pada data referensi.",
+                ];
+
+                return;
+            }
+        }
+
+        $statusPerkawinanNilai = $data['status_perkawinan'] ?? null;
+        $statusPerkawinan = $this->bacaStatusPerkawinan($statusPerkawinanNilai);
+
+        if (filled($statusPerkawinanNilai) && $statusPerkawinan === null) {
+            $hasil->gagal[] = [
+                'baris' => $nomorBaris,
+                'nama' => $nama,
+                'alasan' => "Status perkawinan \"{$statusPerkawinanNilai}\" tidak dikenali.",
+            ];
+
+            return;
+        }
+
         $baris = new BarisImpor(
             nomorBaris: $nomorBaris,
             data: [
@@ -152,6 +188,8 @@ class AnalisisImpor
                 'wilayah_id' => $wilayahId,
                 'pekerjaan_id' => $pekerjaanId,
                 'pendidikan' => $pendidikan,
+                'agama_id' => $agamaId,
+                'status_perkawinan' => $statusPerkawinan,
                 'jenis_masuk' => JenisMasuk::PendataanAwal,
                 'tanggal_masuk' => now()->toDateString(),
             ],
@@ -161,6 +199,8 @@ class AnalisisImpor
             wilayah: $this->labelWilayah($data),
             pekerjaan: $namaPekerjaan,
             pendidikan: $pendidikan?->label(),
+            agama: $namaAgama,
+            statusPerkawinan: $statusPerkawinan?->label(),
         );
 
         // Tanpa NIK atau nomor KK, kombinasi ini yang paling mendekati kunci
@@ -276,6 +316,10 @@ class AnalisisImpor
             ->mapWithKeys(fn (RefPekerjaan $p) => [mb_strtolower($p->nama) => $p->id])
             ->all();
 
+        $this->petaAgama = RefAgama::all()
+            ->mapWithKeys(fn (RefAgama $a) => [mb_strtolower($a->nama) => $a->id])
+            ->all();
+
         // Warga terarsip ikut dimuat: mengimpor ulang orang yang sudah
         // diarsipkan adalah hal yang perlu diketahui admin.
         $this->wargaAda = Penduduk::withTrashed()
@@ -346,6 +390,31 @@ class AnalisisImpor
             's1', 'sarjana', 'd4' => Pendidikan::S1,
             's2', 'magister' => Pendidikan::S2,
             's3', 'doktor' => Pendidikan::S3,
+            default => null,
+        };
+    }
+
+    private function bacaStatusPerkawinan(?string $nilai): ?StatusPerkawinan
+    {
+        if (blank($nilai)) {
+            return null;
+        }
+
+        $normal = mb_strtolower(trim($nilai));
+
+        foreach (StatusPerkawinan::cases() as $status) {
+            if ($normal === $status->value || $normal === mb_strtolower($status->label())) {
+                return $status;
+            }
+        }
+
+        return match ($normal) {
+            'belum menikah', 'lajang', 'single' => StatusPerkawinan::BelumKawin,
+            'menikah', 'nikah' => StatusPerkawinan::Kawin,
+            'nikah tercatat', 'menikah tercatat' => StatusPerkawinan::KawinTercatat,
+            'nikah siri', 'kawin siri' => StatusPerkawinan::KawinTidakTercatat,
+            'cerai', 'duda cerai', 'janda cerai' => StatusPerkawinan::CeraiHidup,
+            'duda', 'janda' => StatusPerkawinan::CeraiMati,
             default => null,
         };
     }
