@@ -124,6 +124,130 @@
         </section>
     </div>
 
+    {{-- ------------------------- Piramida Penduduk ------------------------- --}}
+    <section class="mt-6 rounded-[12px] border border-outline-variant/30 p-5" data-grafik>
+        <h2 class="mb-4 text-sm font-semibold text-primary">Piramida Penduduk</h2>
+        <div class="relative h-[32rem]">
+            <canvas id="grafikPiramidaPublik" class="hidden"></canvas>
+            <div data-status="muat" class="absolute inset-0 flex items-center justify-center text-sm text-on-surface-variant">Memuat…</div>
+            <div data-status="kosong" class="absolute inset-0 hidden flex-col items-center justify-center text-sm text-on-surface-variant">Belum ada data</div>
+            <div data-status="gagal" class="absolute inset-0 hidden flex-col items-center justify-center text-sm text-amber-700">Gagal memuat grafik</div>
+        </div>
+
+        <details class="mt-4">
+            <summary class="cursor-pointer text-xs text-on-surface-variant">Lihat dalam bentuk tabel</summary>
+            <table class="mt-3 w-full text-sm">
+                <thead class="text-left text-xs text-on-surface-variant">
+                    <tr><th class="py-1.5">Kelompok Umur</th><th class="py-1.5 text-right">Laki-laki</th><th class="py-1.5 text-right">Perempuan</th></tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @foreach ($piramida as $baris)
+                        <tr>
+                            <td class="py-1.5 text-on-surface">{{ $baris['label'] }}</td>
+                            <td class="py-1.5 text-right tabular-nums text-on-surface">{{ $baris['laki_tampilan'] }}</td>
+                            <td class="py-1.5 text-right tabular-nums text-on-surface">{{ $baris['perempuan_tampilan'] }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </details>
+    </section>
+
+    {{-- ------------------------- Berdasarkan Pekerjaan ------------------------- --}}
+    <section class="mt-6 overflow-hidden rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest shadow-[0px_4px_20px_rgba(0,0,0,0.03)]">
+        <div class="border-b border-outline-variant/30 px-5 py-4">
+            <h2 class="text-sm font-semibold text-primary">Berdasarkan Pekerjaan</h2>
+        </div>
+        <div class="grid lg:grid-cols-[minmax(0,1fr)_2fr]">
+            <div class="max-h-96 overflow-y-auto border-b border-outline-variant/30 lg:border-r lg:border-b-0">
+                <table class="w-full text-sm">
+                    <thead class="sticky top-0 bg-surface-container-low text-left text-xs tracking-wider text-on-surface-variant uppercase">
+                        <tr>
+                            <th class="px-5 py-3 font-semibold">Jenis Pekerjaan</th>
+                            <th class="px-5 py-3 text-right font-semibold">Jumlah</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @forelse ($sebaranPekerjaan as $baris)
+                            <tr>
+                                <td class="px-5 py-3 text-on-surface">{{ $baris['label'] }}</td>
+                                <td class="px-5 py-3 text-right tabular-nums text-on-surface">{{ $baris['tampilan'] }}</td>
+                            </tr>
+                        @empty
+                            <tr><td colspan="2" class="px-5 py-10 text-center text-on-surface-variant">Belum ada data pekerjaan.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <div class="grid grid-cols-2 gap-4 p-5 sm:grid-cols-3">
+                @foreach (array_slice($sebaranPekerjaan, 0, 6) as $baris)
+                    <div class="rounded-[12px] border border-outline-variant/30 bg-surface p-4">
+                        <p class="text-xs font-medium text-on-surface-variant">{{ $baris['label'] }}</p>
+                        <p class="mt-6 text-right text-2xl font-semibold text-on-surface">{{ $baris['tampilan'] }}</p>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    {{-- ------------------------- Berdasarkan Agama ------------------------- --}}
+    <section class="mt-6 overflow-hidden rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest shadow-[0px_4px_20px_rgba(0,0,0,0.03)]">
+        <div class="border-b border-outline-variant/30 px-5 py-4">
+            <h2 class="text-sm font-semibold text-primary">Berdasarkan Agama</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-surface-container-low text-left text-xs tracking-wider text-on-surface-variant uppercase">
+                    <tr>
+                        <th class="px-5 py-3 font-semibold">Agama</th>
+                        <th class="px-5 py-3 text-right font-semibold">Jumlah</th>
+                        <th class="px-5 py-3 text-right font-semibold">Persen</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse ($agama as $baris)
+                        <tr>
+                            <td class="px-5 py-3 font-medium text-on-surface">{{ $baris['label'] }}</td>
+                            <td class="px-5 py-3 text-right tabular-nums text-on-surface">{{ $baris['tampilan'] }}</td>
+                            <td class="px-5 py-3 text-right tabular-nums text-on-surface-variant">{{ $baris['persen'] }}%</td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="3" class="px-5 py-10 text-center text-on-surface-variant">Belum ada data agama.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    {{-- ------------------------- Berdasarkan Status Perkawinan ------------------------- --}}
+    <section class="mt-6 overflow-hidden rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest shadow-[0px_4px_20px_rgba(0,0,0,0.03)]">
+        <div class="border-b border-outline-variant/30 px-5 py-4">
+            <h2 class="text-sm font-semibold text-primary">Berdasarkan Status Perkawinan</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-surface-container-low text-left text-xs tracking-wider text-on-surface-variant uppercase">
+                    <tr>
+                        <th class="px-5 py-3 font-semibold">Status Perkawinan</th>
+                        <th class="px-5 py-3 text-right font-semibold">Jumlah</th>
+                        <th class="px-5 py-3 text-right font-semibold">Persen</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse ($statusPerkawinan as $baris)
+                        <tr>
+                            <td class="px-5 py-3 font-medium text-on-surface">{{ $baris['label'] }}</td>
+                            <td class="px-5 py-3 text-right tabular-nums text-on-surface">{{ $baris['tampilan'] }}</td>
+                            <td class="px-5 py-3 text-right tabular-nums text-on-surface-variant">{{ $baris['persen'] }}%</td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="3" class="px-5 py-10 text-center text-on-surface-variant">Belum ada data status perkawinan.</td></tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </section>
+
     {{-- ------------------------- Sebaran dusun ------------------------- --}}
     <section class="mt-6 overflow-hidden rounded-[12px] border border-outline-variant/30 bg-surface-container-lowest shadow-[0px_4px_20px_rgba(0,0,0,0.03)]">
         <div class="border-b border-outline-variant/30 px-5 py-4">
@@ -216,5 +340,6 @@
 
     G.muat('grafikUmurPublik', @js(route('publik.statistik.data', 'umur')), konfigurasiPublik('umur'));
     G.muat('grafikPendidikanPublik', @js(route('publik.statistik.data', 'pendidikan')), konfigurasiPublik('pendidikan'));
+    G.muat('grafikPiramidaPublik', @js(route('publik.statistik.data', 'piramida')), G.piramida);
 </script>
 @endpush

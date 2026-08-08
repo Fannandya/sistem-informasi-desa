@@ -341,4 +341,23 @@ class StatistikPublikCacheTest extends TestCase
         $this->getJson(route('publik.statistik.data', 'entah-apa'))
             ->assertNotFound();
     }
+
+    public function test_halaman_statistik_menampilkan_empat_bagian_baru(): void
+    {
+        $agama = \App\Models\RefAgama::create(['nama' => 'Islam']);
+        foreach (range(1, 6) as $i) {
+            $this->warga(['agama_id' => $agama->id, 'status_perkawinan' => 'kawin_tercatat']);
+        }
+
+        $respons = $this->get(route('publik.statistik'));
+
+        $respons->assertOk()
+            ->assertSee('Piramida Penduduk')
+            ->assertSee('grafikPiramidaPublik', false)
+            ->assertSee('Berdasarkan Pekerjaan')
+            ->assertSee('Berdasarkan Agama')
+            ->assertSee('Islam')
+            ->assertSee('Berdasarkan Status Perkawinan')
+            ->assertSee('Kawin Tercatat');
+    }
 }
