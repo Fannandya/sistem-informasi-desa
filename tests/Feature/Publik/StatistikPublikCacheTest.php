@@ -361,6 +361,228 @@ class StatistikPublikCacheTest extends TestCase
         $this->assertNull($hasil['Dewasa Muda']['jumlah']);
     }
 
+    // ------------------------------------------------------------------
+    // Persen ikut disensor
+    //
+    // Menutup kolom "Jumlah" saja tidak menutup apa pun selama kolom
+    // "Persen" di sebelahnya masih terisi. Dengan penduduk desa yang jarang
+    // melewati beberapa ribu jiwa, satu angka di belakang koma sudah cukup
+    // untuk mengembalikan angka aslinya: 0,2% dari 882 hanya bisa berarti
+    // dua orang.
+    // ------------------------------------------------------------------
+
+    public function test_baris_tersensor_tidak_ikut_mengirim_persennya(): void
+    {
+        $islam = \App\Models\RefAgama::create(['nama' => 'Islam']);
+        $konghucu = \App\Models\RefAgama::create(['nama' => 'Konghucu']);
+
+        foreach (range(1, 12) as $i) {
+            $this->warga(['agama_id' => $islam->id]);
+        }
+        foreach (range(1, 2) as $i) {
+            $this->warga(['agama_id' => $konghucu->id]);
+        }
+        foreach (range(1, 6) as $i) {
+            $this->warga();
+        }
+
+        $hasil = collect((new StatistikPublik())->agama())->keyBy('label');
+
+        // Tersensor ambang: 2 dari 20 akan terbaca sebagai 10% persis.
+        $this->assertNull($hasil['Konghucu']['jumlah']);
+        $this->assertNull($hasil['Konghucu']['persen']);
+
+        // Tersamarkan sebagai pelengkap: 6 dari 20 akan terbaca sebagai 30%.
+        $this->assertSame(StatistikPublik::LABEL_DISAMARKAN, $hasil['Belum diisi']['tampilan']);
+        $this->assertNull($hasil['Belum diisi']['persen']);
+
+        // Baris yang memang tampil tidak berubah sedikit pun.
+        $this->assertSame(12, $hasil['Islam']['jumlah']);
+        $this->assertSame(60.0, $hasil['Islam']['persen']);
+    }
+
+    public function test_baris_bernilai_nol_juga_tidak_mengirim_persen(): void
+    {
+        foreach (range(1, 9) as $i) {
+            $this->warga(['tanggal_lahir' => Carbon::today()->subYears(30)]);
+        }
+
+        $hasil = collect((new StatistikPublik())->sebaranUmur())->keyBy('label');
+
+        // Persen selalu senasib dengan jumlahnya — aturan satu baris yang
+        // bisa diperiksa ulang, bukan daftar pengecualian.
+        foreach ($hasil as $label => $baris) {
+            $this->assertSame(
+                $baris['jumlah'] === null,
+                $baris['persen'] === null,
+                "Kelompok \"{$label}\" mengirim persen tanpa jumlah, atau sebaliknya.",
+            );
+        }
+    }
+
+    /**
+     * Contoh yang dipakai sepanjang catatan perbaikan ini: 882 jiwa, Islam
+     * 850, Belum diisi 30, Konghucu 2. Sebelum persen ikut disensor, kedua
+     * baris yang ditutup tetap terbaca — 3,4% dari 882 hanya bisa 30, dan
+     * 0,2% hanya bisa 2 — sehingga penyamaran pelengkapnya sia-sia.
+     */
+    public function test_contoh_delapan_ratus_delapan_puluh_dua_tidak_bisa_direkonstruksi(): void
+    {
+        $islam = \App\Models\RefAgama::create(['nama' => 'Islam']);
+        $konghucu = \App\Models\RefAgama::create(['nama' => 'Konghucu']);
+
+        foreach (range(1, 850) as $i) {
+            $this->warga(['agama_id' => $islam->id]);
+        }
+        foreach (range(1, 30) as $i) {
+            $this->warga();
+        }
+        foreach (range(1, 2) as $i) {
+            $this->warga(['agama_id' => $konghucu->id]);
+        }
+
+        $statistik = new StatistikPublik();
+        $total = $statistik->ringkasan()['jumlah_penduduk'];
+        $hasil = collect($statistik->agama());
+
+        $this->assertSame(882, $total);
+
+        $konghucuBaris = $hasil->firstWhere('label', 'Konghucu');
+        $belumDiisi = $hasil->firstWhere('label', 'Belum diisi');
+
+        $this->assertSame('<'.StatistikPublik::AMBANG, $konghucuBaris['tampilan']);
+        $this->assertNull($konghucuBaris['jumlah']);
+        $this->assertNull($konghucuBaris['persen']);
+
+        $this->assertSame(StatistikPublik::LABEL_DISAMARKAN, $belumDiisi['tampilan']);
+        $this->assertNull($belumDiisi['jumlah']);
+        $this->assertNull($belumDiisi['persen']);
+
+        // Lewat pengurangan pun keduanya tidak bisa dipisahkan: yang tersisa
+        // hanya 32 sebagai jumlah dua nilai tak diketahui.
+        $sisa = $total - $hasil->whereNotNull('jumlah')->sum('jumlah');
+        $this->assertSame(32, $sisa);
+        $this->assertGreaterThan(2, $sisa);
+
+        // Tidak ada satu pun nilai di kedua baris itu yang masih menyebut 2
+        // atau 30 — termasuk lewat kolom persen.
+        foreach ([$konghucuBaris, $belumDiisi] as $baris) {
+            foreach ($baris as $nilai) {
+                $this->assertNotSame(2, $nilai);
+                $this->assertNotSame(30, $nilai);
+                $this->assertNotSame(0.2, $nilai);
+                $this->assertNotSame(3.4, $nilai);
+            }
+        }
+    }
+
+    public function test_endpoint_data_tidak_mengirim_persen_baris_tersensor(): void
+    {
+        // Pendidikan S3 = 2 (tersensor), SMA = 20 (ikut disamarkan).
+        foreach (range(1, 20) as $i) {
+            $this->warga(['pendidikan' => 'sma']);
+        }
+        foreach (range(1, 2) as $i) {
+            $this->warga(['pendidikan' => 's3']);
+        }
+
+        $json = $this->getJson(route('publik.statistik.data', 'pendidikan'))
+            ->assertOk()
+            ->json('data');
+
+        // Menyensor di tampilan saja tidak cukup: JSON grafik memuat baris
+        // yang sama dan bisa dibuka siapa pun.
+        foreach ($json as $baris) {
+            $this->assertSame(
+                $baris['jumlah'] === null,
+                $baris['persen'] === null,
+                "Kelompok \"{$baris['label']}\" mengirim persen untuk angka yang disensor.",
+            );
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // Rasio gender tidak ikut disamarkan
+    //
+    // Kartu ringkasan di halaman yang sama sudah mencetak jumlah laki-laki
+    // dan perempuan apa adanya. Menutup salah satu barisnya di sini hanya
+    // membuang informasi yang toh sudah terbit dua paragraf di atasnya.
+    // ------------------------------------------------------------------
+
+    public function test_rasio_gender_tidak_ikut_disamarkan(): void
+    {
+        foreach (range(1, 20) as $i) {
+            $this->warga(['jenis_kelamin' => 'L']);
+        }
+        foreach (range(1, 3) as $i) {
+            $this->warga(['jenis_kelamin' => 'P']);
+        }
+
+        $statistik = new StatistikPublik();
+        $ringkasan = $statistik->ringkasan();
+        $hasil = collect($statistik->rasioGender())->keyBy('label');
+
+        // Angka mentahnya memang sudah terbit di kartu ringkasan.
+        $this->assertSame(20, $ringkasan['laki']);
+        $this->assertSame(3, $ringkasan['perempuan']);
+
+        // Karena itu barisnya tidak boleh ikut disamarkan.
+        $this->assertSame(20, $hasil['Laki-laki']['jumlah']);
+        $this->assertNotNull($hasil['Laki-laki']['persen']);
+        $this->assertNotSame(StatistikPublik::LABEL_DISAMARKAN, $hasil['Laki-laki']['tampilan']);
+
+        // Sensor ambang per baris tetap berjalan seperti sebelumnya.
+        $this->assertNull($hasil['Perempuan']['jumlah']);
+        $this->assertSame('<'.StatistikPublik::AMBANG, $hasil['Perempuan']['tampilan']);
+        $this->assertNull($hasil['Perempuan']['persen']);
+    }
+
+    /**
+     * Baris pelengkap yang nilainya tepat di ambang tidak menyamarkan apa
+     * pun: pembaca sudah tahu baris tersamarkan bernilai minimal AMBANG,
+     * jadi ketika sisa pengurangan hanya AMBANG + 1, tidak ada kemungkinan
+     * lain selain "AMBANG dan satu orang".
+     */
+    public function test_pelengkap_tepat_di_ambang_tidak_menyisakan_nilai_tunggal(): void
+    {
+        $islam = \App\Models\RefAgama::create(['nama' => 'Islam']);
+        $hindu = \App\Models\RefAgama::create(['nama' => 'Hindu']);
+        $konghucu = \App\Models\RefAgama::create(['nama' => 'Konghucu']);
+
+        foreach (range(1, 12) as $i) {
+            $this->warga(['agama_id' => $islam->id]);
+        }
+        foreach (range(1, StatistikPublik::AMBANG) as $i) {
+            $this->warga(['agama_id' => $hindu->id]);
+        }
+        $this->warga(['agama_id' => $konghucu->id]);
+
+        $statistik = new StatistikPublik();
+        $total = $statistik->ringkasan()['jumlah_penduduk'];
+        $hasil = collect($statistik->agama())->keyBy('label');
+
+        $this->assertSame(18, $total);
+        $this->assertSame('<'.StatistikPublik::AMBANG, $hasil['Konghucu']['tampilan']);
+
+        // Hindu tetap dipilih lebih dulu — ia yang terkecil — tetapi karena
+        // nilainya persis di ambang, baris berikutnya ikut ditutup.
+        $this->assertSame(StatistikPublik::LABEL_DISAMARKAN, $hasil['Hindu']['tampilan']);
+        $this->assertSame(StatistikPublik::LABEL_DISAMARKAN, $hasil['Islam']['tampilan']);
+
+        // Uji intinya: sisa pengurangan harus menyisakan lebih dari satu
+        // kemungkinan. Dengan k baris tersamarkan yang masing-masing
+        // bernilai minimal AMBANG dan satu baris tersensor bernilai minimal
+        // 1, kemungkinannya tunggal tepat ketika sisa = 1 + k x AMBANG.
+        $tersamarkan = collect($statistik->agama())->whereNull('jumlah')->count() - 1;
+        $sisa = $total - collect($statistik->agama())->whereNotNull('jumlah')->sum('jumlah');
+
+        $this->assertGreaterThan(
+            1 + $tersamarkan * StatistikPublik::AMBANG,
+            $sisa,
+            'Sisa pengurangan hanya menyisakan satu kemungkinan — angka tersensor tetap terbaca.',
+        );
+    }
+
     public function test_sensor_pelengkap_piramida_berlaku_per_kolom_gender(): void
     {
         foreach (range(1, 2) as $i) {

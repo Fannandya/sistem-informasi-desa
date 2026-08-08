@@ -87,7 +87,7 @@
                             <tr>
                                 <td class="py-1.5 text-on-surface">{{ $baris['label'] }}</td>
                                 <td class="py-1.5 text-right tabular-nums text-on-surface">{{ $baris['tampilan'] }}</td>
-                                <td class="py-1.5 text-right tabular-nums text-on-surface-variant">{{ $baris['persen'] }}%</td>
+                                <td class="py-1.5 text-right tabular-nums text-on-surface-variant">{{ $baris['persen'] !== null ? $baris['persen'].'%' : '—' }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -115,7 +115,7 @@
                             <tr>
                                 <td class="py-1.5 text-on-surface">{{ $baris['label'] }}</td>
                                 <td class="py-1.5 text-right tabular-nums text-on-surface">{{ $baris['tampilan'] }}</td>
-                                <td class="py-1.5 text-right tabular-nums text-on-surface-variant">{{ $baris['persen'] }}%</td>
+                                <td class="py-1.5 text-right tabular-nums text-on-surface-variant">{{ $baris['persen'] !== null ? $baris['persen'].'%' : '—' }}</td>
                             </tr>
                         @endforeach
                     </tbody>
@@ -209,7 +209,7 @@
                         <tr>
                             <td class="px-5 py-3 font-medium text-on-surface">{{ $baris['label'] }}</td>
                             <td class="px-5 py-3 text-right tabular-nums text-on-surface">{{ $baris['tampilan'] }}</td>
-                            <td class="px-5 py-3 text-right tabular-nums text-on-surface-variant">{{ $baris['persen'] }}%</td>
+                            <td class="px-5 py-3 text-right tabular-nums text-on-surface-variant">{{ $baris['persen'] !== null ? $baris['persen'].'%' : '—' }}</td>
                         </tr>
                     @empty
                         <tr><td colspan="3" class="px-5 py-10 text-center text-on-surface-variant">Belum ada data agama.</td></tr>
@@ -238,7 +238,7 @@
                         <tr>
                             <td class="px-5 py-3 font-medium text-on-surface">{{ $baris['label'] }}</td>
                             <td class="px-5 py-3 text-right tabular-nums text-on-surface">{{ $baris['tampilan'] }}</td>
-                            <td class="px-5 py-3 text-right tabular-nums text-on-surface-variant">{{ $baris['persen'] }}%</td>
+                            <td class="px-5 py-3 text-right tabular-nums text-on-surface-variant">{{ $baris['persen'] !== null ? $baris['persen'].'%' : '—' }}</td>
                         </tr>
                     @empty
                         <tr><td colspan="3" class="px-5 py-10 text-center text-on-surface-variant">Belum ada data status perkawinan.</td></tr>
@@ -292,7 +292,10 @@
             Rincian dibatasi sampai tingkat dusun, dan kelompok berisi kurang dari
             {{ \App\Queries\StatistikPublik::AMBANG }} orang ditampilkan sebagai
             &ldquo;&lt;{{ \App\Queries\StatistikPublik::AMBANG }}&rdquo; agar tidak ada warga yang
-            dapat dikenali dari angka ini.
+            dapat dikenali dari angka ini. Baris bertanda
+            &ldquo;{{ \App\Queries\StatistikPublik::LABEL_DISAMARKAN }}&rdquo; ikut ditutup —
+            beserta persennya — supaya jumlah kelompok kecil tadi tidak dapat dihitung
+            kembali dengan mengurangkan baris lain dari totalnya.
         </p>
     </div>
 </div>

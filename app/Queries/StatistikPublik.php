@@ -16,8 +16,10 @@ use Illuminate\Support\Facades\Cache;
  * ke peramban dan bisa dibaca siapa saja lewat "lihat sumber halaman".
  *
  * Tiga perlindungan yang diterapkan:
- * 1. Kelompok berisi kurang dari 5 warga tidak pernah menjadi angka pasti.
- *    Di RT kecil, "1 orang lulusan S3" praktis menunjuk satu orang tertentu.
+ * 1. Kelompok berisi kurang dari 5 warga tidak pernah menjadi angka pasti —
+ *    termasuk persennya. Di RT kecil, "1 orang lulusan S3" praktis menunjuk
+ *    satu orang tertentu, dan pada desa berpenduduk ribuan satu angka di
+ *    belakang koma sudah cukup untuk mengembalikan angka bulatnya.
  * 2. Bila hanya satu baris yang tersensor pada tabel yang habis dibagi,
  *    satu baris lain ikut ditutup — tanpa itu angka yang disensor bisa
  *    dihitung kembali dengan pengurangan. Lihat samarkanPelengkap().
@@ -108,7 +110,7 @@ class StatistikPublik
     }
 
     /**
-     * @return array<int, array{label: string, jumlah: int|null, tampilan: string, persen: float}>
+     * @return array<int, array{label: string, jumlah: int|null, tampilan: string, persen: float|null}>
      */
     public function sebaranUmur(): array
     {
@@ -119,20 +121,26 @@ class StatistikPublik
     }
 
     /**
-     * @return array<int, array{label: string, jumlah: int|null, tampilan: string, persen: float}>
+     * @return array<int, array{label: string, jumlah: int|null, tampilan: string, persen: float|null}>
      */
     public function rasioGender(): array
     {
         // Gender hanya dua kelompok dan selalu besar; tidak perlu digabung,
         // tetapi ambang tetap diterapkan demi konsistensi aturan.
+        //
+        // Sensor pelengkap justru dimatikan di sini. ringkasan() mencetak
+        // 'laki' dan 'perempuan' apa adanya, tanpa ambang, di kartu paling
+        // atas halaman yang sama — menutup salah satu baris di tabel ini
+        // hanya membuang informasi yang toh sudah terbit dua paragraf di
+        // atasnya, tanpa satu pun angka yang jadi lebih terlindungi.
         return $this->hafalkan(
             'rasio_gender',
-            fn () => $this->lindungi($this->statistik->rasioGender()),
+            fn () => $this->lindungi($this->statistik->rasioGender(), sensorPelengkap: false),
         );
     }
 
     /**
-     * @return array<int, array{label: string, jumlah: int|null, tampilan: string, persen: float}>
+     * @return array<int, array{label: string, jumlah: int|null, tampilan: string, persen: float|null}>
      */
     public function pendidikan(): array
     {
@@ -154,7 +162,7 @@ class StatistikPublik
     }
 
     /**
-     * @return array<int, array{label: string, jumlah: int|null, tampilan: string, persen: float}>
+     * @return array<int, array{label: string, jumlah: int|null, tampilan: string, persen: float|null}>
      */
     public function agama(): array
     {
@@ -165,7 +173,7 @@ class StatistikPublik
     }
 
     /**
-     * @return array<int, array{label: string, jumlah: int|null, tampilan: string, persen: float}>
+     * @return array<int, array{label: string, jumlah: int|null, tampilan: string, persen: float|null}>
      */
     public function statusPerkawinan(): array
     {
@@ -176,7 +184,7 @@ class StatistikPublik
     }
 
     /**
-     * @return array<int, array{label: string, jumlah: int|null, tampilan: string, persen: float}>
+     * @return array<int, array{label: string, jumlah: int|null, tampilan: string, persen: float|null}>
      */
     public function sebaranPekerjaan(): array
     {
@@ -329,10 +337,19 @@ class StatistikPublik
      * Kelompok di bawah ambang tidak dihapus dari daftar — kehadirannya bukan
      * rahasia, hanya jumlah pastinya. Yang dikeluarkan hanya angkanya.
      *
+     * Persen ikut hilang bersama jumlahnya. Menutup kolom "Jumlah" saja
+     * tidak menutup apa pun selama kolom "Persen" di sebelahnya masih
+     * terisi: penduduk desa jarang melewati beberapa ribu jiwa, dan pada
+     * ukuran sebesar itu satu angka di belakang koma sudah menentukan angka
+     * bulatnya. "0,2% dari 882" hanya bisa berarti dua orang.
+     *
      * @param  array<int, array{label: string, jumlah: int, persen: float}>  $baris
-     * @return array<int, array{label: string, jumlah: int|null, tampilan: string, persen: float}>
+     * @param  bool  $sensorPelengkap  lihat samarkanPelengkap(); dimatikan
+     *                                 untuk tabel yang angkanya toh sudah
+     *                                 terbit utuh di tempat lain
+     * @return array<int, array{label: string, jumlah: int|null, tampilan: string, persen: float|null}>
      */
-    private function lindungi(array $baris): array
+    private function lindungi(array $baris, bool $sensorPelengkap = true): array
     {
         $baris = array_values($baris);
 
@@ -340,10 +357,16 @@ class StatistikPublik
             'label' => $b['label'],
             'jumlah' => $b['jumlah'] >= self::AMBANG ? $b['jumlah'] : null,
             'tampilan' => $this->tampilkan($b['jumlah']),
-            'persen' => $b['persen'],
+            // Satu aturan yang bisa diperiksa ulang sekali lihat: persen ada
+            // persis ketika jumlahnya ada.
+            'persen' => $b['jumlah'] >= self::AMBANG ? $b['persen'] : null,
         ], $baris);
 
-        return $this->samarkanPelengkap($hasil, array_column($baris, 'jumlah'), 'jumlah', 'tampilan');
+        if (! $sensorPelengkap) {
+            return $hasil;
+        }
+
+        return $this->samarkanPelengkap($hasil, array_column($baris, 'jumlah'), 'jumlah', 'tampilan', 'persen');
     }
 
     /**
@@ -408,38 +431,66 @@ class StatistikPublik
      * yang perlu ditutup: tanpa sisa pengurangan yang bersih, persamaannya
      * memang tidak bisa dipecahkan.
      *
+     * Satu perkecualian pada "baris tampil terkecil": baris yang nilainya
+     * PERSIS di ambang tidak menyamarkan apa pun. Pembaca sudah tahu baris
+     * tersamarkan bernilai minimal AMBANG, jadi ketika sisanya hanya
+     * AMBANG + 1, satu-satunya pembagian yang mungkin adalah "AMBANG dan
+     * satu orang" — kedua angka kembali terbaca. Karena itu baris berikutnya
+     * ikut ditutup sampai ada satu yang benar-benar di atas ambang. Syarat
+     * berhentinya hanya melihat nilai baris tampil, yang memang boleh
+     * terbit; ia tidak pernah bergantung pada angka yang sedang disensor,
+     * sehingga banyaknya baris tersamarkan tidak ikut membocorkannya.
+     *
+     * Bila SELURUH baris tampil bernilai persis di ambang, tidak ada lagi
+     * yang bisa ditutup — menutup semuanya pun tidak menambah kemungkinan.
+     * Itu batas bawaan tabel sekecil itu, bukan sesuatu yang bisa
+     * diperbaiki di sini.
+     *
      * @param  array<int, array<string, mixed>>  $hasil  baris yang sudah lewat sensor utama
      * @param  array<int, int>  $asli  angka sebenarnya, indeksnya sejajar dengan $hasil
+     * @param  string|null  $kunciPersen  kolom persen yang ikut ditutup, bila tabelnya punya
      * @return array<int, array<string, mixed>>
      */
-    private function samarkanPelengkap(array $hasil, array $asli, string $kunciJumlah, string $kunciTampilan): array
-    {
+    private function samarkanPelengkap(
+        array $hasil,
+        array $asli,
+        string $kunciJumlah,
+        string $kunciTampilan,
+        ?string $kunciPersen = null,
+    ): array {
         $tersensor = array_filter($asli, fn (int $jumlah) => $jumlah > 0 && $jumlah < self::AMBANG);
 
         if (count($tersensor) !== 1) {
             return $hasil;
         }
 
-        $pilihan = null;
+        $kandidat = [];
 
         foreach ($hasil as $i => $baris) {
-            if ($baris[$kunciJumlah] === null || $baris[$kunciJumlah] <= 0) {
-                continue;
-            }
-
-            if ($pilihan === null || $baris[$kunciJumlah] < $hasil[$pilihan][$kunciJumlah]) {
-                $pilihan = $i;
+            if ($baris[$kunciJumlah] !== null && $baris[$kunciJumlah] > 0) {
+                $kandidat[$i] = $baris[$kunciJumlah];
             }
         }
 
-        if ($pilihan === null) {
-            return $hasil;
-        }
+        // Dari yang terkecil: informasi yang hilang paling sedikit, dan
+        // urutannya bisa diulang oleh siapa pun yang membaca kode ini.
+        asort($kandidat);
 
-        // Bukan "<5": angkanya bisa saja besar, dan keterangan yang keliru
-        // lebih buruk daripada keterangan yang jujur soal ketiadaannya.
-        $hasil[$pilihan][$kunciJumlah] = null;
-        $hasil[$pilihan][$kunciTampilan] = self::LABEL_DISAMARKAN;
+        foreach ($kandidat as $i => $nilai) {
+            // Bukan "<5": angkanya bisa saja besar, dan keterangan yang
+            // keliru lebih buruk daripada keterangan yang jujur soal
+            // ketiadaannya.
+            $hasil[$i][$kunciJumlah] = null;
+            $hasil[$i][$kunciTampilan] = self::LABEL_DISAMARKAN;
+
+            if ($kunciPersen !== null) {
+                $hasil[$i][$kunciPersen] = null;
+            }
+
+            if ($nilai > self::AMBANG) {
+                break;
+            }
+        }
 
         return $hasil;
     }

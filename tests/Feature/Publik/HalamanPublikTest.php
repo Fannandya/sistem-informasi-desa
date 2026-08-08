@@ -188,11 +188,22 @@ class HalamanPublikTest extends TestCase
         // lewat "lihat sumber halaman".
         $this->assertNull($s3['jumlah']);
 
+        // Persennya pun tidak boleh ikut terkirim: 2 dari 22 adalah 9,1%,
+        // dan pada desa sekecil ini satu angka di belakang koma sudah
+        // mengembalikan angka bulatnya.
+        $this->assertNull($s3['persen']);
+
         // Tidak boleh ada satu pun angka di bawah ambang yang lolos ke respons.
         foreach ($json as $baris) {
             $this->assertTrue(
                 $baris['jumlah'] === null || $baris['jumlah'] >= StatistikPublik::AMBANG,
                 "Kelompok \"{$baris['label']}\" mengirim angka {$baris['jumlah']} yang di bawah ambang.",
+            );
+
+            $this->assertSame(
+                $baris['jumlah'] === null,
+                $baris['persen'] === null,
+                "Kelompok \"{$baris['label']}\" mengirim persen untuk angka yang disensor.",
             );
         }
     }
