@@ -3,6 +3,7 @@
 @section('judul', 'Beranda')
 @section('deskripsi', $desa->deskripsiMeta())
 @section('footer_margin', 'mt-0')
+@section('main_padding', 'pt-0')
 
 @php
     use App\Support\Teks;
@@ -15,9 +16,8 @@
 @section('konten')
 
 {{-- ============================== HERO ============================== --}}
-{{-- -mt-16 menarik hero naik ke belakang header (h-16) yang transparan di
-     beranda, supaya gambar hero benar-benar terlihat di balik navbar. --}}
-<section class="relative -mt-16 w-full h-[600px] md:h-[819px] flex items-center justify-center overflow-hidden bg-on-surface"
+{{-- hero akan mengisi seluruh area atas karena main padding diset ke pt-0 --}}
+<section class="relative w-full h-[600px] md:h-[819px] flex items-center justify-center overflow-hidden bg-on-surface"
          style="--hero-text-color: {{ $desa->hero_text_color ?? '#ffffff' }};"
          x-data="carousel()" x-init="init()">
     {{-- Carousel images --}}
