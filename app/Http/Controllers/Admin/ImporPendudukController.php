@@ -9,6 +9,7 @@ use App\Imports\BarisMentah;
 use App\Imports\HasilAnalisisImpor;
 use App\Imports\ImporPenduduk;
 use App\Imports\KolomImporPenduduk;
+use App\Models\RefAgama;
 use App\Models\RefPekerjaan;
 use App\Models\Wilayah;
 use Illuminate\Http\RedirectResponse;
@@ -42,6 +43,7 @@ class ImporPendudukController extends Controller
         return view('admin.penduduk.impor', [
             'wilayahList' => Wilayah::urut()->get(),
             'pekerjaanList' => RefPekerjaan::orderBy('nama')->get(),
+            'agamaList' => RefAgama::orderBy('nama')->get(),
         ]);
     }
 
@@ -54,10 +56,11 @@ class ImporPendudukController extends Controller
         $judul = KolomImporPenduduk::judul();
         $wilayah = Wilayah::urut()->first();
         $pekerjaan = RefPekerjaan::orderBy('nama')->first();
+        $agama = RefAgama::orderBy('nama')->first();
 
         $contoh = [
-            ['Siti Nurhayati', '1985-04-17', 'P', $wilayah?->dusun ?? 'Dusun Krajan', $wilayah?->rw ?? '001', $wilayah?->rt ?? '001', $pekerjaan?->nama ?? 'Petani', 'SMA'],
-            ['Budi Santoso', '17/04/1985', 'L', $wilayah?->dusun ?? 'Dusun Krajan', $wilayah?->rw ?? '001', $wilayah?->rt ?? '001', '', 'S1'],
+            ['Siti Nurhayati', '1985-04-17', 'P', $wilayah?->dusun ?? 'Dusun Krajan', $wilayah?->rw ?? '001', $wilayah?->rt ?? '001', $pekerjaan?->nama ?? 'Petani', 'SMA', $agama?->nama ?? 'Islam', 'Kawin Tercatat'],
+            ['Budi Santoso', '17/04/1985', 'L', $wilayah?->dusun ?? 'Dusun Krajan', $wilayah?->rw ?? '001', $wilayah?->rt ?? '001', '', 'S1', '', ''],
         ];
 
         $response = response()->streamDownload(function () use ($judul, $contoh): void {

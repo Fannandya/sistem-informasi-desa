@@ -36,7 +36,7 @@ class EksporPenduduk implements FromQuery, ShouldAutoSize, WithCustomCsvSettings
             : Penduduk::query()->aktif();
 
         return $this->pencarian
-            ->terapkan($query->with(['wilayah', 'pekerjaan']))
+            ->terapkan($query->with(['wilayah', 'pekerjaan', 'agama']))
             ->orderBy('nama_lengkap');
     }
 
@@ -57,6 +57,8 @@ class EksporPenduduk implements FromQuery, ShouldAutoSize, WithCustomCsvSettings
             'RT',
             'Pekerjaan',
             'Pendidikan',
+            'Agama',
+            'Status Perkawinan',
         ];
 
         if ($this->arsip) {
@@ -84,6 +86,8 @@ class EksporPenduduk implements FromQuery, ShouldAutoSize, WithCustomCsvSettings
             $penduduk->wilayah->rt,
             $penduduk->pekerjaan?->nama,
             $penduduk->pendidikan?->label(),
+            $penduduk->agama?->nama,
+            $penduduk->status_perkawinan?->label(),
         ];
 
         if ($this->arsip) {

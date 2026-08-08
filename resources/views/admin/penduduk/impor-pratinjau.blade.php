@@ -100,6 +100,8 @@
                                         <div class="flex gap-2"><dt class="w-24 text-slate-400">Wilayah</dt><dd>{{ $baris->wilayah }}</dd></div>
                                         <div class="flex gap-2"><dt class="w-24 text-slate-400">Pekerjaan</dt><dd>{{ $baris->pekerjaan ?? '—' }}</dd></div>
                                         <div class="flex gap-2"><dt class="w-24 text-slate-400">Pendidikan</dt><dd>{{ $baris->pendidikan ?? '—' }}</dd></div>
+                                        <div class="flex gap-2"><dt class="w-24 text-slate-400">Agama</dt><dd>{{ $baris->agama ?? '—' }}</dd></div>
+                                        <div class="flex gap-2"><dt class="w-24 text-slate-400">Status Perkawinan</dt><dd>{{ $baris->statusPerkawinan ?? '—' }}</dd></div>
                                     </dl>
                                 </div>
 
@@ -195,6 +197,8 @@
                             <th class="px-6 py-2 font-semibold">Wilayah</th>
                             <th class="px-6 py-2 font-semibold">Pekerjaan</th>
                             <th class="px-6 py-2 font-semibold">Pendidikan</th>
+                            <th class="px-6 py-2 font-semibold">Agama</th>
+                            <th class="px-6 py-2 font-semibold">Status Perkawinan</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
@@ -209,6 +213,8 @@
                                 <td class="px-6 py-2 whitespace-nowrap text-slate-600">{{ $baris->wilayah }}</td>
                                 <td class="px-6 py-2 text-slate-600">{{ $baris->pekerjaan ?? '—' }}</td>
                                 <td class="px-6 py-2 text-slate-600">{{ $baris->pendidikan ?? '—' }}</td>
+                                <td class="px-6 py-2 text-slate-600">{{ $baris->agama ?? '—' }}</td>
+                                <td class="px-6 py-2 text-slate-600">{{ $baris->statusPerkawinan ?? '—' }}</td>
                             </tr>
                         @endforeach
                     </tbody>

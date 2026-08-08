@@ -61,7 +61,7 @@ class EksporPendudukTest extends TestCase
 
     public static function kolomTerlarangProvider(): array
     {
-        return [['NIK'], ['Nomor KK'], ['Kartu Keluarga'], ['Telepon'], ['No HP'], ['Alamat'], ['Tanggal Lahir'], ['Agama']];
+        return [['NIK'], ['Nomor KK'], ['Kartu Keluarga'], ['Telepon'], ['No HP'], ['Alamat'], ['Tanggal Lahir']];
     }
 
     #[DataProvider('kolomTerlarangProvider')]
@@ -83,12 +83,12 @@ class EksporPendudukTest extends TestCase
         // Daftar putih. Menambah kolom pada tabel penduduk tidak boleh
         // membuat kolom itu ikut terekspor dengan sendirinya.
         $this->assertSame(
-            ['Nama Lengkap', 'Umur', 'Jenis Kelamin', 'Dusun', 'RW', 'RT', 'Pekerjaan', 'Pendidikan'],
+            ['Nama Lengkap', 'Umur', 'Jenis Kelamin', 'Dusun', 'RW', 'RT', 'Pekerjaan', 'Pendidikan', 'Agama', 'Status Perkawinan'],
             EksporPenduduk::kolomDiizinkan(),
         );
 
         $this->assertSame(
-            ['Nama Lengkap', 'Umur', 'Jenis Kelamin', 'Dusun', 'RW', 'RT', 'Pekerjaan', 'Pendidikan', 'Alasan Keluar', 'Tanggal Keluar'],
+            ['Nama Lengkap', 'Umur', 'Jenis Kelamin', 'Dusun', 'RW', 'RT', 'Pekerjaan', 'Pendidikan', 'Agama', 'Status Perkawinan', 'Alasan Keluar', 'Tanggal Keluar'],
             EksporPenduduk::kolomDiizinkan(arsip: true),
         );
     }
@@ -152,8 +152,33 @@ class EksporPendudukTest extends TestCase
 
         $baris = (new EksporPenduduk(new PencarianPenduduk(), arsip: true))->map($warga->fresh());
 
-        $this->assertSame('Meninggal Dunia', $baris[8]);
-        $this->assertSame(now()->format('Y-m-d'), $baris[9]);
+        $this->assertSame('Meninggal Dunia', $baris[10]);
+        $this->assertSame(now()->format('Y-m-d'), $baris[11]);
+    }
+
+    public function test_agama_dan_status_perkawinan_ikut_terekspor(): void
+    {
+        $agama = \App\Models\RefAgama::create(['nama' => 'Islam']);
+        $warga = $this->warga([
+            'agama_id' => $agama->id,
+            'status_perkawinan' => 'kawin_tercatat',
+        ]);
+
+        $baris = (new EksporPenduduk(new PencarianPenduduk()))->map($warga);
+
+        $this->assertContains('Islam', $baris);
+        $this->assertContains('Kawin Tercatat', $baris);
+    }
+
+    public function test_agama_kosong_diekspor_sebagai_null(): void
+    {
+        $warga = $this->warga(['agama_id' => null, 'status_perkawinan' => null]);
+
+        $baris = (new EksporPenduduk(new PencarianPenduduk()))->map($warga);
+
+        $this->assertSame(EksporPenduduk::kolomDiizinkan(), array_keys(array_combine(EksporPenduduk::kolomDiizinkan(), $baris)));
+        $indexAgama = array_search('Agama', EksporPenduduk::kolomDiizinkan());
+        $this->assertNull($baris[$indexAgama]);
     }
 
     // ------------------------------------------------------------------
