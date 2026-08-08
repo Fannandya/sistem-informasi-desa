@@ -67,7 +67,7 @@ async function muatGrafik(idKanvas, url, bangunKonfigurasi) {
         const muatan = await respons.json();
         const baris = muatan.data ?? [];
 
-        const adaIsi = baris.some((b) => (b.jumlah ?? b.jumlah_warga ?? b.kelahiran ?? 0) > 0);
+        const adaIsi = baris.some((b) => (b.jumlah ?? b.jumlah_warga ?? b.kelahiran ?? b.laki ?? b.perempuan ?? 0) > 0);
         if (!adaIsi) {
             tampilkan(statusKosong);
             return;
@@ -258,6 +258,57 @@ const konfigurasiPendidikan = (baris) => ({
     },
 });
 
+const konfigurasiPiramida = (baris) => ({
+    type: 'bar',
+    data: {
+        labels: baris.map((b) => b.label),
+        datasets: [
+            {
+                label: 'Laki-laki',
+                data: baris.map((b) => (b.laki === null ? 0 : -b.laki)),
+                backgroundColor: WARNA.biru,
+                maxBarThickness: 16,
+            },
+            {
+                label: 'Perempuan',
+                data: baris.map((b) => b.perempuan ?? 0),
+                backgroundColor: WARNA.ungu,
+                maxBarThickness: 16,
+            },
+        ],
+    },
+    options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { position: 'bottom' },
+            tooltip: {
+                callbacks: {
+                    label: (k) => {
+                        const b = baris[k.dataIndex];
+                        const laki = k.dataset.label === 'Laki-laki';
+                        const nilai = laki ? b.laki : b.perempuan;
+                        const tampilan = laki ? b.laki_tampilan : b.perempuan_tampilan;
+
+                        return nilai === null
+                            ? `${k.dataset.label}: kurang dari 5 orang`
+                            : `${k.dataset.label}: ${tampilan} warga`;
+                    },
+                },
+            },
+        },
+        scales: {
+            x: {
+                stacked: true,
+                ticks: { callback: (v) => angka(Math.abs(v)), precision: 0 },
+                grid: { color: '#f1f5f9' },
+            },
+            y: { stacked: true, grid: { display: false } },
+        },
+    },
+});
+
 // Diekspos sebagai objek global, bukan modul ES, supaya halaman Blade cukup
 // memuatnya lewat @vite tanpa perlu tahu nama berkas hasil build.
 window.Grafik = {
@@ -268,4 +319,5 @@ window.Grafik = {
     mataPencaharian: konfigurasiMataPencaharian,
     pendidikan: konfigurasiPendidikan,
     trenMutasi: konfigurasiTrenMutasi,
+    piramida: konfigurasiPiramida,
 };
