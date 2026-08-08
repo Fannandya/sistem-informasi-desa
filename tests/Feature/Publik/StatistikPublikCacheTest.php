@@ -313,4 +313,32 @@ class StatistikPublikCacheTest extends TestCase
         $this->assertSame($sebelum['perkawinan'] + 1, $sesudah['perkawinan']);
         $this->assertSame($sebelum['pekerjaan'] + 1, $sesudah['pekerjaan']);
     }
+
+    public function test_halaman_statistik_mengirim_data_piramida_pekerjaan_agama_perkawinan(): void
+    {
+        $this->warga();
+
+        $respons = $this->get(route('publik.statistik'));
+
+        $respons->assertOk();
+        $respons->assertViewHas('piramida');
+        $respons->assertViewHas('sebaranPekerjaan');
+        $respons->assertViewHas('agama');
+        $respons->assertViewHas('statusPerkawinan');
+    }
+
+    public function test_endpoint_data_piramida_mengembalikan_json(): void
+    {
+        $this->warga();
+
+        $this->getJson(route('publik.statistik.data', 'piramida'))
+            ->assertOk()
+            ->assertJsonStructure(['data']);
+    }
+
+    public function test_endpoint_data_jenis_ngawur_ditolak(): void
+    {
+        $this->getJson(route('publik.statistik.data', 'entah-apa'))
+            ->assertNotFound();
+    }
 }

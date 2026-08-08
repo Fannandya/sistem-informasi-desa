@@ -25,6 +25,10 @@ class StatistikController extends Controller
             'sebaranDusun' => $this->statistik->sebaranDusun(),
             'sebaranUmur' => $this->statistik->sebaranUmur(),
             'pendidikan' => $this->statistik->pendidikan(),
+            'piramida' => $this->statistik->piramidaUmurGender(),
+            'sebaranPekerjaan' => $this->statistik->sebaranPekerjaan(),
+            'agama' => $this->statistik->agama(),
+            'statusPerkawinan' => $this->statistik->statusPerkawinan(),
             'jumlahDusun' => $this->statistik->jumlahDusun(),
             'tanggalPembaruan' => $this->statistik->tanggalPembaruan(),
         ]);
@@ -32,7 +36,7 @@ class StatistikController extends Controller
 
     public function data(string $jenis): JsonResponse
     {
-        abort_unless(in_array($jenis, ['umur', 'gender', 'pendidikan'], true), 404);
+        abort_unless(in_array($jenis, ['umur', 'gender', 'pendidikan', 'piramida'], true), 404);
 
         return response()->json(['data' => $this->statistik->untukGrafik($jenis)]);
     }
