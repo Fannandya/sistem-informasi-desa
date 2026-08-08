@@ -6,7 +6,9 @@ use App\Enums\AlasanKeluar;
 use App\Enums\JenisKelamin;
 use App\Enums\JenisMasuk;
 use App\Enums\Pendidikan;
+use App\Enums\StatusPerkawinan;
 use App\Models\Penduduk;
+use App\Models\RefAgama;
 use App\Models\RefPekerjaan;
 use App\Models\Wilayah;
 use Illuminate\Database\Seeder;
@@ -43,15 +45,17 @@ class PendudukSeeder extends Seeder
             return;
         }
 
+        $agama = RefAgama::pluck('id')->all();
+
         mt_srand(2026); // hasil seeder konsisten antar-jalan
 
-        $this->warga(320, $wilayah, $pekerjaan);
+        $this->warga(320, $wilayah, $pekerjaan, $agama);
         $this->kelahiran($wilayah);
         $this->arsip($wilayah, $pekerjaan);
     }
 
     /** Warga aktif hasil pendataan awal, tersebar di seluruh kelompok umur. */
-    private function warga(int $jumlah, array $wilayah, array $pekerjaan): void
+    private function warga(int $jumlah, array $wilayah, array $pekerjaan, array $agama): void
     {
         $baris = [];
 
@@ -74,6 +78,12 @@ class PendudukSeeder extends Seeder
                     ? $pekerjaan[array_rand($pekerjaan)]
                     : null,
                 'pendidikan' => $this->pendidikan($umur)?->value,
+                // ~4% sengaja tidak mengisi agama, meniru data lama sebelum
+                // kolom ini ada — supaya baris "Belum diisi" ikut teruji.
+                'agama_id' => $agama !== [] && mt_rand(1, 100) <= 96
+                    ? $agama[array_rand($agama)]
+                    : null,
+                'status_perkawinan' => $this->statusPerkawinan($umur)?->value,
                 'jenis_masuk' => JenisMasuk::PendataanAwal->value,
                 'tanggal_masuk' => Carbon::today()->subYears(3)->toDateString(),
                 'created_at' => now(),
@@ -185,6 +195,21 @@ class PendudukSeeder extends Seeder
                 Pendidikan::SMA, Pendidikan::SMA, Pendidikan::SMA,
                 Pendidikan::D1D3, Pendidikan::S1, Pendidikan::S1, Pendidikan::S2,
             ])->random(),
+        };
+    }
+
+    private function statusPerkawinan(int $umur): ?StatusPerkawinan
+    {
+        if ($umur < 17) {
+            return StatusPerkawinan::BelumKawin;
+        }
+
+        return match (true) {
+            mt_rand(1, 100) <= 25 => StatusPerkawinan::BelumKawin,
+            mt_rand(1, 100) <= 78 => StatusPerkawinan::KawinTercatat,
+            mt_rand(1, 100) <= 88 => StatusPerkawinan::KawinTidakTercatat,
+            mt_rand(1, 100) <= 95 => StatusPerkawinan::CeraiHidup,
+            default => StatusPerkawinan::CeraiMati,
         };
     }
 }

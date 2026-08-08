@@ -20,7 +20,9 @@ class PendudukFactory extends Factory
             'jenis_kelamin' => fake()->randomElement(['L', 'P']),
             'wilayah_id' => $wilayah->id,
             'pekerjaan_id' => null,
+            'agama_id' => null,
             'pendidikan' => fake()->randomElement(['sd', 'smp', 'sma', 's1']),
+            'status_perkawinan' => null,
             'jenis_masuk' => 'pendataan_awal',
             'tanggal_masuk' => fake()->dateTimeBetween('-10 years', 'now'),
         ];
