@@ -389,7 +389,7 @@ function carousel() {
                                 </div>
                                 <div class="min-w-0">
                                     <p class="truncate text-lg font-bold text-on-surface">{{ $item->nama }}</p>
-                                    <span class="mt-1 inline-block rounded-full bg-primary-fixed px-3 py-1 text-xs font-medium tracking-wide text-on-primary-fixed-variant">
+                                    <span class="mt-1 inline-block text-xs font-medium tracking-wide text-primary underline decoration-2 underline-offset-4">
                                         {{ $item->kategori->label() }}
                                     </span>
                                 </div>
@@ -426,7 +426,7 @@ function carousel() {
                                 <div class="flex flex-wrap items-center gap-3">
                                     <span class="font-bold text-on-surface-variant tabular-nums">{{ $item->tahun }}</span>
                                     @if ($item->tingkat)
-                                        <span class="rounded-full bg-primary-fixed px-3 py-1 text-xs font-medium tracking-wide text-on-primary-fixed-variant">
+                                        <span class="text-xs font-medium tracking-wide text-primary underline decoration-2 underline-offset-4">
                                             {{ $item->tingkat->label() }}
                                         </span>
                                     @endif
