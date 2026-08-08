@@ -259,21 +259,58 @@ class StatistikPublikCacheTest extends TestCase
         $this->assertArrayHasKey('laki', $data->first());
     }
 
+    /**
+     * assertIsArray() pada tipe kembalian yang sudah dideklarasikan `array`
+     * selalu benar — tidak membuktikan apa pun soal cache. Tes ini
+     * membandingkan angka sungguhan sebelum/sesudah, dengan kelompok uji
+     * yang sudah di atas ambang sedari awal (lihat komentar di bawah)
+     * supaya sensor privasi tidak menutupi selisihnya.
+     */
     public function test_cache_piramida_agama_perkawinan_pekerjaan_dikosongkan_bersama(): void
     {
-        $this->warga();
+        $agama = \App\Models\RefAgama::create(['nama' => 'Cache Uji']);
+        $pekerjaan = \App\Models\RefPekerjaan::create(['nama' => 'Cache Uji']);
 
-        (new StatistikPublik())->piramidaUmurGender();
-        (new StatistikPublik())->agama();
-        (new StatistikPublik())->statusPerkawinan();
-        (new StatistikPublik())->sebaranPekerjaan();
+        $atributUji = [
+            'tanggal_lahir' => Carbon::today()->subYears(30),
+            'jenis_kelamin' => 'L',
+            'agama_id' => $agama->id,
+            'status_perkawinan' => 'kawin_tercatat',
+            'pekerjaan_id' => $pekerjaan->id,
+        ];
+
+        // Kelompok uji diisi sampai tepat di ambang lebih dulu. Kalau
+        // dimulai dari nol, penambahan satu warga di bawah akan tetap
+        // tersensor jadi "<5" di kedua sisi — perbandingannya tidak akan
+        // pernah bisa membuktikan bahwa cache benar-benar disegarkan.
+        foreach (range(1, StatistikPublik::AMBANG) as $i) {
+            $this->warga($atributUji);
+        }
+
+        $ambilAngka = fn () => [
+            'piramida' => collect((new StatistikPublik())->piramidaUmurGender())->firstWhere('label', '30–34')['laki'],
+            'agama' => collect((new StatistikPublik())->agama())->firstWhere('label', 'Cache Uji')['jumlah'],
+            'perkawinan' => collect((new StatistikPublik())->statusPerkawinan())
+                ->firstWhere('label', \App\Enums\StatusPerkawinan::KawinTercatat->label())['jumlah'],
+            'pekerjaan' => collect((new StatistikPublik())->sebaranPekerjaan())->firstWhere('label', 'Cache Uji')['jumlah'],
+        ];
+
+        // Cache terisi dengan kondisi awal (tepat di ambang, jadi sudah
+        // tampil sebagai angka pasti untuk keempat statistik).
+        $sebelum = $ambilAngka();
+
+        $this->warga($atributUji);
 
         StatistikPublik::lupakanCache();
 
-        $this->warga();
+        $sesudah = $ambilAngka();
 
-        // Nilai baru harus terlihat — cache lama tidak lagi dipakai.
-        $ulang = (new StatistikPublik())->sebaranPekerjaan();
-        $this->assertIsArray($ulang);
+        // Setiap statistik harus naik satu — kalau salah satu kunci cache
+        // lupa didaftarkan di KUNCI_CACHE, nilainya akan tetap sama dengan
+        // $sebelum karena masih dilayani dari cache lama.
+        $this->assertSame($sebelum['piramida'] + 1, $sesudah['piramida']);
+        $this->assertSame($sebelum['agama'] + 1, $sesudah['agama']);
+        $this->assertSame($sebelum['perkawinan'] + 1, $sesudah['perkawinan']);
+        $this->assertSame($sebelum['pekerjaan'] + 1, $sesudah['pekerjaan']);
     }
 }
