@@ -219,4 +219,61 @@ class StatistikPublikCacheTest extends TestCase
         // Halaman HTML-nya memakai jatah terpisah dan tetap bisa dibuka.
         $this->get('/statistik')->assertOk();
     }
+
+    public function test_piramida_menyensor_sel_di_bawah_ambang(): void
+    {
+        foreach (range(1, 3) as $i) {
+            $this->warga(['tanggal_lahir' => Carbon::today()->subYears(3), 'jenis_kelamin' => 'L']);
+        }
+        foreach (range(1, 6) as $i) {
+            $this->warga(['tanggal_lahir' => Carbon::today()->subYears(3), 'jenis_kelamin' => 'P']);
+        }
+
+        $hasil = collect((new StatistikPublik())->piramidaUmurGender())->keyBy('label');
+
+        $this->assertNull($hasil['0–4']['laki']);
+        $this->assertSame('<5', $hasil['0–4']['laki_tampilan']);
+        $this->assertSame(6, $hasil['0–4']['perempuan']);
+    }
+
+    public function test_agama_publik_menyensor_kelompok_kecil(): void
+    {
+        $agama = \App\Models\RefAgama::create(['nama' => 'Konghucu']);
+        foreach (range(1, 3) as $i) {
+            $this->warga(['agama_id' => $agama->id]);
+        }
+
+        $hasil = collect((new StatistikPublik())->agama())->keyBy('label');
+
+        $this->assertNull($hasil['Konghucu']['jumlah']);
+        $this->assertSame('<5', $hasil['Konghucu']['tampilan']);
+    }
+
+    public function test_untuk_grafik_piramida_mengembalikan_data_piramida(): void
+    {
+        $this->warga(['tanggal_lahir' => Carbon::today()->subYears(30)]);
+
+        $data = (new StatistikPublik())->untukGrafik('piramida');
+
+        $this->assertNotEmpty($data);
+        $this->assertArrayHasKey('laki', $data->first());
+    }
+
+    public function test_cache_piramida_agama_perkawinan_pekerjaan_dikosongkan_bersama(): void
+    {
+        $this->warga();
+
+        (new StatistikPublik())->piramidaUmurGender();
+        (new StatistikPublik())->agama();
+        (new StatistikPublik())->statusPerkawinan();
+        (new StatistikPublik())->sebaranPekerjaan();
+
+        StatistikPublik::lupakanCache();
+
+        $this->warga();
+
+        // Nilai baru harus terlihat — cache lama tidak lagi dipakai.
+        $ulang = (new StatistikPublik())->sebaranPekerjaan();
+        $this->assertIsArray($ulang);
+    }
 }

@@ -37,6 +37,10 @@ class StatistikPublik
         'sebaran_dusun',
         'jumlah_dusun',
         'tanggal_pembaruan',
+        'piramida',
+        'agama',
+        'status_perkawinan',
+        'pekerjaan',
     ];
 
     /**
@@ -125,6 +129,50 @@ class StatistikPublik
         return $this->hafalkan(
             'pendidikan',
             fn () => $this->lindungi($this->statistik->pendidikan()),
+        );
+    }
+
+    /**
+     * @return array<int, array{label: string, laki: int|null, laki_tampilan: string, perempuan: int|null, perempuan_tampilan: string}>
+     */
+    public function piramidaUmurGender(): array
+    {
+        return $this->hafalkan(
+            'piramida',
+            fn () => $this->lindungiPiramida($this->statistik->piramidaUmurGender()),
+        );
+    }
+
+    /**
+     * @return array<int, array{label: string, jumlah: int|null, tampilan: string, persen: float}>
+     */
+    public function agama(): array
+    {
+        return $this->hafalkan(
+            'agama',
+            fn () => $this->lindungi($this->statistik->agama()),
+        );
+    }
+
+    /**
+     * @return array<int, array{label: string, jumlah: int|null, tampilan: string, persen: float}>
+     */
+    public function statusPerkawinan(): array
+    {
+        return $this->hafalkan(
+            'status_perkawinan',
+            fn () => $this->lindungi($this->statistik->statusPerkawinan()),
+        );
+    }
+
+    /**
+     * @return array<int, array{label: string, jumlah: int|null, tampilan: string, persen: float}>
+     */
+    public function sebaranPekerjaan(): array
+    {
+        return $this->hafalkan(
+            'pekerjaan',
+            fn () => $this->lindungi($this->statistik->sebaranPekerjaan()),
         );
     }
 
@@ -290,6 +338,32 @@ class StatistikPublik
     }
 
     /**
+     * Sensor ambang untuk piramida — tiap baris punya DUA kolom angka
+     * (laki & perempuan) yang disensor independen, karena satu sisi bisa
+     * di bawah ambang sementara sisi lain tidak.
+     *
+     * @param  array<int, array{label: string, laki: int, perempuan: int}>  $baris
+     * @return array<int, array{label: string, laki: int|null, laki_tampilan: string, perempuan: int|null, perempuan_tampilan: string}>
+     */
+    private function lindungiPiramida(array $baris): array
+    {
+        $tampilkan = fn (int $jumlah) => $jumlah >= self::AMBANG
+            ? number_format($jumlah, 0, ',', '.')
+            : ($jumlah === 0 ? '0' : '<'.self::AMBANG);
+
+        return collect($baris)
+            ->map(fn (array $b) => [
+                'label' => $b['label'],
+                'laki' => $b['laki'] >= self::AMBANG ? $b['laki'] : null,
+                'laki_tampilan' => $tampilkan($b['laki']),
+                'perempuan' => $b['perempuan'] >= self::AMBANG ? $b['perempuan'] : null,
+                'perempuan_tampilan' => $tampilkan($b['perempuan']),
+            ])
+            ->values()
+            ->all();
+    }
+
+    /**
      * Data siap kirim untuk grafik. Hanya memuat nilai yang sudah disaring.
      *
      * @return Collection<string, mixed>
@@ -300,6 +374,7 @@ class StatistikPublik
             'umur' => $this->sebaranUmur(),
             'gender' => $this->rasioGender(),
             'pendidikan' => $this->pendidikan(),
+            'piramida' => $this->piramidaUmurGender(),
             default => [],
         });
     }
