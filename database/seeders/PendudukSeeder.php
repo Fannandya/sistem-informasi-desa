@@ -204,11 +204,13 @@ class PendudukSeeder extends Seeder
             return StatusPerkawinan::BelumKawin;
         }
 
+        $undi = mt_rand(1, 100);
+
         return match (true) {
-            mt_rand(1, 100) <= 25 => StatusPerkawinan::BelumKawin,
-            mt_rand(1, 100) <= 78 => StatusPerkawinan::KawinTercatat,
-            mt_rand(1, 100) <= 88 => StatusPerkawinan::KawinTidakTercatat,
-            mt_rand(1, 100) <= 95 => StatusPerkawinan::CeraiHidup,
+            $undi <= 25 => StatusPerkawinan::BelumKawin,
+            $undi <= 78 => StatusPerkawinan::KawinTercatat,
+            $undi <= 88 => StatusPerkawinan::KawinTidakTercatat,
+            $undi <= 95 => StatusPerkawinan::CeraiHidup,
             default => StatusPerkawinan::CeraiMati,
         };
     }
