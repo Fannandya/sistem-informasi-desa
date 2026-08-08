@@ -88,23 +88,25 @@
                 {{-- Mobile Toggle --}}
                 <button type="button" @click="menu = !menu"
                         :class="scrolled ? 'text-on-surface hover:bg-surface-container-low' : 'text-white hover:bg-white/10'"
-                        class="md:hidden p-2 -mr-2 rounded-xl transition-colors duration-300 outline-none focus-visible:ring-2 focus-visible:ring-primary flex items-center justify-center"
+                        class="md:hidden p-2 -mr-2 rounded-xl transition-colors duration-300 outline-none focus-visible:ring-2 focus-visible:ring-primary flex items-center justify-center relative w-10 h-10"
                         aria-label="Toggle menu">
-                    <span class="material-symbols-outlined" x-show="!menu">menu</span>
-                    <span class="material-symbols-outlined" x-show="menu" x-cloak>close</span>
+                    <span class="material-symbols-outlined absolute transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                          :class="menu ? 'opacity-0 rotate-90 scale-50' : 'opacity-100 rotate-0 scale-100'">menu</span>
+                    <span class="material-symbols-outlined absolute transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                          :class="menu ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-50'">close</span>
                 </button>
             </div>
 
             {{-- Mobile Nav Dropdown --}}
             <div x-show="menu" x-cloak
                  @click.away="menu = false"
-                 x-transition:enter="transition ease-out duration-200"
-                 x-transition:enter-start="opacity-0 -translate-y-4 scale-95"
-                 x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-                 x-transition:leave="transition ease-in duration-150"
-                 x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-                 x-transition:leave-end="opacity-0 -translate-y-4 scale-95"
-                 class="absolute top-full mt-3 left-4 right-4 bg-surface-container-lowest/95 backdrop-blur-xl border border-outline-variant/40 rounded-2xl shadow-[0_20px_40px_rgb(0,0,0,0.08)] overflow-hidden md:hidden origin-top">
+                 x-transition:enter="transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
+                 x-transition:enter-start="opacity-0 -translate-y-8 scale-95 blur-md"
+                 x-transition:enter-end="opacity-100 translate-y-0 scale-100 blur-none"
+                 x-transition:leave="transition-all duration-300 ease-in"
+                 x-transition:leave-start="opacity-100 translate-y-0 scale-100 blur-none"
+                 x-transition:leave-end="opacity-0 -translate-y-4 scale-95 blur-sm"
+                 class="absolute top-full mt-3 left-4 right-4 bg-surface-container-lowest/70 backdrop-blur-3xl backdrop-saturate-[2] border-t border-t-white/80 border-b border-b-outline-variant/20 border-x border-x-outline-variant/20 rounded-2xl shadow-[0_30px_60px_rgb(0,0,0,0.12)] overflow-hidden md:hidden origin-top">
                 <div class="p-2 flex flex-col gap-1">
                     @foreach (\App\Support\MenuPublik::tautan() as $tautan)
                         <a href="{{ $tautan['url'] }}"
