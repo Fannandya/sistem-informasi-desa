@@ -7,6 +7,7 @@ use App\Enums\JenisMasuk;
 use App\Enums\KelompokUmur;
 use App\Models\Admin;
 use App\Models\Penduduk;
+use App\Models\RefAgama;
 use App\Models\RefPekerjaan;
 use App\Models\RekapKk;
 use App\Models\Wilayah;
@@ -35,7 +36,7 @@ class StatistikTest extends TestCase
         $this->admin = Admin::create(['nama' => 'A', 'email' => 'a@desa.test', 'password' => 'rahasia123']);
         $this->krajan = Wilayah::create(['dusun' => 'Krajan', 'rw' => '001', 'rt' => '001', 'urutan' => 1]);
         $this->sukasari = Wilayah::create(['dusun' => 'Sukasari', 'rw' => '002', 'rt' => '001', 'urutan' => 2]);
-        $this->statistik = new StatistikPenduduk();
+        $this->statistik = new StatistikPenduduk;
     }
 
     private function warga(array $atribut = []): Penduduk
@@ -196,6 +197,159 @@ class StatistikTest extends TestCase
 
         // Kekosongan data harus terlihat, bukan tersembunyi.
         $this->assertSame(1, $hasil['Belum diisi']['jumlah']);
+    }
+
+    // ------------------------------------------------------------------
+    // Piramida umur x gender
+    // ------------------------------------------------------------------
+
+    public function test_piramida_mengelompokkan_per_lima_tahun_dan_gender(): void
+    {
+        $this->warga(['tanggal_lahir' => Carbon::today()->subYears(3), 'jenis_kelamin' => 'L']);
+        $this->warga(['tanggal_lahir' => Carbon::today()->subYears(3), 'jenis_kelamin' => 'P']);
+        $this->warga(['tanggal_lahir' => Carbon::today()->subYears(3), 'jenis_kelamin' => 'P']);
+        $this->warga(['tanggal_lahir' => Carbon::today()->subYears(101), 'jenis_kelamin' => 'L']);
+
+        $hasil = collect($this->statistik->piramidaUmurGender())->keyBy('label');
+
+        $this->assertSame(1, $hasil['0–4']['laki']);
+        $this->assertSame(2, $hasil['0–4']['perempuan']);
+        $this->assertSame(1, $hasil['100+']['laki']);
+        $this->assertSame(0, $hasil['100+']['perempuan']);
+    }
+
+    /**
+     * Batas pita dihitung terhadap hari ini, persis seperti sebaranUmur():
+     * berulang tahun ke-5 tepat hari ini harus pindah ke pita "5–9", bukan
+     * tertinggal di "0–4".
+     */
+    public function test_piramida_tepat_pada_batas_pita(): void
+    {
+        // Berulang tahun ke-5 tepat hari ini -> pita 5–9.
+        $this->warga(['tanggal_lahir' => Carbon::today()->subYears(5), 'jenis_kelamin' => 'L']);
+
+        // Berulang tahun ke-5 besok, hari ini masih 4 -> pita 0–4.
+        $this->warga(['tanggal_lahir' => Carbon::today()->subYears(5)->addDay(), 'jenis_kelamin' => 'P']);
+
+        $hasil = collect($this->statistik->piramidaUmurGender())->keyBy('label');
+
+        $this->assertSame(1, $hasil['5–9']['laki']);
+        $this->assertSame(0, $hasil['5–9']['perempuan']);
+        $this->assertSame(0, $hasil['0–4']['laki']);
+        $this->assertSame(1, $hasil['0–4']['perempuan']);
+    }
+
+    public function test_piramida_dihitung_dalam_satu_kueri(): void
+    {
+        $this->warga(['tanggal_lahir' => Carbon::today()->subYears(30)]);
+
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+
+        $this->statistik->piramidaUmurGender();
+
+        $jumlahKueri = count(DB::getQueryLog());
+        DB::disableQueryLog();
+
+        $this->assertSame(1, $jumlahKueri);
+    }
+
+    public function test_piramida_punya_21_kelompok(): void
+    {
+        $this->assertCount(21, $this->statistik->piramidaUmurGender());
+    }
+
+    public function test_piramida_mengabaikan_warga_tanpa_tanggal_lahir(): void
+    {
+        $this->warga(['tanggal_lahir' => null]);
+
+        $total = collect($this->statistik->piramidaUmurGender())->sum(fn ($b) => $b['laki'] + $b['perempuan']);
+
+        $this->assertSame(0, $total);
+    }
+
+    // ------------------------------------------------------------------
+    // Agama
+    // ------------------------------------------------------------------
+
+    public function test_agama_mengelompokkan_dan_memisahkan_belum_diisi(): void
+    {
+        $islam = RefAgama::create(['nama' => 'Islam']);
+        $kristen = RefAgama::create(['nama' => 'Kristen']);
+
+        $this->warga(['agama_id' => $islam->id]);
+        $this->warga(['agama_id' => $islam->id]);
+        $this->warga(['agama_id' => $kristen->id]);
+        $this->warga(['agama_id' => null]);
+
+        $hasil = collect($this->statistik->agama())->keyBy('label');
+
+        $this->assertSame(2, $hasil['Islam']['jumlah']);
+        $this->assertSame(1, $hasil['Kristen']['jumlah']);
+        $this->assertSame(1, $hasil['Belum diisi']['jumlah']);
+    }
+
+    public function test_tidak_ingin_menyebutkan_terpisah_dari_belum_diisi(): void
+    {
+        $rahasia = RefAgama::create(['nama' => 'Tidak Ingin Menyebutkan']);
+
+        $this->warga(['agama_id' => $rahasia->id]);
+        $this->warga(['agama_id' => null]);
+
+        $hasil = collect($this->statistik->agama())->keyBy('label');
+
+        $this->assertSame(1, $hasil['Tidak Ingin Menyebutkan']['jumlah']);
+        $this->assertSame(1, $hasil['Belum diisi']['jumlah']);
+    }
+
+    // ------------------------------------------------------------------
+    // Status perkawinan
+    // ------------------------------------------------------------------
+
+    public function test_status_perkawinan_mengelompokkan_enam_kategori(): void
+    {
+        $this->warga(['status_perkawinan' => 'belum_kawin']);
+        $this->warga(['status_perkawinan' => 'kawin_tercatat']);
+        $this->warga(['status_perkawinan' => 'kawin_tercatat']);
+        $this->warga(['status_perkawinan' => null]);
+
+        $hasil = collect($this->statistik->statusPerkawinan())->keyBy('label');
+
+        $this->assertSame(1, $hasil['Belum Kawin']['jumlah']);
+        $this->assertSame(2, $hasil['Kawin Tercatat']['jumlah']);
+        $this->assertSame(1, $hasil['Belum diisi']['jumlah']);
+    }
+
+    // ------------------------------------------------------------------
+    // Sebaran pekerjaan (lengkap, publik)
+    // ------------------------------------------------------------------
+
+    public function test_sebaran_pekerjaan_tidak_dibatasi_sepuluh(): void
+    {
+        foreach (range(1, 12) as $i) {
+            $pekerjaan = RefPekerjaan::create(['nama' => "Pekerjaan {$i}"]);
+            $this->warga(['pekerjaan_id' => $pekerjaan->id]);
+        }
+
+        $hasil = collect($this->statistik->sebaranPekerjaan());
+
+        $this->assertCount(12, $hasil);
+        $this->assertFalse($hasil->contains('label', 'Lainnya'));
+    }
+
+    public function test_sebaran_pekerjaan_diurutkan_terbanyak(): void
+    {
+        $sedikit = RefPekerjaan::create(['nama' => 'Sedikit']);
+        $banyak = RefPekerjaan::create(['nama' => 'Banyak']);
+
+        $this->warga(['pekerjaan_id' => $sedikit->id]);
+        $this->warga(['pekerjaan_id' => $banyak->id]);
+        $this->warga(['pekerjaan_id' => $banyak->id]);
+        $this->warga(['pekerjaan_id' => $banyak->id]);
+
+        $hasil = collect($this->statistik->sebaranPekerjaan());
+
+        $this->assertSame('Banyak', $hasil->first()['label']);
     }
 
     // ------------------------------------------------------------------

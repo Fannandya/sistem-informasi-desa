@@ -7,7 +7,9 @@ use App\Enums\JenisKelamin;
 use App\Enums\JenisMasuk;
 use App\Enums\KelompokUmur;
 use App\Enums\Pendidikan;
+use App\Enums\StatusPerkawinan;
 use App\Models\Penduduk;
+use App\Models\RekapKk;
 use App\Models\Wilayah;
 use Illuminate\Support\Collection;
 
@@ -157,6 +159,73 @@ class StatistikPenduduk
             ->all();
     }
 
+    /** Lebar tiap kelompok umur pada piramida, dalam tahun. */
+    private const LEBAR_PITA_PIRAMIDA = 5;
+
+    /** Umur mulai kelompok terbuka terakhir ("100+"). */
+    private const PITA_PIRAMIDA_TERAKHIR = 100;
+
+    // ------------------------------------------------------------------
+    // Piramida penduduk (umur 5 tahunan x gender) — terpisah dari
+    // KelompokUmur, yang tetap dipakai grafik "Sebaran Kelompok Umur".
+    // ------------------------------------------------------------------
+
+    /**
+     * @return array<int, array{label: string, laki: int, perempuan: int}>
+     */
+    public function piramidaUmurGender(): array
+    {
+        $pilih = [];
+        $binding = [];
+        $hariIni = now();
+        $pita = $this->pitaPiramida();
+
+        foreach ($pita as $i => $p) {
+            foreach (['L', 'P'] as $jk) {
+                $alias = "pita_{$i}_{$jk}";
+                $syarat = ['jenis_kelamin = ?', 'tanggal_lahir IS NOT NULL', 'date(tanggal_lahir) <= ?'];
+                $binding[] = $jk;
+                $binding[] = $hariIni->copy()->subYears($p['min'])->toDateString();
+
+                if ($p['maks'] !== null) {
+                    $syarat[] = 'date(tanggal_lahir) > ?';
+                    $binding[] = $hariIni->copy()->subYears($p['maks'] + 1)->toDateString();
+                }
+
+                $pilih[] = 'SUM(CASE WHEN '.implode(' AND ', $syarat).' THEN 1 ELSE 0 END) as '.$alias;
+            }
+        }
+
+        $baris = Penduduk::query()->aktif()->selectRaw(implode(', ', $pilih), $binding)->first();
+
+        $hasil = [];
+
+        foreach ($pita as $i => $p) {
+            $hasil[] = [
+                'label' => $p['label'],
+                'laki' => (int) ($baris?->{"pita_{$i}_L"} ?? 0),
+                'perempuan' => (int) ($baris?->{"pita_{$i}_P"} ?? 0),
+            ];
+        }
+
+        return $hasil;
+    }
+
+    /** @return array<int, array{label: string, min: int, maks: int|null}> */
+    private function pitaPiramida(): array
+    {
+        $pita = [];
+
+        for ($mulai = 0; $mulai < self::PITA_PIRAMIDA_TERAKHIR; $mulai += self::LEBAR_PITA_PIRAMIDA) {
+            $akhir = $mulai + self::LEBAR_PITA_PIRAMIDA - 1;
+            $pita[] = ['label' => "{$mulai}–{$akhir}", 'min' => $mulai, 'maks' => $akhir];
+        }
+
+        $pita[] = ['label' => self::PITA_PIRAMIDA_TERAKHIR.'+', 'min' => self::PITA_PIRAMIDA_TERAKHIR, 'maks' => null];
+
+        return $pita;
+    }
+
     // ------------------------------------------------------------------
     // Mata pencaharian
     // ------------------------------------------------------------------
@@ -240,6 +309,121 @@ class StatistikPenduduk
     }
 
     // ------------------------------------------------------------------
+    // Agama
+    // ------------------------------------------------------------------
+
+    /**
+     * @return array<int, array{label: string, jumlah: int, persen: float}>
+     */
+    public function agama(): array
+    {
+        $total = $this->totalWargaAktif();
+
+        $perAgama = Penduduk::query()->aktif()
+            ->whereNotNull('agama_id')
+            ->join('ref_agama', 'penduduk.agama_id', '=', 'ref_agama.id')
+            ->selectRaw('ref_agama.nama as nama, COUNT(*) as total')
+            ->groupBy('ref_agama.nama')
+            ->orderByDesc('total')
+            ->pluck('total', 'nama');
+
+        $hasil = $perAgama
+            ->map(fn ($jumlah, $nama) => [
+                'label' => $nama,
+                'jumlah' => (int) $jumlah,
+                'persen' => $this->persen((int) $jumlah, $total),
+            ])
+            ->values()
+            ->all();
+
+        // Terpisah dari baris "Tidak Ingin Menyebutkan" (agama_id nyata):
+        // ini murni warga yang belum pernah didata agamanya.
+        $belumDiisi = Penduduk::query()->aktif()->whereNull('agama_id')->count();
+
+        if ($belumDiisi > 0) {
+            $hasil[] = ['label' => 'Belum diisi', 'jumlah' => $belumDiisi, 'persen' => $this->persen($belumDiisi, $total)];
+        }
+
+        return $hasil;
+    }
+
+    // ------------------------------------------------------------------
+    // Status perkawinan
+    // ------------------------------------------------------------------
+
+    /**
+     * @return array<int, array{label: string, jumlah: int, persen: float}>
+     */
+    public function statusPerkawinan(): array
+    {
+        $total = $this->totalWargaAktif();
+
+        $jumlah = Penduduk::query()->aktif()
+            ->selectRaw('status_perkawinan, COUNT(*) as total')
+            ->groupBy('status_perkawinan')
+            ->pluck('total', 'status_perkawinan');
+
+        $hasil = collect(StatusPerkawinan::cases())
+            ->map(fn (StatusPerkawinan $s) => [
+                'label' => $s->label(),
+                'jumlah' => (int) ($jumlah[$s->value] ?? 0),
+                'persen' => $this->persen((int) ($jumlah[$s->value] ?? 0), $total),
+            ])
+            ->filter(fn (array $baris) => $baris['jumlah'] > 0)
+            ->values()
+            ->all();
+
+        // Baris NULL pada groupBy muncul dengan kunci array '' (koersi PHP
+        // untuk kunci null), jadi angkanya sudah termasuk warga yang belum
+        // diisi — tidak perlu whereNull() terpisah, itu hanya akan
+        // menghitung dua kali baris yang sama.
+        $belumDiisi = (int) ($jumlah[''] ?? 0);
+
+        if ($belumDiisi > 0) {
+            $hasil[] = ['label' => 'Belum diisi', 'jumlah' => $belumDiisi, 'persen' => $this->persen($belumDiisi, $total)];
+        }
+
+        return $hasil;
+    }
+
+    // ------------------------------------------------------------------
+    // Sebaran pekerjaan lengkap (halaman publik — tidak dibatasi 10 teratas)
+    // ------------------------------------------------------------------
+
+    /**
+     * @return array<int, array{label: string, jumlah: int, persen: float}>
+     */
+    public function sebaranPekerjaan(): array
+    {
+        $total = $this->totalWargaAktif();
+
+        $perPekerjaan = Penduduk::query()->aktif()
+            ->whereNotNull('pekerjaan_id')
+            ->join('ref_pekerjaan', 'penduduk.pekerjaan_id', '=', 'ref_pekerjaan.id')
+            ->selectRaw('ref_pekerjaan.nama as nama, COUNT(*) as total')
+            ->groupBy('ref_pekerjaan.nama')
+            ->orderByDesc('total')
+            ->pluck('total', 'nama');
+
+        $hasil = $perPekerjaan
+            ->map(fn ($jumlah, $nama) => [
+                'label' => $nama,
+                'jumlah' => (int) $jumlah,
+                'persen' => $this->persen((int) $jumlah, $total),
+            ])
+            ->values()
+            ->all();
+
+        $belumDiisi = Penduduk::query()->aktif()->whereNull('pekerjaan_id')->count();
+
+        if ($belumDiisi > 0) {
+            $hasil[] = ['label' => 'Belum diisi', 'jumlah' => $belumDiisi, 'persen' => $this->persen($belumDiisi, $total)];
+        }
+
+        return $hasil;
+    }
+
+    // ------------------------------------------------------------------
     // Sebaran wilayah
     // ------------------------------------------------------------------
 
@@ -250,7 +434,7 @@ class StatistikPenduduk
      */
     public function sebaranWilayah(string $tingkat = 'dusun', string $urutan = 'desc'): array
     {
-        $ringkasanKk = new RingkasanKk();
+        $ringkasanKk = new RingkasanKk;
         $tahun = $ringkasanKk->tahunAcuan();
 
         $wargaPerWilayah = Penduduk::query()->aktif()
@@ -260,7 +444,7 @@ class StatistikPenduduk
 
         $kkPerWilayah = $tahun === null
             ? collect()
-            : \App\Models\RekapKk::tahun($tahun)->pluck('jumlah_kk', 'wilayah_id');
+            : RekapKk::tahun($tahun)->pluck('jumlah_kk', 'wilayah_id');
 
         // Wilayah yang belum punya warga tetap tampil dengan angka nol,
         // bukan hilang dari daftar — RT kosong adalah informasi, bukan
