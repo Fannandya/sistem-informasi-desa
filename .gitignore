@@ -46,3 +46,6 @@ bun.md
 DESIGN.md
 PRODUCT.md
 
+# Knowledge graph lokal (/graphify) - regenerable, tidak perlu di-commit
+graphify-out/
+
