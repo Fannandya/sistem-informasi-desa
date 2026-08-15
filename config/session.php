@@ -173,9 +173,16 @@ return [
     | mendapat peringatan apa pun, hanya cookie sesi admin yang ikut
     | terkirim pada permintaan http biasa.
     |
+    | SESSION_SECURE_COOKIE="" (string kosong, bukan unset) di .env tetap
+    | harus jatuh ke bawaan APP_ENV di atas — env() dengan default hanya
+    | fallback saat variabelnya benar-benar tidak ada, bukan saat isinya
+    | kosong. filled() di sini yang menjaga kontrak itu.
+    |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE', env('APP_ENV') === 'production'),
+    'secure' => filled(env('SESSION_SECURE_COOKIE'))
+        ? env('SESSION_SECURE_COOKIE')
+        : env('APP_ENV') === 'production',
 
     /*
     |--------------------------------------------------------------------------
