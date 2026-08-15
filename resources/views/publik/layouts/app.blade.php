@@ -39,6 +39,7 @@
         x-data="{
             menu: false,
             scrolled: false,
+            heroGelap: @yield('header_transparan_gelap', 'false'),
             init() {
                 this.scrolled = window.scrollY > 20;
                 window.addEventListener('scroll', () => {
@@ -66,7 +67,7 @@
                             {{ mb_strtoupper(mb_substr($desa->nama_desa, 0, 1)) }}
                         </div>
                     @endif
-                    <div :class="scrolled ? 'text-on-surface' : 'text-white'" class="font-headline-md text-lg font-bold tracking-tight transition-colors duration-300 truncate max-w-[160px] sm:max-w-none">
+                    <div :class="scrolled ? 'text-on-surface' : (heroGelap ? 'text-white' : 'text-on-surface')" class="font-headline-md text-lg font-bold tracking-tight transition-colors duration-300 truncate max-w-[160px] sm:max-w-none">
                         {{ $desa->nama_desa }}
                     </div>
                 </a>
@@ -78,7 +79,9 @@
                            data-aktif="{{ $tautan['aktif'] ? '1' : '0' }}"
                            :class="scrolled
                                ? ($el.dataset.aktif === '1' ? 'text-primary bg-primary/10' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low')
-                               : ($el.dataset.aktif === '1' ? 'text-white bg-white/20' : 'text-white/80 hover:text-white hover:bg-white/10')"
+                               : (heroGelap
+                                   ? ($el.dataset.aktif === '1' ? 'text-white bg-white/20' : 'text-white/80 hover:text-white hover:bg-white/10')
+                                   : ($el.dataset.aktif === '1' ? 'text-primary bg-primary/10' : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low'))"
                            class="font-label-md text-sm px-4 py-2 rounded-xl transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-primary">
                             {{ $tautan['label'] }}
                         </a>
@@ -87,7 +90,7 @@
 
                 {{-- Mobile Toggle --}}
                 <button type="button" @click="menu = !menu"
-                        :class="scrolled ? 'text-on-surface hover:bg-surface-container-low' : 'text-white hover:bg-white/10'"
+                        :class="scrolled ? 'text-on-surface hover:bg-surface-container-low' : (heroGelap ? 'text-white hover:bg-white/10' : 'text-on-surface hover:bg-surface-container-low')"
                         class="md:hidden p-2 -mr-2 rounded-xl transition-colors duration-300 outline-none focus-visible:ring-2 focus-visible:ring-primary flex items-center justify-center relative w-10 h-10"
                         aria-label="Toggle menu">
                     <span class="material-symbols-outlined absolute transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"

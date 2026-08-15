@@ -4,6 +4,7 @@
 @section('deskripsi', $desa->deskripsiMeta())
 @section('footer_margin', 'mt-0')
 @section('main_padding', 'pt-0')
+@section('header_transparan_gelap', 'true')
 
 @php
     use App\Support\Teks;
