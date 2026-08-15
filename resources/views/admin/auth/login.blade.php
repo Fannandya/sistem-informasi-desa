@@ -68,12 +68,6 @@
                     @enderror
                 </div>
 
-                <label class="flex items-center gap-2 text-sm text-slate-600">
-                    <input type="checkbox" name="remember" value="1"
-                           class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
-                    Ingat saya di perangkat ini
-                </label>
-
                 <button type="submit"
                         class="w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white
                                transition hover:bg-emerald-700 focus:ring-2 focus:ring-emerald-500/40 focus:outline-none">

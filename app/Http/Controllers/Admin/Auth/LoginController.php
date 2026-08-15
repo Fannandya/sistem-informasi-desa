@@ -32,9 +32,12 @@ class LoginController extends Controller
         $this->pastikanBelumDiblokir($kunci);
 
         $kredensial = $request->only('email', 'password');
-        $ingatSaya = $request->boolean('remember');
 
-        if (! Auth::guard('admin')->attempt($kredensial, $ingatSaya)) {
+        // Tidak ada opsi "ingat saya": remember-token Laravel berlaku ~5
+        // tahun dan berjalan lepas dari EnsureAdminSessionNotExpired, jadi
+        // kalau diaktifkan, timeout sesi yang wajib menurut PRD 8 tidak akan
+        // pernah berlaku lagi untuk perangkat yang mencentangnya.
+        if (! Auth::guard('admin')->attempt($kredensial)) {
             RateLimiter::hit($kunci, self::DETIK_BLOKIR);
 
             // Pesan sengaja dibuat sama untuk email salah maupun kata sandi

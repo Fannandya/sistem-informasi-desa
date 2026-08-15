@@ -70,7 +70,7 @@ php artisan admin:buat --nama="Sekretaris Desa" --email=sekdes@desa.test
 php artisan admin:reset-sandi admin@desa.test
 ```
 
-`admin:reset-sandi` juga mengosongkan token "ingat saya", sehingga sesi lama di perangkat lain langsung tidak berlaku.
+Sistem ini tidak punya fitur "ingat saya" (remember me) — sengaja dihapus karena token-nya berlaku ~5 tahun dan berjalan lepas dari timeout sesi 60–120 menit yang wajib menurut PRD 8. Setiap sesi mengikuti `SESSION_LIFETIME` tanpa pengecualian. `admin:reset-sandi` tetap mengosongkan kolom `remember_token` sebagai langkah jaga-jaga bila ada sisa data lama.
 
 > **Penting:** bila seluruh akun admin kehilangan kata sandinya dan Anda tidak punya akses terminal ke server, sistem tidak dapat dipulihkan lewat web. Pastikan akses SSH atau Terminal cPanel tersedia sebelum dipakai produksi.
 
