@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\PengaturanDesa;
 use App\Services\LayananUnggahGambar;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Throwable;
@@ -18,6 +19,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        if ($this->app->environment('production')) {
+            URL::forceScheme('https');
+        }
+
         $this->bagikanPengaturanDesa();
     }
 
