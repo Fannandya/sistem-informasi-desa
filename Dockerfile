@@ -13,13 +13,14 @@ RUN npm run build
 # ==============================================================================
 FROM composer:2 AS vendor
 WORKDIR /app
-COPY composer*.json ./
+COPY composer.json composer.lock ./
 RUN composer install \
     --no-dev \
     --no-interaction \
     --prefer-dist \
     --optimize-autoloader \
-    --no-scripts
+    --no-scripts \
+    --ignore-platform-reqs
 
 # ==============================================================================
 # Stage 3: Production Runtime (PHP 8.2-FPM + Nginx + Supervisor)
@@ -73,6 +74,9 @@ RUN { \
         echo 'max_execution_time = 300'; \
     } > /usr/local/etc/php/conf.d/laravel.ini
 
+# Copy composer binary from official image
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
 # Set working directory
 WORKDIR /var/www/html
 
@@ -92,8 +96,7 @@ COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Run composer post-autoload-dump to discover packages
-RUN composer --version || curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
-    && composer dump-autoload --optimize --no-dev --classmap-authoritative
+RUN composer dump-autoload --optimize --no-dev --classmap-authoritative
 
 # Ensure proper ownership
 RUN chown -R www-data:www-data /var/www/html \
