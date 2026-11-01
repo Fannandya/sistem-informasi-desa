@@ -1,0 +1,62 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: desa-app
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    env_file:
+      - .env
+    volumes:
+      - ./storage/app/public:/var/www/html/storage/app/public
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - desa-network
+
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: desa-queue
+    restart: unless-stopped
+    command: ["php", "artisan", "queue:work", "--sleep=3", "--tries=3"]
+    env_file:
+      - .env
+    volumes:
+      - ./storage/app/public:/var/www/html/storage/app/public
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - desa-network
+
+  db:
+    image: mariadb:10.11
+    container_name: desa-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${DB_PASSWORD}
+      MARIADB_DATABASE: ${DB_DATABASE:-sistem_informasi_desa}
+      MARIADB_USER: ${DB_USERNAME:-desa_user}
+      MARIADB_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - desa-db-data:/var/lib/mysql
+    networks:
+      - desa-network
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  desa-db-data:
+    driver: local
+
+networks:
+  desa-network:
+    driver: bridge

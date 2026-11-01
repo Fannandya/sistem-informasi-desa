@@ -49,3 +49,8 @@ PRODUCT.md
 # Knowledge graph lokal (/graphify) - regenerable, tidak perlu di-commit
 graphify-out/
 
+# Backup/deploy archives
+*.zip
+*.sql
+
+
